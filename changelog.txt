@@ -1,0 +1,4 @@
+*** TradeSafe Changelog ***
+
+2018-01-14 - version 1.0.0
+ * Update -
