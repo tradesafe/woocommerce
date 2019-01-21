@@ -72,8 +72,9 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 		add_action( 'woocommerce_api_wc_gateway_tradesafe', array( $this, 'check_itn_response' ) );
 		add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
 		add_action( 'woocommerce_receipt_tradesafe', array( $this, 'receipt_page' ) );
-        add_action( 'woocommerce_order_status_cancelled', 'order_status_cancelled' );
-		add_action( 'admin_notices', array( $this, 'admin_notices' ) );
+        add_action( 'woocommerce_cancelled_order', array($this, 'order_status_cancelled'));
+        add_action( 'admin_notices', array( $this, 'admin_notices' ) );
+        print "###";
 
     }
 
@@ -1089,7 +1090,7 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 
 		$results = wp_remote_request( $api_endpoint, $api_args );
 
-		if ( 200 !== $results['response']['code'] && 201 !== $results['response']['code']) {
+		if (isset($results['response']['code']) && 200 !== $results['response']['code'] && 201 !== $results['response']['code']) {
 			$this->log( "Error posting API request:\n" . print_r( $results['response'], true ) );
 			return new WP_Error( $results['response']['code'], $results['response']['message'], $results );
 		}
@@ -1427,17 +1428,4 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 			. __( 'TradeSafe requires a token to work.', 'woocommerce-gateway-tradesafe' )
 			. '</p></div>';
 	}
-
-	/**
-     *
-     */
-	public function order_status_cancelled($order) {
-	    $data = array(
-            'id' => $order->get_meta('tradesafe_id'),
-            'step' => 'DECLINED',
-        );
-
-        $response = $this->api_request('contract/' . $order->get_meta('tradesafe_id'), array('body' => $data), 'PUT');
-        print_r($response);
-    }
 }
