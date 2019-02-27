@@ -66,7 +66,6 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway
         // Setup the test data, if in test mode.
         if ('yes' === $this->get_option('testmode')) {
             $this->url = 'https://sandbox.tradesafe.co.za/api';
-            $this->url = 'http://local.tradesafe.co.za/api';
             $this->add_testmode_admin_settings_notice();
         } else {
             $this->send_debug_email = false;
@@ -77,6 +76,8 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway
         add_action('woocommerce_receipt_tradesafe', array($this, 'receipt_page'));
         add_action('woocommerce_cancelled_order', array($this, 'order_status_cancelled'));
         add_action('admin_notices', array($this, 'admin_notices'));
+
+        add_option( 'tradesafe_verify_last_check', '64', '', true );
 
     }
 
@@ -89,6 +90,7 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway
     {
         $countries_obj = new WC_Countries();
         $countries = $countries_obj->get_countries();
+        $this->update_option('tradesafe_verify_last_check', 0);
 
         $this->form_fields = array(
             'enabled' => array(
@@ -131,7 +133,7 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway
                 'description' => __('Please select that you are a Seller or an Agent', 'woocommerce-gateway-tradesafe'),
                 'options' => array(
                     'seller' => __('Seller', 'woocommerce-gateway-tradesafe'),
-                    'agent' => __('Agent or Broker', 'woocommerce-gateway-tradesafe')
+                    'marketplace' => __('Agent or Broker', 'woocommerce-gateway-tradesafe')
                 ),
                 'default' => 'seller',
             ),
@@ -248,11 +250,39 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway
     {
         $is_available = false;
         $is_available_currency = in_array(get_woocommerce_currency(), $this->available_currencies);
+        $last_check = (int) $this->get_option('tradesafe_verify_last_check');
 
-        $id_valid = $this->valid_id_number($this->get_option('id_number'));
-
-        if ($is_available_currency && $this->api_key && $id_valid) {
+        if ($is_available_currency && $this->api_key) {
             $is_available = true;
+        }
+
+        $data = [
+            'first_name' => $this->get_option('first_name'),
+            'last_name' => $this->get_option('last_name'),
+            'email' => $this->get_option('email'),
+            'mobile_country' => $this->get_option('mobile_country'),
+            'mobile' => $this->get_option('mobile'),
+            'id_number' => $this->get_option('id_number'),
+        ];
+
+        if (0 > ($last_check + 86400) - time()) {
+            $response = $this->api_request('verify/owner', array('body' => $data));
+
+            if (is_object($response) && 'WP_Error' === get_class($response)) {
+                $is_available = false;
+                foreach ($response->errors as $code => $message) {
+                    add_action( 'admin_notices', function() use ($code, $message) {
+                        echo '<div class="error tradesafe-' . $code . '"><p>'
+                            . '<strong>'
+                            . __('TradeSafe Escrow: ', 'woocommerce-gateway-tradesafe')
+                            . '</strong><br />'
+                            . __($message[0], 'woocommerce-gateway-tradesafe')
+                            . '</p></div>';
+                    });
+                }
+            } else {
+                $this->update_option('tradesafe_verify_last_check', time());
+            }
         }
 
         return $is_available;
@@ -344,17 +374,19 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway
             } else {
                 $data["fee_allocation"] = 1;
 
-                $data["buyer"] = array(
-                    "first_name" => "Buyer",
-                    "email" => "buyer@tradesafe.co.za",
-                    "mobile_country" => "ZA",
-                    "mobile" => "0100000001",
-                    "id_number" => "1901010001087",
-                    "bank" => "ABC",
-                    "number" => "0123456789",
-                    "branch_code" => "123456",
-                    "type" => "CHEQUE"
-                );
+                $user = wp_get_current_user();
+                $user_data = $this->api_request('user/' . $user->user_email, array(), 'get');
+
+                if (!is_wp_error($user_data) && isset($user_data['Account'])) {
+                    $data["buyer"] = array(
+                        "first_name" => $user_data['Account']['first_name'],
+                        "last_name" => $user_data['Account']['last_name'],
+                        "email" => $user_data['User']['email'],
+                        "mobile_country" => $user_data['Account']['mobile_country'],
+                        "mobile" => $user_data['Account']['mobile'],
+                        "id_number" => $user_data['Account']['id_number']
+                    );
+                }
 
                 $data["seller"] = array(
                     "first_name" => $this->get_option('first_name'),
@@ -364,6 +396,13 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway
                     "mobile" => $this->get_option('mobile'),
                     "id_number" => $this->get_option('id_number'),
                 );
+            }
+
+            $verify_response = $this->api_request('validate/contract', array('body' => $data));
+            if (!is_wp_error($verify_response) && isset($verify_response['errors'])) {
+                $output = '<p><strong>ERROR:</strong> ' . $verify_response['errors'][0] . '</p>';
+                $output .= '<a class="button cancel" href="' . $order->get_cancel_order_url() . '">' . __('Cancel order &amp; restore cart', 'woocommerce-gateway-tradesafe') . '</a>';
+                return $output;
             }
 
             $response = $this->api_request('contract', array('body' => $data));
@@ -1119,6 +1158,12 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway
             return new WP_Error('404', __('A token is required to submit a request to the TradeSafe API', 'woocommerce-gateway-tradesafe'), null);
         }
 
+
+        // Setup the test data, if in test mode.
+        if ('yes' === $this->get_option('testmode')) {
+            $this->url = 'https://sandbox.tradesafe.co.za/api';
+        }
+
         $api_endpoint = sprintf('%s/%s', $this->url, $command);
 
         $api_args['timeout'] = 45;
@@ -1134,9 +1179,15 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway
 
         $results = wp_remote_request($api_endpoint, $api_args);
 
+        if (is_object($results) && 'WP_Error' === get_class($results)) {
+            return $results;
+        }
+
         if (isset($results['response']['code']) && 200 !== $results['response']['code'] && 201 !== $results['response']['code']) {
             $this->log("Error posting API request:\n" . print_r($results['response'], true));
-            return new WP_Error($results['response']['code'], $results['response']['message'], $results);
+            $message = json_decode($results['body'], true);
+            $message_string = implode('<br />', $message['errors']);
+            return new WP_Error($results['response']['code'], $message_string, $results);
         }
 
         $maybe_json = json_decode($results['body'], true);
@@ -1472,27 +1523,20 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway
      */
     public function admin_notices()
     {
-        static $id_valid;
-
         if ('yes' !== $this->get_option('enabled')) {
             return;
         }
 
         if (empty($this->api_key)) {
             echo '<div class="error tradesafe-passphrase-message"><p>'
+                . '<strong>'
+                . __('TradeSafe Escrow: ', 'woocommerce-gateway-tradesafe')
+                . '</strong><br />'
                 . __('TradeSafe requires a token to work.', 'woocommerce-gateway-tradesafe')
                 . '</p></div>';
         }
-
-        if (!isset($id_valid)) {
-            $id_valid = $this->valid_id_number($this->get_option('id_number'));
-            if (!$id_valid) {
-                echo '<div class="error tradesafe-passphrase-message"><p>'
-                    . __('Invalid ID Number.', 'woocommerce-gateway-tradesafe')
-                    . '</p></div>';
-            }
-        }
     }
+
 
     /**
      * Check if ID number is valid.

@@ -169,10 +169,153 @@ function update_tradesafe_profile( $user_id ) {
 }
 
 /**
+ * Cancel Order
+ */
+add_action('woocommerce_order_status_pending_to_cancelled', 'woocommerce_tradesafe_cancel_order', 0, 1);
+function woocommerce_tradesafe_cancel_order($order_id) {
+    $order = wc_get_order( $order_id );
+
+    if ($order->meta_exists('tradesafe_id')) {
+        $data = array(
+                'step' => 'DECLINED',
+        );
+
+        $response = woocommerce_tradesafe_api_request('contract/' . $order->get_meta('tradesafe_id'), array('body' => $data), 'PUT');
+    }
+}
+
+/**
+ * Send off API request.
+ *
+ * @since 1.4.0 introduced.
+ *
+ * @param $command
+ * @param $token
+ * @param $api_args
+ * @param string $method GET | PUT | POST | DELETE.
+ *
+ * @return bool|WP_Error
+ */
+function woocommerce_tradesafe_api_request( $command, $api_args, $method = 'POST' ) {
+    $settings = get_option('woocommerce_tradesafe_settings');
+    $url = 'https://www.tradesafe.co.za/api';
+    $token = $settings['json_web_token'];
+
+    if ( 'yes' === $settings['testmode'] ) {
+        $url = 'https://sandbox.tradesafe.co.za/api';
+    }
+
+    if ( empty( $token ) ) {
+        error_log( "Error posting API request: No token supplied", true );
+        return new WP_Error( '404', __( 'A token is required to submit a request to the TradeSafe API', 'woocommerce-gateway-tradesafe' ), null );
+    }
+
+    $api_endpoint  = sprintf('%s/%s', $url, $command);
+
+    $api_args['timeout'] = 45;
+    $api_args['headers'] = array(
+        'Authorization' => 'Bearer ' . $token,
+        'Content-Type'   => 'application/json',
+    );
+
+    if (isset($api_args['body'])) {
+        $api_args['body'] = json_encode($api_args['body']);
+    }
+    $api_args['method'] = strtoupper( $method );
+
+    $results = wp_remote_request( $api_endpoint, $api_args );
+
+    if (isset($results['response']['code']) && 200 !== $results['response']['code'] && 201 !== $results['response']['code']) {
+        error_log( "Error posting API request:\n" . print_r( $results['response'], true ) );
+        return new WP_Error( $results['response']['code'], $results['response']['message'], $results );
+    }
+
+    $maybe_json = json_decode( $results['body'], true );
+
+    if ( ! is_null( $maybe_json ) && isset($maybe_json['error']) ) {
+        error_log( "Error posting API request:\n" . print_r( $results['body'], true ) );
+
+        // Use trim here to display it properly e.g. on an order note, since TradeSafe can include CRLF in a message.
+        return new WP_Error( 422, trim( $maybe_json['error'] ), $results['body'] );
+    }
+
+    return $maybe_json;
+}
+
+/**
  * Add the gateway to WooCommerce
  * @since 1.0.0
  */
 function woocommerce_tradesafe_add_gateway( $methods ) {
 	$methods[] = 'WC_Gateway_TradeSafe';
 	return $methods;
+}
+
+add_filter( 'woocommerce_available_payment_gateways', 'woocommerce_tradesafe_valid_transaction' );
+function woocommerce_tradesafe_valid_transaction($available_gateways) {
+    $user = wp_get_current_user();
+    $user_id = get_user_meta($user->id, 'tradesafe_id', true);
+
+    if (!$user_id && isset($available_gateways['tradesafe'])) {
+        unset($available_gateways['tradesafe']);
+    }
+
+    return $available_gateways;
+}
+
+/*
+ * Add Link (Tab) to My Account menu
+ */
+add_filter ( 'woocommerce_account_menu_items', 'woocommerce_tradesafe_account_tab', 40 );
+function woocommerce_tradesafe_account_tab($menu_links){
+    $menu_links = array_slice( $menu_links, 0, 5, true )
+        + array( 'tradesafe' => 'TradeSafe Details' )
+        + array_slice( $menu_links, 5, NULL, true );
+
+    return $menu_links;
+}
+
+add_action( 'init', 'woocommerce_tradesafe_account' );
+function woocommerce_tradesafe_account() {
+    add_rewrite_endpoint( 'tradesafe', EP_PAGES );
+}
+
+add_action( 'woocommerce_account_tradesafe_endpoint', 'woocommerce_tradesafe_account_content' );
+function woocommerce_tradesafe_account_content() {
+    $settings = get_option('woocommerce_tradesafe_settings');
+    $url = 'https://www.tradesafe.co.za/api';
+    $token = $settings['json_web_token'];
+
+    if ( 'yes' === $settings['testmode'] ) {
+        $url = 'https://sandbox.tradesafe.co.za/api';
+    }
+
+    $user = wp_get_current_user();
+    $user_id = get_user_meta($user->id, 'tradesafe_id', true);
+
+    if (!$user_id) {
+        $api_endpoint  = sprintf('%s/%s', $url, 'user/' . $user->user_email);
+    } else {
+        $api_endpoint  = sprintf('%s/%s', $url, 'user/' . $user_id);
+    }
+
+    $api_args['timeout'] = 45;
+    $api_args['headers'] = array(
+        'Authorization' => 'Bearer ' . $token,
+        'Content-Type'   => 'application/json',
+    );
+
+    $response = wp_remote_request($api_endpoint, $api_args);
+
+    if ( ! is_wp_error( $response ) ) {
+        if ( 200 == wp_remote_retrieve_response_code( $response ) ) {
+            $body = json_decode($response['body']);
+            add_user_meta($user->id, 'tradesafe_id', $body->User->username, true);
+            print "Account linked!";
+        } else {
+            print 'Could not link TradeSafe Account';
+        }
+    } else {
+        print 'Could not link TradeSafe Account';
+    }
 }
