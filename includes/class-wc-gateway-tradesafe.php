@@ -403,6 +403,10 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway
                 $output = '<p><strong>ERROR:</strong> ' . $verify_response['errors'][0] . '</p>';
                 $output .= '<a class="button cancel" href="' . $order->get_cancel_order_url() . '">' . __('Cancel order &amp; restore cart', 'woocommerce-gateway-tradesafe') . '</a>';
                 return $output;
+            } elseif (is_wp_error($verify_response)) {
+                $output = '<p>An error occured.</p>';
+                $output .= '<a class="button cancel" href="' . $order->get_cancel_order_url() . '">' . __('Cancel order &amp; restore cart', 'woocommerce-gateway-tradesafe') . '</a>';
+                return $output;
             }
 
             $response = $this->api_request('contract', array('body' => $data));
