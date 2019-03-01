@@ -282,40 +282,172 @@ function woocommerce_tradesafe_account() {
 
 add_action( 'woocommerce_account_tradesafe_endpoint', 'woocommerce_tradesafe_account_content' );
 function woocommerce_tradesafe_account_content() {
-    $settings = get_option('woocommerce_tradesafe_settings');
-    $url = 'https://www.tradesafe.co.za/api';
-    $token = $settings['json_web_token'];
-
-    if ( 'yes' === $settings['testmode'] ) {
-        $url = 'https://sandbox.tradesafe.co.za/api';
-    }
+	$gateway = new WC_Gateway_TradeSafe();
 
     $user = wp_get_current_user();
     $user_id = get_user_meta($user->id, 'tradesafe_id', true);
 
     if (!$user_id) {
-        $api_endpoint  = sprintf('%s/%s', $url, 'user/' . $user->user_email);
+        $api_endpoint  = 'user/' . $user->user_email;
     } else {
-        $api_endpoint  = sprintf('%s/%s', $url, 'user/' . $user_id);
+        $api_endpoint  = 'user/' . $user_id;
     }
 
-    $api_args['timeout'] = 45;
-    $api_args['headers'] = array(
-        'Authorization' => 'Bearer ' . $token,
-        'Content-Type'   => 'application/json',
-    );
-
-    $response = wp_remote_request($api_endpoint, $api_args);
+//	$response = $gateway->api_request($api_endpoint, array(), 'GET');
+    $response = '';
 
     if ( ! is_wp_error( $response ) ) {
-        if ( 200 == wp_remote_retrieve_response_code( $response ) ) {
-            $body = json_decode($response['body']);
-            add_user_meta($user->id, 'tradesafe_id', $body->User->username, true);
-            print "Account linked!";
+        if ( isset($response['User']['username']) ) {
+            add_user_meta($user->id, 'tradesafe_id', $response['User']['username'], true);
+
+            print '<div class="row"><strong>First Name:</strong> ' . $response['Account']['first_name'] . '</div>';
+            print '<div class="row"><strong>Last Name:</strong> ' . $response['Account']['last_name'] . '</div>';
+	        print '<div class="row"><strong>Email:</strong> ' . $response['User']['email'] . '</div>';
+            print '<div class="row"><strong>ID Number:</strong> ' . $response['Account']['id_number'] . '</div>';
+            print '<div class="row"><strong>Mobile Number:</strong> ' . $response['Account']['mobile'] . '</div>';
+
+            if ('yes' === $gateway->testmode) {
+                $link = 'https://sandbox.tradesafe.co.za/login';
+            } else {
+	            $link = 'https://www.tradesafe.co.za/login';
+            }
+
+	        print '<a href="' . $link . '" target="_blank">Update TradeSafe Account</a>';
         } else {
-            print 'Could not link TradeSafe Account';
+	        woocommerce_tradesafe_account_form();
         }
     } else {
-        print 'Could not link TradeSafe Account';
+	    print 'Account incomplete';
+
+	    if ('yes' === $gateway->debug) {
+		    foreach ($response->errors as $code => $errors) {
+			    print '<div class="row"><strong>Error Code:</strong> ' . $code . '</div>';
+			    print '<div class="row"><strong>Error Messages:</strong><br/>' . implode('<br/>', $errors) . '</div>';
+            }
+	    }
+
+	    woocommerce_tradesafe_account_form();
     }
 }
+
+function  woocommerce_tradesafe_account_form() {
+	$user = wp_get_current_user();
+    $banks = array(
+            "632005" => "Absa Bank",
+            "430000" => "African Bank",
+            "470010" => "Capitec Bank",
+            "250655" => "First National Bank / Rand Merchant Bank",
+            "580105" => "Investec Bank",
+            "450105" => "Mercantile Bank",
+            "490991" => "MTN Banking",
+            "198765" => "Nedbank (South Africa)",
+            "460005" => "Postbank",
+            "051001" => "Standard Bank (South Africa)",
+    );
+    $account_types = array(
+            "CHEQUE" => "Cheque/Current Account",
+            "SAVINGS" => "Savings Account",
+            "TRANSMISSION" =>"Transmission Account",
+            "BOND" => "Bond Account",
+    );
+	if ( ! empty( $_POST ) ) {
+		$gateway = new WC_Gateway_TradeSafe();
+		$data = array(
+		        'first_name' => get_user_meta($user->id, 'first_name',true),
+		        'last_name' => get_user_meta($user->id, 'last_name',true),
+		        'email' => $user->user_email,
+		        'mobile_country' => 'ZA',
+		        'mobile' => $_POST['account_mobile_number'],
+		        'id_number' => $_POST['account_id_number'],
+		        'bank' => $banks[$_POST['account_bank_name']],
+		        'number' => $_POST['account_bank_number'],
+		        'branch_code' => $_POST['account_bank_name'],
+		        'type' => $_POST['account_bank_type'],
+        );
+
+		$response = $gateway->api_request('verify/user', array('body' => $data));
+
+		if (! is_wp_error($response)) {
+			update_user_meta($user->id, 'account_id_number', $data['id_number']);
+			update_user_meta($user->id, 'account_mobile_number', $data['mobile']);
+			update_user_meta($user->id, 'account_bank_name', $data['branch_code']);
+			update_user_meta($user->id, 'account_bank_number', $data['number']);
+			update_user_meta($user->id, 'account_bank_type', $data['type']);
+        } else {
+			foreach ($response->errors as $code => $errors) {
+				print '<div class="row"><strong>Error:</strong><br/>' . implode('<br/>', $errors) . '</div>';
+			}
+        }
+	} else {
+	    $_POST = array(
+	            'account_id_number' => get_user_meta($user->id, 'account_id_number', true),
+	            'account_mobile_number' => get_user_meta($user->id, 'account_mobile_number', true),
+	            'account_bank_name' => get_user_meta($user->id, 'account_bank_name', true),
+	            'account_bank_number' => get_user_meta($user->id, 'account_bank_number', true),
+	            'account_bank_type' => get_user_meta($user->id, 'account_bank_type', true),
+        );
+    }
+    ?>
+    <form class="woocommerce-EditAccountForm edit-account" action="" method="post">
+        <h3><?php esc_html_e( 'Personal Information', 'tradesafe' ); ?></h3>
+
+        <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+            <label for="account_id_number"><?php esc_html_e( 'ID Number', 'tradesafe' ); ?>&nbsp;<span class="required">*</span></label>
+            <input type="text" class="woocommerce-Input woocommerce-Input--text input-text" name="account_id_number" id="account_id_number" value="<?php print $_POST['account_id_number']; ?>" required="required">
+        </p>
+
+        <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+            <label for="account_mobile_number"><?php esc_html_e( 'Mobile Number', 'tradesafe' ); ?>&nbsp;<span class="required">*</span></label>
+            <input type="text" class="woocommerce-Input woocommerce-Input--text input-text" name="account_mobile_number" id="account_mobile_number" value="<?php print $_POST['account_mobile_number']; ?>" required="required">
+        </p>
+
+        <h3><?php esc_html_e( 'Banking Details', 'tradesafe' ); ?></h3>
+
+        <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+            <label for="account_bank_name"><?php esc_html_e( 'Bank', 'tradesafe' ); ?>&nbsp;<span class="required">*</span></label>
+            <select class="woocommerce-Input woocommerce-Input--select input-select" name="account_bank_name" id="account_bank_name" required="required">
+                <option value="">-- Select your Bank --</option>
+                <?php
+                    foreach ($banks as $branch_code => $bank_name) {
+                        if ($_POST['account_bank_name'] == $branch_code) {
+	                        print '<option value="' . $branch_code .  '" selected>' . $bank_name . '</option>';
+                        } else {
+	                        print '<option value="' . $branch_code .  '">' . $bank_name . '</option>';
+                        }
+                    }
+                ?>
+            </select>
+        </p>
+
+        <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+            <label for="account_bank_number"><?php esc_html_e( 'Account Number', 'tradesafe' ); ?>&nbsp;<span class="required">*</span></label>
+            <input type="text" class="woocommerce-Input woocommerce-Input--text input-text" name="account_bank_number" id="account_bank_number" value="<?php print $_POST['account_bank_number']; ?>" required="required">
+        </p>
+
+<!--        <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">-->
+<!--            <label for="account_bank_code">--><?php //esc_html_e( 'Branch Code', 'tradesafe' ); ?><!--&nbsp;<span class="required">*</span></label>-->
+<!--            <input type="text" class="woocommerce-Input woocommerce-Input--text input-text" name="account_bank_code" id="account_bank_code" value="--><?php //print $_POST['account_bank_code']; ?><!--" required="required">-->
+<!--        </p>-->
+
+        <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+            <label for="account_bank_type"><?php esc_html_e( 'Account Type', 'tradesafe' ); ?>&nbsp;<span class="required">*</span></label>
+            <select class="woocommerce-Input woocommerce-Input--select input-select" name="account_bank_type" id="account_bank_type" required="required">
+                <option value="">-- Select Account Type --</option>
+	            <?php
+	            foreach ($account_types as $account_code => $account_name) {
+		            if ($_POST['account_bank_type'] == $account_code) {
+			            print '<option value="' . $account_code .  '" selected>' . $account_name . '</option>';
+		            } else {
+			            print '<option value="' . $account_code .  '">' . $account_name . '</option>';
+		            }
+	            }
+	            ?>
+            </select>
+        </p>
+
+        <p>
+            <button type="submit" class="woocommerce-Button button" name="save_account_details" value="Save changes">Save changes</button>
+        </p>
+    </form>
+
+<?php }

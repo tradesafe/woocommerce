@@ -61,13 +61,16 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway
         $this->send_debug_email = 'yes' === $this->get_option('send_debug_email');
         $this->description = $this->get_option('description');
         $this->enabled = $this->is_valid_for_use() ? 'yes' : 'no'; // Check if the base currency supports this gateway.
-        $this->enable_logging = 'yes' === $this->get_option('enable_logging');
+        $this->enable_logging = 'yes' === $this->get_option('enable_logging') ? 'yes' : 'no';
+        $this->debug = 'yes' === $this->get_option('enable_debugging') ? 'yes' : 'no';
 
         // Setup the test data, if in test mode.
         if ('yes' === $this->get_option('testmode')) {
+	        $this->testmode = 'yes';
             $this->url = 'https://sandbox.tradesafe.co.za/api';
             $this->add_testmode_admin_settings_notice();
         } else {
+	        $this->testmode = 'no';
             $this->send_debug_email = false;
         }
 
@@ -221,7 +224,13 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway
             'enable_logging' => array(
                 'title' => __('Enable Logging', 'woocommerce-gateway-tradesafe'),
                 'type' => 'checkbox',
-                'label' => __('Enable transaction logging for gateway.', 'woocommerce-gateway-tradesafe'),
+                'label' => __('Enable transaction logging for the gateway.', 'woocommerce-gateway-tradesafe'),
+                'default' => 'no',
+            ),
+            'enable_debugging' => array(
+                'title' => __('Enable API Debugging', 'woocommerce-gateway-tradesafe'),
+                'type' => 'checkbox',
+                'label' => __('Enable API debugging for the gateway.', 'woocommerce-gateway-tradesafe'),
                 'default' => 'no',
             ),
         );
@@ -268,7 +277,7 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway
         if (0 > ($last_check + 86400) - time()) {
             $response = $this->api_request('verify/owner', array('body' => $data));
 
-            if (is_object($response) && 'WP_Error' === get_class($response)) {
+            if (is_wp_error($response)) {
                 $is_available = false;
                 foreach ($response->errors as $code => $message) {
                     add_action( 'admin_notices', function() use ($code, $message) {
@@ -321,6 +330,25 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway
         if ($order->meta_exists('tradesafe_id')) {
             $response = $this->api_request('contract/' . $order->get_meta('tradesafe_id'), array(), 'GET');
         } else {
+	        $banks = array(
+		        "632005" => "Absa Bank",
+		        "430000" => "African Bank",
+		        "470010" => "Capitec Bank",
+		        "250655" => "First National Bank / Rand Merchant Bank",
+		        "580105" => "Investec Bank",
+		        "450105" => "Mercantile Bank",
+		        "490991" => "MTN Banking",
+		        "198765" => "Nedbank (South Africa)",
+		        "460005" => "Postbank",
+		        "051001" => "Standard Bank (South Africa)",
+	        );
+	        $account_types = array(
+		        "CHEQUE" => "Cheque/Current Account",
+		        "SAVINGS" => "Savings Account",
+		        "TRANSMISSION" =>"Transmission Account",
+		        "BOND" => "Bond Account",
+	        );
+
             $data = array(
                 "name" => get_bloginfo('name') . ' - Order ' . $order->get_order_number(),
                 "reference" => get_site_url(null, null, null) . '|' . self::get_order_prop($order, 'order_key'),
@@ -375,18 +403,19 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway
                 $data["fee_allocation"] = 1;
 
                 $user = wp_get_current_user();
-                $user_data = $this->api_request('user/' . $user->user_email, array(), 'get');
 
-                if (!is_wp_error($user_data) && isset($user_data['Account'])) {
-                    $data["buyer"] = array(
-                        "first_name" => $user_data['Account']['first_name'],
-                        "last_name" => $user_data['Account']['last_name'],
-                        "email" => $user_data['User']['email'],
-                        "mobile_country" => $user_data['Account']['mobile_country'],
-                        "mobile" => $user_data['Account']['mobile'],
-                        "id_number" => $user_data['Account']['id_number']
-                    );
-                }
+                $data["buyer"] = array(
+	                'first_name' => get_user_meta($user->id, 'first_name',true),
+	                'last_name' => get_user_meta($user->id, 'last_name',true),
+	                'email' => $user->user_email,
+	                'mobile_country' => 'ZA',
+	                'mobile' => get_user_meta($user->id, 'account_mobile_number', true),
+	                'id_number' => get_user_meta($user->id, 'account_id_number', true),
+	                'bank' => $banks[get_user_meta($user->id, 'account_bank_name', true)],
+	                'number' => get_user_meta($user->id, 'account_bank_number', true),
+	                'branch_code' => get_user_meta($user->id, 'account_bank_name', true),
+	                'type' => get_user_meta($user->id, 'account_bank_type', true),
+                );
 
                 $data["seller"] = array(
                     "first_name" => $this->get_option('first_name'),
@@ -406,6 +435,14 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway
             } elseif (is_wp_error($verify_response)) {
                 $output = '<p>An error occured.</p>';
                 $output .= '<a class="button cancel" href="' . $order->get_cancel_order_url() . '">' . __('Cancel order &amp; restore cart', 'woocommerce-gateway-tradesafe') . '</a>';
+
+	            if ('yes' === $this->debug) {
+		            foreach ($verify_response->errors as $code => $errors) {
+			            $output .= '<div class="row"><strong>Error Code:</strong> ' . $code . '</div>';
+			            $output .=  '<div class="row"><strong>Error Messages:</strong><br/>' . implode('<br/>', $errors) . '</div>';
+		            }
+	            }
+
                 return $output;
             }
 
@@ -1161,7 +1198,6 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway
             $this->log("Error posting API request: No token supplied", true);
             return new WP_Error('404', __('A token is required to submit a request to the TradeSafe API', 'woocommerce-gateway-tradesafe'), null);
         }
-
 
         // Setup the test data, if in test mode.
         if ('yes' === $this->get_option('testmode')) {
