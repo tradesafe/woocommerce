@@ -257,7 +257,16 @@ function woocommerce_tradesafe_valid_transaction($available_gateways) {
     $user_id = get_user_meta($user->id, 'tradesafe_id', true);
 
     if (!$user_id && isset($available_gateways['tradesafe'])) {
-        unset($available_gateways['tradesafe']);
+	    if (get_user_meta($user->id, 'account_id_number', true) == '' ||
+            get_user_meta($user->id, 'account_mobile_number', true) == '' ||
+            get_user_meta($user->id, 'account_bank_name', true) == '' ||
+            get_user_meta($user->id, 'account_bank_number', true) == '' ||
+            get_user_meta($user->id, 'account_bank_type', true) == '') {
+		    unset($available_gateways['tradesafe']);
+		    if (isset($_REQUEST['wc-ajax'])) {
+			    print "<div>The TradeSafe Escrow Payment Gateway is currently disabled. Have you updated your <a href='" . get_site_url(null, 'my-account/tradesafe/') . "'>account</a>?</div>";
+            }
+        }
     }
 
     return $available_gateways;
