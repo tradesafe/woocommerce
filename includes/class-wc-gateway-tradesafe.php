@@ -327,8 +327,12 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway
     {
         $order = wc_get_order($order_id);
 
+	    $pay_url = $order->get_checkout_payment_url();
+	    $order_url = $order->get_view_order_url();
+
         if ($order->meta_exists('tradesafe_id')) {
             $response = $this->api_request('contract/' . $order->get_meta('tradesafe_id'), array(), 'GET');
+	        $response = $response['Contract'];
         } else {
 	        $banks = array(
 		        "632005" => "Absa Bank",
@@ -352,6 +356,8 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway
             $data = array(
                 "name" => get_bloginfo('name') . ' - Order ' . $order->get_order_number(),
                 "reference" => get_site_url(null, null, null) . '|' . self::get_order_prop($order, 'order_key'),
+                "success_url" => $order_url,
+                "failure_url" => $pay_url,
                 "industry" => $this->get_option('industry'),
                 "description" => sprintf(__('New order from %s. Order ID: %s', 'woocommerce-gateway-tradesafe'), get_bloginfo('name'), $order->get_order_number()),
                 "value" => (float)$order->get_total(),
@@ -428,6 +434,7 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway
             }
 
             $verify_response = $this->api_request('validate/contract', array('body' => $data));
+
             if (!is_wp_error($verify_response) && isset($verify_response['errors'])) {
                 $output = '<p><strong>ERROR:</strong> ' . $verify_response['errors'][0] . '</p>';
                 $output .= '<a class="button cancel" href="' . $order->get_cancel_order_url() . '">' . __('Cancel order &amp; restore cart', 'woocommerce-gateway-tradesafe') . '</a>';
@@ -453,17 +460,17 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway
             $order->save();
         }
 
-        $payfast_request = wp_remote_request($response['payfast_payment_url'], array('method' => 'GET'));
-        $payfast_json = json_decode($payfast_request['body'], true);
+        $ecentric_request = wp_remote_request($response['ecentric_payment_url'], array('method' => 'GET'));
+        $ecentric_json = json_decode($ecentric_request['body'], true);
 
         $payments = array(
             'eftsecure' => array(
                 'title' => 'Pay via Instant EFT',
                 'data' => $response['eftsecure_payment_url'],
             ),
-            'payfast' => array(
-                'title' => 'PayFast (Credit / Debit Card)',
-                'data' => $payfast_json['payfast_payment_button'],
+            'ecentric' => array(
+                'title' => 'Ecentric (Credit / Debit Card)',
+                'data' => $ecentric_json['ecentric_payment_button'],
             ),
             'manual' => array(
                 'title' => 'Pay via Manual EFT',
@@ -497,9 +504,9 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway
             'source' => 'WooCommerce-Free-Plugin',
         );
 
-        $output = $payments['payfast']['data']
+        $output = $payments['ecentric']['data']
             . '<a class="button" href="' . $payments['eftsecure']['data'] . '">' . __($payments['eftsecure']['title'], 'woocommerce-gateway-tradesafe') . '</a>'
-            . '<a class="button" href="' . $payments['manual']['data'] . '">' . __($payments['manual']['title'], 'woocommerce-gateway-tradesafe') . '</a>'
+            . '<a class="button" target="_blank" href="' . $payments['manual']['data'] . '">' . __($payments['manual']['title'], 'woocommerce-gateway-tradesafe') . '</a>'
             . '<a class="button cancel" href="' . $order->get_cancel_order_url() . '">' . __('Cancel order &amp; restore cart', 'woocommerce-gateway-tradesafe') . '</a>';
 
         return $output;

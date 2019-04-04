@@ -272,6 +272,70 @@ function woocommerce_tradesafe_valid_transaction($available_gateways) {
     return $available_gateways;
 }
 
+add_action( 'wp_loaded', function() {
+	if ( $_SERVER['REQUEST_METHOD'] === 'POST' && $_SERVER['HTTP_USER_AGENT'] === 'api.tradesafe.co.za') {
+	    $data = json_decode(file_get_contents('php://input'), true);
+
+		$query = new WC_Order_Query();
+		$query->set('customer', $data['counterparty_buyer_email']);
+		$orders = $query->get_orders();
+
+	    if (isset($data['step'])) {
+	        switch ($data['step']) {
+		        case "FUNDS_RECEIVED":
+			        foreach ( $orders as $order ) {
+				        $tradesafe_id = $order->get_meta('tradesafe_id');
+				        if ($tradesafe_id == $data['id']) {
+					        $order->update_status( 'processing', sprintf( __( 'Payment via TradeSafe.', 'woocommerce-gateway-tradesafe' ) ) );
+					        $data = array(
+						        'step' => 'SENT',
+					        );
+
+					        $response = woocommerce_tradesafe_api_request('contract/' . $tradesafe_id, array('body' => $data), 'PUT');
+                        }
+			        }
+			        break;
+                case "DECLINED":
+	                foreach ( $orders as $order ) {
+		                $tradesafe_id = $order->get_meta('tradesafe_id');
+		                if ($tradesafe_id == $data['id']) {
+			                $order->update_status( 'cancelled', sprintf( __( 'Payment via TradeSafe.', 'woocommerce-gateway-tradesafe' ) ) );
+		                }
+	                }
+                    break;
+	        }
+        }
+	}
+});
+
+add_filter( 'woocommerce_my_account_my_orders_actions', 'woocommerce_tradesafe_my_orders_actions', 100, 2 );
+function woocommerce_tradesafe_my_orders_actions($actions, $order) {
+
+	if ( $order->has_status( array( 'processing' ) ) ) {
+		// Set the action button
+		$actions['accept'] = array(
+			'url'       => '/tradesafe/accept/' . $order->get_id(),
+			'name'      => __( 'Accept', 'woocommerce-gateway-tradesafe' ),
+			'action'    => 'accept',
+		);
+
+		// Set the action button
+		$actions['extend'] = array(
+			'url'       => '/tradesafe/extend/' . $order->get_id(),
+			'name'      => __( 'Extend', 'woocommerce-gateway-tradesafe' ),
+			'action'    => 'extend',
+		);
+
+		// Set the action button
+		$actions['decline'] = array(
+			'url'       => '/tradesafe/decline/' . $order->get_id(),
+			'name'      => __( 'Decline', 'woocommerce-gateway-tradesafe' ),
+			'action'    => 'decline',
+		);
+	}
+	return $actions;
+}
+
 /*
  * Add Link (Tab) to My Account menu
  */
@@ -286,7 +350,42 @@ function woocommerce_tradesafe_account_tab($menu_links){
 
 add_action( 'init', 'woocommerce_tradesafe_account' );
 function woocommerce_tradesafe_account() {
-    add_rewrite_endpoint( 'tradesafe', EP_PAGES );
+    add_rewrite_endpoint( 'tradesafe', EP_PERMALINK | EP_PAGES | EP_ROOT);
+}
+
+add_action( 'pre_get_posts', 'woocommerce_tradesafe_order_actions' );
+function woocommerce_tradesafe_order_actions( $query ) {
+	if ( $query->is_main_query() ) {
+	    $action = $query->query['pagename'];
+
+		// this is for security!
+		$allowed_actions = array('tradesafe/accept', 'tradesafe/extend', 'tradesafe/decline');
+
+		if ( in_array($action, $allowed_actions) ) {
+			$order_id = $query->query['page'];
+			$order = wc_get_order($order_id);
+			$tradesafe_id = $order->get_meta('tradesafe_id');
+
+			switch ( $action ) {
+				case 'tradesafe/accept':
+					$data = array(
+						'step' => 'GOODS_ACCEPTED',
+					);
+
+					$response = woocommerce_tradesafe_api_request('contract/' . $tradesafe_id, array('body' => $data), 'PUT');
+
+					$order->update_status( 'completed', sprintf( __( 'Payment via TradeSafe.', 'woocommerce-gateway-tradesafe' ) ) );
+				    break;
+				case 'tradesafe/extend':
+					break;
+				case 'tradesafe/decline':
+					break;
+			}
+
+			wp_redirect('/my-account/orders/');
+			exit;
+		}
+	}
 }
 
 add_action( 'woocommerce_account_tradesafe_endpoint', 'woocommerce_tradesafe_account_content' );
@@ -302,8 +401,8 @@ function woocommerce_tradesafe_account_content() {
         $api_endpoint  = 'user/' . $user_id;
     }
 
-//	$response = $gateway->api_request($api_endpoint, array(), 'GET');
-    $response = '';
+	$response = $gateway->api_request($api_endpoint, array(), 'GET');
+//    $response = '';
 
     if ( ! is_wp_error( $response ) ) {
         if ( isset($response['User']['username']) ) {
