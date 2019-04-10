@@ -273,7 +273,7 @@ function woocommerce_tradesafe_valid_transaction($available_gateways) {
 }
 
 add_action( 'wp_loaded', function() {
-    if (is_user_logged_in()) {
+    if (is_user_logged_in() && !current_user_can('administrator')) {
 	    $user = wp_get_current_user();
 
 	    $first_name = get_user_meta($user->id, 'first_name',true);
