@@ -273,6 +273,43 @@ function woocommerce_tradesafe_valid_transaction($available_gateways) {
 }
 
 add_action( 'wp_loaded', function() {
+    if (is_user_logged_in()) {
+	    $user = wp_get_current_user();
+
+	    $first_name = get_user_meta($user->id, 'first_name',true);
+	    $last_name = get_user_meta($user->id, 'last_name',true);
+
+	    $account_id_number =get_user_meta($user->id, 'account_id_number', true);
+        $account_mobile_number = get_user_meta($user->id, 'account_mobile_number', true);
+        $account_bank_name = get_user_meta($user->id, 'account_bank_name', true);
+        $account_bank_number = get_user_meta($user->id, 'account_bank_number', true);
+        $account_bank_type = get_user_meta($user->id, 'account_bank_type', true);
+
+	    if (!isset($first_name, $last_name) || $first_name == '' || $last_name == '') {
+		    $edit_account_url = wc_get_endpoint_url( 'edit-account', '', wc_get_page_permalink( 'myaccount' ) );
+		    $current_url = home_url($_SERVER['REQUEST_URI']);
+
+		    if ($edit_account_url !== $current_url) {
+			    wp_redirect($edit_account_url);
+            }
+        }
+
+	    if (!isset($account_id_number, $account_mobile_number, $account_bank_name, $account_bank_number, $account_bank_type) ||
+	        $account_id_number == '' ||
+	        $account_mobile_number == '' ||
+	        $account_bank_name == '' ||
+	        $account_bank_number == '' ||
+	        $account_bank_type == ''
+        ) {
+		    $edit_account_url = wc_get_endpoint_url( 'tradesafe', '', wc_get_page_permalink( 'myaccount' ) );
+		    $current_url = home_url($_SERVER['REQUEST_URI']);
+
+		    if ($edit_account_url !== $current_url) {
+			    wp_redirect($edit_account_url);
+		    }
+	    }
+
+    }
 	if ( $_SERVER['REQUEST_METHOD'] === 'POST' && $_SERVER['HTTP_USER_AGENT'] === 'api.tradesafe.co.za') {
 	    $data = json_decode(file_get_contents('php://input'), true);
 
@@ -483,7 +520,11 @@ function  woocommerce_tradesafe_account_form() {
 			update_user_meta($user->id, 'account_bank_type', $data['type']);
         } else {
 			foreach ($response->errors as $code => $errors) {
-				print '<div class="row"><strong>Error:</strong><br/>' . implode('<br/>', $errors) . '</div>';
+				if ('yes' === $gateway->debug) {
+					print '<div class="row"><strong>Error:</strong><br/>' . implode( '<br/>', $errors ) . '</div>';
+				} else {
+					print '<div class="row"><strong>Error:</strong><br/> There was a problem updating you account.</div>';
+                }
 			}
         }
 	} else {
