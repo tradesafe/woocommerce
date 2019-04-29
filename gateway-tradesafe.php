@@ -264,7 +264,7 @@ function woocommerce_tradesafe_valid_transaction($available_gateways) {
             get_user_meta($user->id, 'account_bank_type', true) == '') {
 		    unset($available_gateways['tradesafe']);
 		    if (isset($_REQUEST['wc-ajax'])) {
-			    print "<div>The TradeSafe Escrow Payment Gateway is currently disabled. Have you updated your <a href='" . get_site_url(null, 'my-account/tradesafe/') . "'>account</a>?</div>";
+			    print "<div style='border: 1px solid #CA170F; padding: 10px; background-color: #f9e7e7'>To complete this action your must first complete <a style='font-weight: bold;' href='" . get_site_url(null, 'my-account/tradesafe/') . "'>your account</a></div>";
             }
         }
     }
