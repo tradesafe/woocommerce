@@ -60,82 +60,115 @@ function order_status_cancelled($order) {
 //    die();
 }
 
+function woocommerce_tradesafe_plugin_callback_rewrite_rule( $wp_rewrite ) {
+	$wp_rewrite->rules = array_merge(
+		['tradesafe/(.+)/?$' => 'index.php?tradesafe=1&action=$matches[1]'],
+		$wp_rewrite->rules
+	);
+}
+add_filter( 'generate_rewrite_rules', 'woocommerce_tradesafe_plugin_callback_rewrite_rule');
+
+// Adding the id var so that WP recognizes it
+function woocommerce_tradesafe_plugin_callback_query_vars( $vars )
+{
+	$vars[] = 'tradesafe';
+	$vars[] = 'action';
+	return $vars;
+}
+add_filter( 'query_vars','woocommerce_tradesafe_plugin_callback_query_vars' );
+
+function woocommerce_tradesafe_plugin_callback_parse_request($wp) {
+	// only process requests with "mypluginname=param1"
+	if (array_key_exists('tradesafe', $wp->query_vars)
+	    && $wp->query_vars['tradesafe'] == '1') {
+	    switch ($wp->query_vars['action']) {
+            case 'callback':
+                die('Callback');
+	            // run callback query
+                break;
+            case "auth":
+                // run auth check
+	            woocommerce_tradesafe_plugin_callback_auth();
+                break;
+            case "unlink":
+                if (is_user_logged_in()) {
+	                $user = wp_get_current_user();
+	                delete_user_meta($user->ID, 'tradesafe_user_id');
+	                $edit_account_url = wc_get_endpoint_url( 'tradesafe', '', wc_get_page_permalink( 'myaccount' ) );
+	                wp_redirect($edit_account_url);
+                }
+                break;
+            default:
+	            status_header(404);
+	            die();
+        }
+	}
+}
+add_action('parse_request', 'woocommerce_tradesafe_plugin_callback_parse_request');
+
+function woocommerce_tradesafe_plugin_callback_auth() {
+//    print_r($_SERVER);
+    $json = file_get_contents('php://input');
+    $data = json_decode($json, true);
+
+    if (isset($data['user_id']) && isset($data['parameters']['user_id'])) {
+	    update_user_meta( $data['parameters']['user_id'], 'tradesafe_user_id', $data['user_id'] );
+	    status_header(200);
+    } else {
+	    status_header(404);
+	    die();
+    }
+    die();
+}
+
 add_action( 'show_user_profile', 'edit_tradesafe_profile' );
 add_action( 'edit_user_profile', 'edit_tradesafe_profile' );
 function edit_tradesafe_profile($user) {
-    $id_number = get_the_author_meta( 'id_number', $user->ID );
-    $bank = get_the_author_meta( 'bank', $user->ID );
-    $account_number = get_the_author_meta( 'account_number', $user->ID );
-    $branch_code = get_the_author_meta( 'branch_code', $user->ID );
-    $account_type = get_the_author_meta( 'account_type', $user->ID );
+	$tradesafe_id = get_the_author_meta( 'tradesafe_user_id', $user->ID );
+	$tradesafe_user_data = array();
+	if ($tradesafe_id != '') {
+		$gateway = new WC_Gateway_TradeSafe();
+		$tradesafe_user_data_request = $gateway->api_request('user/' . $tradesafe_id, array(), 'GET');
+
+		if (!is_wp_error( $tradesafe_user_data_request )) {
+			$tradesafe_user_data['name']['title'] = 'Name';
+			$tradesafe_user_data['name']['value'] = $tradesafe_user_data_request['first_name'] . ' ' . $tradesafe_user_data_request['last_name'];
+
+			$tradesafe_user_data['id_number']['title'] = 'ID Number';
+			$tradesafe_user_data['id_number']['value'] = $tradesafe_user_data_request['id_number'];
+
+			$tradesafe_user_data['email']['title'] = 'Email';
+			$tradesafe_user_data['email']['value'] = $tradesafe_user_data_request['email'];
+
+			$tradesafe_user_data['mobile']['title'] = 'Mobile';
+			$tradesafe_user_data['mobile']['value'] = $tradesafe_user_data_request['mobile'];
+		}
+    }
+
     ?>
-    <h3><?php esc_html_e( 'Personal Information', 'tradesafe' ); ?></h3>
+    <h3><?php esc_html_e( 'TradeSafe Account Details', 'tradesafe' ); ?></h3>
 
     <table class="form-table">
         <tr>
-            <th><label for="id_number"><?php esc_html_e( 'ID Number', 'tradesafe' ); ?></label></th>
+            <th><label for="id_number"><?php esc_html_e( 'TradeSafe ID', 'tradesafe' ); ?></label></th>
             <td>
-                <input type="text"
-                       id="id_number"
-                       name="id_number"
-                       value="<?php echo esc_attr( $id_number ); ?>"
-                       class="regular-text"
-                />
+                <?php echo esc_attr( $tradesafe_id ); ?>
             </td>
         </tr>
     </table>
 
-    <h3><?php esc_html_e( 'Banking Details', 'tradesafe' ); ?></h3>
-
+    <?php if (!empty($tradesafe_user_data)): ?>
     <table class="form-table">
+        <?php foreach ($tradesafe_user_data as $tradesafe_user_data_key => $tradesafe_user_data_row): ?>
         <tr>
-            <th><label for="bank"><?php esc_html_e( 'Bank Name', 'tradesafe' ); ?></label></th>
+            <th><label for="bank"><?php esc_html_e( $tradesafe_user_data_row['title'], 'tradesafe' ); ?></label></th>
             <td>
-                <input type="text"
-                       id="bank"
-                       name="bank"
-                       value="<?php echo esc_attr( $bank ); ?>"
-                       class="regular-text"
-                />
+                <?php echo  esc_attr( $tradesafe_user_data_row['value'] ); ?>
             </td>
         </tr>
-
-        <tr>
-            <th><label for="account_number"><?php esc_html_e( 'Account Number', 'tradesafe' ); ?></label></th>
-            <td>
-                <input type="text"
-                       id="account_number"
-                       name="account_number"
-                       value="<?php echo esc_attr( $account_number ); ?>"
-                       class="regular-text"
-                />
-            </td>
-        </tr>
-
-        <tr>
-            <th><label for="branch_code"><?php esc_html_e( 'Branch Code', 'tradesafe' ); ?></label></th>
-            <td>
-                <input type="text"
-                       id="branch_code"
-                       name="branch_code"
-                       value="<?php echo esc_attr( $branch_code ); ?>"
-                       class="regular-text"
-                />
-            </td>
-        </tr>
-
-        <tr>
-            <th><label for="account_type"><?php esc_html_e( 'Account Type', 'tradesafe' ); ?></label></th>
-            <td>
-                <input type="text"
-                       id="account_type"
-                       name="account_type"
-                       value="<?php echo esc_attr( $account_type ); ?>"
-                       class="regular-text"
-                />
-            </td>
-        </tr>
+        <?php endforeach;?>
     </table>
+    <?php endif; ?>
 
     <?php
 }
@@ -254,18 +287,12 @@ function woocommerce_tradesafe_add_gateway( $methods ) {
 add_filter( 'woocommerce_available_payment_gateways', 'woocommerce_tradesafe_valid_transaction' );
 function woocommerce_tradesafe_valid_transaction($available_gateways) {
     $user = wp_get_current_user();
-    $user_id = get_user_meta($user->id, 'tradesafe_id', true);
+    $user_id = get_user_meta($user->ID, 'tradesafe_user_id', true);
 
     if (!$user_id && isset($available_gateways['tradesafe'])) {
-	    if (get_user_meta($user->id, 'account_id_number', true) == '' ||
-            get_user_meta($user->id, 'account_mobile_number', true) == '' ||
-            get_user_meta($user->id, 'account_bank_name', true) == '' ||
-            get_user_meta($user->id, 'account_bank_number', true) == '' ||
-            get_user_meta($user->id, 'account_bank_type', true) == '') {
-		    unset($available_gateways['tradesafe']);
-		    if (isset($_REQUEST['wc-ajax'])) {
-			    print "<div style='border: 1px solid #CA170F; padding: 10px; background-color: #f9e7e7'>To complete this action your must first complete <a style='font-weight: bold;' href='" . get_site_url(null, 'my-account/tradesafe/') . "'>your account</a></div>";
-            }
+        unset($available_gateways['tradesafe']);
+        if (isset($_REQUEST['wc-ajax'])) {
+            print "<div style='border: 1px solid #CA170F; padding: 10px; background-color: #f9e7e7'>To complete this action your must first complete <a style='font-weight: bold;' href='" . get_site_url(null, 'my-account/tradesafe/') . "'>your account</a></div>";
         }
     }
 
@@ -427,176 +454,122 @@ function woocommerce_tradesafe_order_actions( $query ) {
 
 add_action( 'woocommerce_account_tradesafe_endpoint', 'woocommerce_tradesafe_account_content' );
 function woocommerce_tradesafe_account_content() {
-	$gateway = new WC_Gateway_TradeSafe();
-
     $user = wp_get_current_user();
-    $user_id = get_user_meta($user->id, 'tradesafe_id', true);
+	$gateway = new WC_Gateway_TradeSafe();
+	$tradesafe_id = get_user_meta($user->ID, 'tradesafe_user_id', true);
+	$settings = get_option('woocommerce_tradesafe_settings');
 
-    if (!$user_id) {
-        $api_endpoint  = 'user/' . $user->user_email;
-    } else {
-        $api_endpoint  = 'user/' . $user_id;
-    }
+	if ( 'yes' === $settings['testmode'] ) {
+		$url = 'https://sandbox.tradesafe.co.za';
+	} else {
+		$url = 'https://www.tradesafe.co.za';
+	}
 
-	$response = $gateway->api_request($api_endpoint, array(), 'GET');
-//    $response = '';
+	if ($tradesafe_id != '') {
+		$tradesafe_user_data = array();
 
-    if ( ! is_wp_error( $response ) ) {
-        if ( isset($response['User']['username']) ) {
-            add_user_meta($user->id, 'tradesafe_id', $response['User']['username'], true);
+        $tradesafe_user_data_request = $gateway->api_request('user/' . $tradesafe_id, array(), 'GET');
 
-            print '<div class="row"><strong>First Name:</strong> ' . $response['Account']['first_name'] . '</div>';
-            print '<div class="row"><strong>Last Name:</strong> ' . $response['Account']['last_name'] . '</div>';
-	        print '<div class="row"><strong>Email:</strong> ' . $response['User']['email'] . '</div>';
-            print '<div class="row"><strong>ID Number:</strong> ' . $response['Account']['id_number'] . '</div>';
-            print '<div class="row"><strong>Mobile Number:</strong> ' . $response['Account']['mobile'] . '</div>';
+        if (!is_wp_error( $tradesafe_user_data_request )) {
+            $tradesafe_user_data['user']['name']['title'] = 'Name';
+            $tradesafe_user_data['user']['name']['value'] = $tradesafe_user_data_request['first_name'] . ' ' . $tradesafe_user_data_request['last_name'];
 
-            if ('yes' === $gateway->testmode) {
-                $link = 'https://sandbox.tradesafe.co.za/login';
-            } else {
-	            $link = 'https://www.tradesafe.co.za/login';
+            $tradesafe_user_data['user']['id_number']['title'] = 'ID Number';
+            $tradesafe_user_data['user']['id_number']['value'] = $tradesafe_user_data_request['id_number'];
+
+            $tradesafe_user_data['user']['email']['title'] = 'Email';
+            $tradesafe_user_data['user']['email']['value'] = $tradesafe_user_data_request['email'];
+
+            $tradesafe_user_data['user']['mobile']['title'] = 'Mobile';
+            $tradesafe_user_data['user']['mobile']['value'] = $tradesafe_user_data_request['mobile'];
+
+            if ($tradesafe_user_data_request['company']) {
+                $tradesafe_user_data['company']['name']['title'] = 'Name';
+                $tradesafe_user_data['company']['name']['value'] = $tradesafe_user_data_request['company']['name'] . ' ' . $tradesafe_user_data_request['company']['type'];
+
+                $tradesafe_user_data['company']['reg']['title'] = 'Registration Number';
+                $tradesafe_user_data['company']['reg']['value'] = $tradesafe_user_data_request['company']['reg_number'];
             }
 
-	        print '<a href="' . $link . '" target="_blank">Update TradeSafe Account</a>';
-        } else {
-	        woocommerce_tradesafe_account_form();
+            if ($tradesafe_user_data_request['bank']) {
+                $tradesafe_user_data['bank']['name']['title'] = 'Bank';
+                $tradesafe_user_data['bank']['name']['value'] = $tradesafe_user_data_request['bank']['name'];
+
+                $tradesafe_user_data['bank']['number']['title'] = 'Account Number';
+                $tradesafe_user_data['bank']['number']['value'] = $tradesafe_user_data_request['bank']['account'];
+
+                $tradesafe_user_data['bank']['type']['title'] = 'Account Type';
+                $tradesafe_user_data['bank']['type']['value'] = $tradesafe_user_data_request['bank']['type'];
+            }
         }
-    } else {
-	    print 'Account incomplete';
 
-	    if ('yes' === $gateway->debug) {
-		    foreach ($response->errors as $code => $errors) {
-			    print '<div class="row"><strong>Error Code:</strong> ' . $code . '</div>';
-			    print '<div class="row"><strong>Error Messages:</strong><br/>' . implode('<br/>', $errors) . '</div>';
+        printf('<div style="border: 1px solid #FFD700; background-color: #fffbe5; padding: 10px;"><strong>Please Note:</strong> This following information is not stored on <strong>%s</strong> and is provided for confirmation purposes only. If you would like your information please <a href="%s/login" target="_blank">login to your account</a> on the TradeSafe Website.</div>', get_bloginfo('name'), $url);
+
+        if (!empty($tradesafe_user_data['user'])) {
+            print "<h3>Personal Details</h3>";
+            foreach ( $tradesafe_user_data['user'] as $tradesafe_user_data_key => $tradesafe_user_data_row ) {
+                echo "<div class=\"tradesafe-user-$tradesafe_user_data_key\">";
+                printf( "<strong>%s :</strong> %s", esc_attr( $tradesafe_user_data_row['title'] ), esc_attr( $tradesafe_user_data_row['value'] ) );
+                echo "</div>";
             }
-	    }
+        }
 
-	    woocommerce_tradesafe_account_form();
+        if (!empty($tradesafe_user_data['company'])) {
+            print "<h3>Company Details</h3>";
+            foreach ( $tradesafe_user_data['company'] as $tradesafe_user_data_key => $tradesafe_user_data_row ) {
+                echo "<div class=\"tradesafe-company-$tradesafe_user_data_key\">";
+                printf( "<strong>%s :</strong> %s", esc_attr( $tradesafe_user_data_row['title'] ), esc_attr( $tradesafe_user_data_row['value'] ) );
+                echo "</div>";
+            }
+        }
+
+        if (!empty($tradesafe_user_data['bank'])) {
+            print "<h3>Banking Details</h3>";
+            foreach ($tradesafe_user_data['bank'] as $tradesafe_user_data_key => $tradesafe_user_data_row) {
+                echo "<div class=\"tradesafe-bank-$tradesafe_user_data_key\">";
+                printf("<strong>%s :</strong> %s", esc_attr($tradesafe_user_data_row['title']), esc_attr($tradesafe_user_data_row['value']));
+                echo "</div>";
+            }
+        }
+
+		echo "<br/>";
+
+        printf('<a href="%s" class="button">%s</a>', '/tradesafe/unlink', __( 'Unlink Account', 'woocommerce-gateway-tradesafe' ));
+	} else {
+	    $token_cache_id = 'tradesafe-token-' . $user->ID;
+	    $token = get_transient( $token_cache_id);
+
+	    if (false === $token) {
+		    $tradesafe_auth_token_request = $gateway->api_request('authorize/token', array(), 'GET');
+		    if (!is_wp_error($tradesafe_auth_token_request)) {
+			    $token_lifetime = $tradesafe_auth_token_request['expire'] - $tradesafe_auth_token_request['created'];
+			    $token          = $tradesafe_auth_token_request['token'];
+			    set_transient( $token_cache_id, $token, $token_lifetime);
+		    }
+        }
+
+		if (isset($token)) {
+			$edit_account_url = wc_get_endpoint_url( 'tradesafe', '', wc_get_page_permalink( 'myaccount' ) );
+			?>
+            <form action="<?php print $url; ?>/api/register" method="post" target="_blank" style="display: inline">
+                <input type="hidden" name="auth_key" value="a68f4d96-f94e-4a4c-8335-54f41d87b9a5">
+                <input type="hidden" name="auth_token" value="<?php print $token; ?>">
+                <input type="hidden" name="success_url" value="<?php print $edit_account_url; ?>">
+                <input type="hidden" name="failure_url" value="<?php print get_site_url(); ?>">
+                <input type="hidden" name="parameters[user_id]" value="<?php print $user->ID; ?>">
+                <input type="submit" value="Create a TradeSafe Account" disabled="disabled" class="disabled">
+            </form>
+            <br />
+            <br />
+            <form action="<?php print $url; ?>/api/authorize" method="post" target="_blank" style="display: inline">
+                <input type="hidden" name="auth_key" value="a68f4d96-f94e-4a4c-8335-54f41d87b9a5">
+                <input type="hidden" name="auth_token" value="<?php print $token; ?>">
+                <input type="hidden" name="success_url" value="<?php print $edit_account_url; ?>">
+                <input type="hidden" name="failure_url" value="<?php print get_site_url(); ?>">
+                <input type="hidden" name="parameters[user_id]" value="<?php print $user->ID; ?>">
+                <input type="submit" value="Link Your TradeSafe Account">
+            </form>
+            <?php
+        }
     }
 }
-
-function  woocommerce_tradesafe_account_form() {
-	$user = wp_get_current_user();
-    $banks = array(
-            "632005" => "Absa Bank",
-            "430000" => "African Bank",
-            "470010" => "Capitec Bank",
-            "250655" => "First National Bank / Rand Merchant Bank",
-            "580105" => "Investec Bank",
-            "450105" => "Mercantile Bank",
-            "490991" => "MTN Banking",
-            "198765" => "Nedbank (South Africa)",
-            "460005" => "Postbank",
-            "051001" => "Standard Bank (South Africa)",
-    );
-    $account_types = array(
-            "CHEQUE" => "Cheque/Current Account",
-            "SAVINGS" => "Savings Account",
-            "TRANSMISSION" =>"Transmission Account",
-            "BOND" => "Bond Account",
-    );
-	if ( ! empty( $_POST ) ) {
-		$gateway = new WC_Gateway_TradeSafe();
-		$data = array(
-		        'first_name' => get_user_meta($user->id, 'first_name',true),
-		        'last_name' => get_user_meta($user->id, 'last_name',true),
-		        'email' => $user->user_email,
-		        'mobile_country' => 'ZA',
-		        'mobile' => $_POST['account_mobile_number'],
-		        'id_number' => $_POST['account_id_number'],
-		        'bank' => $banks[$_POST['account_bank_name']],
-		        'number' => $_POST['account_bank_number'],
-		        'branch_code' => $_POST['account_bank_name'],
-		        'type' => $_POST['account_bank_type'],
-        );
-
-		$response = $gateway->api_request('verify/user', array('body' => $data));
-
-		if (! is_wp_error($response)) {
-			update_user_meta($user->id, 'account_id_number', $data['id_number']);
-			update_user_meta($user->id, 'account_mobile_number', $data['mobile']);
-			update_user_meta($user->id, 'account_bank_name', $data['branch_code']);
-			update_user_meta($user->id, 'account_bank_number', $data['number']);
-			update_user_meta($user->id, 'account_bank_type', $data['type']);
-        } else {
-			foreach ($response->errors as $code => $errors) {
-				if ('yes' === $gateway->debug) {
-					print '<div class="row"><strong>Error:</strong><br/>' . implode( '<br/>', $errors ) . '</div>';
-				} else {
-					print '<div class="row"><strong>Error:</strong><br/> There was a problem updating you account.</div>';
-                }
-			}
-        }
-	} else {
-	    $_POST = array(
-	            'account_id_number' => get_user_meta($user->id, 'account_id_number', true),
-	            'account_mobile_number' => get_user_meta($user->id, 'account_mobile_number', true),
-	            'account_bank_name' => get_user_meta($user->id, 'account_bank_name', true),
-	            'account_bank_number' => get_user_meta($user->id, 'account_bank_number', true),
-	            'account_bank_type' => get_user_meta($user->id, 'account_bank_type', true),
-        );
-    }
-    ?>
-    <form class="woocommerce-EditAccountForm edit-account" action="" method="post">
-        <h3><?php esc_html_e( 'Personal Information', 'tradesafe' ); ?></h3>
-
-        <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
-            <label for="account_id_number"><?php esc_html_e( 'ID Number', 'tradesafe' ); ?>&nbsp;<span class="required">*</span></label>
-            <input type="text" class="woocommerce-Input woocommerce-Input--text input-text" name="account_id_number" id="account_id_number" value="<?php print $_POST['account_id_number']; ?>" required="required">
-        </p>
-
-        <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
-            <label for="account_mobile_number"><?php esc_html_e( 'Mobile Number', 'tradesafe' ); ?>&nbsp;<span class="required">*</span></label>
-            <input type="text" class="woocommerce-Input woocommerce-Input--text input-text" name="account_mobile_number" id="account_mobile_number" value="<?php print $_POST['account_mobile_number']; ?>" required="required">
-        </p>
-
-        <h3><?php esc_html_e( 'Banking Details', 'tradesafe' ); ?></h3>
-
-        <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
-            <label for="account_bank_name"><?php esc_html_e( 'Bank', 'tradesafe' ); ?>&nbsp;<span class="required">*</span></label>
-            <select class="woocommerce-Input woocommerce-Input--select input-select" name="account_bank_name" id="account_bank_name" required="required">
-                <option value="">-- Select your Bank --</option>
-                <?php
-                    foreach ($banks as $branch_code => $bank_name) {
-                        if ($_POST['account_bank_name'] == $branch_code) {
-	                        print '<option value="' . $branch_code .  '" selected>' . $bank_name . '</option>';
-                        } else {
-	                        print '<option value="' . $branch_code .  '">' . $bank_name . '</option>';
-                        }
-                    }
-                ?>
-            </select>
-        </p>
-
-        <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
-            <label for="account_bank_number"><?php esc_html_e( 'Account Number', 'tradesafe' ); ?>&nbsp;<span class="required">*</span></label>
-            <input type="text" class="woocommerce-Input woocommerce-Input--text input-text" name="account_bank_number" id="account_bank_number" value="<?php print $_POST['account_bank_number']; ?>" required="required">
-        </p>
-
-<!--        <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">-->
-<!--            <label for="account_bank_code">--><?php //esc_html_e( 'Branch Code', 'tradesafe' ); ?><!--&nbsp;<span class="required">*</span></label>-->
-<!--            <input type="text" class="woocommerce-Input woocommerce-Input--text input-text" name="account_bank_code" id="account_bank_code" value="--><?php //print $_POST['account_bank_code']; ?><!--" required="required">-->
-<!--        </p>-->
-
-        <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
-            <label for="account_bank_type"><?php esc_html_e( 'Account Type', 'tradesafe' ); ?>&nbsp;<span class="required">*</span></label>
-            <select class="woocommerce-Input woocommerce-Input--select input-select" name="account_bank_type" id="account_bank_type" required="required">
-                <option value="">-- Select Account Type --</option>
-	            <?php
-	            foreach ($account_types as $account_code => $account_name) {
-		            if ($_POST['account_bank_type'] == $account_code) {
-			            print '<option value="' . $account_code .  '" selected>' . $account_name . '</option>';
-		            } else {
-			            print '<option value="' . $account_code .  '">' . $account_name . '</option>';
-		            }
-	            }
-	            ?>
-            </select>
-        </p>
-
-        <p>
-            <button type="submit" class="woocommerce-Button button" name="save_account_details" value="Save changes">Save changes</button>
-        </p>
-    </form>
-
-<?php }
