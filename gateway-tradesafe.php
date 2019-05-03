@@ -32,13 +32,14 @@ function woocommerce_tradesafe_init() {
 	load_plugin_textdomain( 'woocommerce-gateway-tradesafe', false, trailingslashit( dirname( plugin_basename( __FILE__ ) ) ) );
 	add_filter( 'woocommerce_payment_gateways', 'woocommerce_tradesafe_add_gateway' );
 }
+
 add_action( 'plugins_loaded', 'woocommerce_tradesafe_init', 0 );
 
 function woocommerce_tradesafe_plugin_links( $links ) {
 	$settings_url = add_query_arg(
 		array(
-			'page' => 'wc-settings',
-			'tab' => 'checkout',
+			'page'    => 'wc-settings',
+			'tab'     => 'checkout',
 			'section' => 'wc_gateway_tradesafe',
 		),
 		admin_url( 'admin.php' )
@@ -52,85 +53,89 @@ function woocommerce_tradesafe_plugin_links( $links ) {
 
 	return array_merge( $plugin_links, $links );
 }
+
 add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), 'woocommerce_tradesafe_plugin_links' );
 
-add_action( 'woocommerce_cancelled_order', 'order_status_cancelled');
-function order_status_cancelled($order) {
+add_action( 'woocommerce_cancelled_order', 'order_status_cancelled' );
+function order_status_cancelled( $order ) {
 //    print_r(get_defined_vars());
 //    die();
 }
 
 function woocommerce_tradesafe_plugin_callback_rewrite_rule( $wp_rewrite ) {
 	$wp_rewrite->rules = array_merge(
-		['tradesafe/(.+)/?$' => 'index.php?tradesafe=1&action=$matches[1]'],
+		[ 'tradesafe/(.+)/?$' => 'index.php?tradesafe=1&action=$matches[1]' ],
 		$wp_rewrite->rules
 	);
 }
-add_filter( 'generate_rewrite_rules', 'woocommerce_tradesafe_plugin_callback_rewrite_rule');
+
+add_filter( 'generate_rewrite_rules', 'woocommerce_tradesafe_plugin_callback_rewrite_rule' );
 
 // Adding the id var so that WP recognizes it
-function woocommerce_tradesafe_plugin_callback_query_vars( $vars )
-{
+function woocommerce_tradesafe_plugin_callback_query_vars( $vars ) {
 	$vars[] = 'tradesafe';
 	$vars[] = 'action';
+
 	return $vars;
 }
-add_filter( 'query_vars','woocommerce_tradesafe_plugin_callback_query_vars' );
 
-function woocommerce_tradesafe_plugin_callback_parse_request($wp) {
+add_filter( 'query_vars', 'woocommerce_tradesafe_plugin_callback_query_vars' );
+
+function woocommerce_tradesafe_plugin_callback_parse_request( $wp ) {
 	// only process requests with "mypluginname=param1"
-	if (array_key_exists('tradesafe', $wp->query_vars)
-	    && $wp->query_vars['tradesafe'] == '1') {
-	    switch ($wp->query_vars['action']) {
-            case 'callback':
-                die('Callback');
-	            // run callback query
-                break;
-            case "auth":
-                // run auth check
-	            woocommerce_tradesafe_plugin_callback_auth();
-                break;
-            case "unlink":
-                if (is_user_logged_in()) {
-	                $user = wp_get_current_user();
-	                delete_user_meta($user->ID, 'tradesafe_user_id');
-	                $edit_account_url = wc_get_endpoint_url( 'tradesafe', '', wc_get_page_permalink( 'myaccount' ) );
-	                wp_redirect($edit_account_url);
-                }
-                break;
-            default:
-	            status_header(404);
-	            die();
-        }
+	if ( array_key_exists( 'tradesafe', $wp->query_vars )
+	     && $wp->query_vars['tradesafe'] == '1' ) {
+		switch ( $wp->query_vars['action'] ) {
+			case 'callback':
+				die( 'Callback' );
+				// run callback query
+				break;
+			case "auth":
+				// run auth check
+				woocommerce_tradesafe_plugin_callback_auth();
+				break;
+			case "unlink":
+				if ( is_user_logged_in() ) {
+					$user = wp_get_current_user();
+					delete_user_meta( $user->ID, 'tradesafe_user_id' );
+					$edit_account_url = wc_get_endpoint_url( 'tradesafe', '', wc_get_page_permalink( 'myaccount' ) );
+					wp_redirect( $edit_account_url );
+				}
+				break;
+			default:
+				status_header( 404 );
+				die();
+		}
 	}
 }
-add_action('parse_request', 'woocommerce_tradesafe_plugin_callback_parse_request');
+
+add_action( 'parse_request', 'woocommerce_tradesafe_plugin_callback_parse_request' );
 
 function woocommerce_tradesafe_plugin_callback_auth() {
 //    print_r($_SERVER);
-    $json = file_get_contents('php://input');
-    $data = json_decode($json, true);
+	$json = file_get_contents( 'php://input' );
+	$data = json_decode( $json, true );
 
-    if (isset($data['user_id']) && isset($data['parameters']['user_id'])) {
-	    update_user_meta( $data['parameters']['user_id'], 'tradesafe_user_id', $data['user_id'] );
-	    status_header(200);
-    } else {
-	    status_header(404);
-	    die();
-    }
-    die();
+	if ( isset( $data['user_id'] ) && isset( $data['parameters']['user_id'] ) ) {
+		update_user_meta( $data['parameters']['user_id'], 'tradesafe_user_id', $data['user_id'] );
+		status_header( 200 );
+	} else {
+		status_header( 404 );
+		die();
+	}
+	die();
 }
 
 add_action( 'show_user_profile', 'edit_tradesafe_profile' );
 add_action( 'edit_user_profile', 'edit_tradesafe_profile' );
-function edit_tradesafe_profile($user) {
-	$tradesafe_id = get_the_author_meta( 'tradesafe_user_id', $user->ID );
+function edit_tradesafe_profile( $user ) {
+	$tradesafe_id        = get_the_author_meta( 'tradesafe_user_id', $user->ID );
 	$tradesafe_user_data = array();
-	if ($tradesafe_id != '') {
-		$gateway = new WC_Gateway_TradeSafe();
-		$tradesafe_user_data_request = $gateway->api_request('user/' . $tradesafe_id, array(), 'GET');
+	if ( $tradesafe_id != '' ) {
+		$gateway                     = new WC_Gateway_TradeSafe();
+		$tradesafe_user_data_request = $gateway->api_request( 'user/' . $tradesafe_id, array(), 'GET' );
 
-		if (!is_wp_error( $tradesafe_user_data_request )) {
+		if ( ! is_wp_error( $tradesafe_user_data_request ) ) {
 			$tradesafe_user_data['name']['title'] = 'Name';
 			$tradesafe_user_data['name']['value'] = $tradesafe_user_data_request['first_name'] . ' ' . $tradesafe_user_data_request['last_name'];
 
@@ -143,78 +148,79 @@ function edit_tradesafe_profile($user) {
 			$tradesafe_user_data['mobile']['title'] = 'Mobile';
 			$tradesafe_user_data['mobile']['value'] = $tradesafe_user_data_request['mobile'];
 		}
-    }
+	}
 
-    ?>
+	?>
     <h3><?php esc_html_e( 'TradeSafe Account Details', 'tradesafe' ); ?></h3>
 
     <table class="form-table">
         <tr>
             <th><label for="id_number"><?php esc_html_e( 'TradeSafe ID', 'tradesafe' ); ?></label></th>
             <td>
-                <?php echo esc_attr( $tradesafe_id ); ?>
+				<?php echo esc_attr( $tradesafe_id ); ?>
             </td>
         </tr>
     </table>
 
-    <?php if (!empty($tradesafe_user_data)): ?>
-    <table class="form-table">
-        <?php foreach ($tradesafe_user_data as $tradesafe_user_data_key => $tradesafe_user_data_row): ?>
-        <tr>
-            <th><label for="bank"><?php esc_html_e( $tradesafe_user_data_row['title'], 'tradesafe' ); ?></label></th>
-            <td>
-                <?php echo  esc_attr( $tradesafe_user_data_row['value'] ); ?>
-            </td>
-        </tr>
-        <?php endforeach;?>
-    </table>
-    <?php endif; ?>
+	<?php if ( ! empty( $tradesafe_user_data ) ): ?>
+        <table class="form-table">
+			<?php foreach ( $tradesafe_user_data as $tradesafe_user_data_key => $tradesafe_user_data_row ): ?>
+                <tr>
+                    <th><label for="bank"><?php esc_html_e( $tradesafe_user_data_row['title'], 'tradesafe' ); ?></label>
+                    </th>
+                    <td>
+						<?php echo esc_attr( $tradesafe_user_data_row['value'] ); ?>
+                    </td>
+                </tr>
+			<?php endforeach; ?>
+        </table>
+	<?php endif; ?>
 
-    <?php
+	<?php
 }
 
 add_action( 'personal_options_update', 'update_tradesafe_profile' );
 add_action( 'edit_user_profile_update', 'update_tradesafe_profile' );
 function update_tradesafe_profile( $user_id ) {
-    if ( ! current_user_can( 'edit_user', $user_id ) ) {
-        return false;
-    }
+	if ( ! current_user_can( 'edit_user', $user_id ) ) {
+		return false;
+	}
 
-    if ( ! empty( $_POST['id_number'] ) ) {
-        update_user_meta( $user_id, 'id_number', intval( $_POST['id_number'] ) );
-    }
+	if ( ! empty( $_POST['id_number'] ) ) {
+		update_user_meta( $user_id, 'id_number', intval( $_POST['id_number'] ) );
+	}
 
-    if ( ! empty( $_POST['bank'] ) ) {
-        update_user_meta( $user_id, 'bank', intval( $_POST['bank'] ) );
-    }
+	if ( ! empty( $_POST['bank'] ) ) {
+		update_user_meta( $user_id, 'bank', intval( $_POST['bank'] ) );
+	}
 
-    if ( ! empty( $_POST['account_number'] ) ) {
-        update_user_meta( $user_id, 'account_number', intval( $_POST['account_number'] ) );
-    }
+	if ( ! empty( $_POST['account_number'] ) ) {
+		update_user_meta( $user_id, 'account_number', intval( $_POST['account_number'] ) );
+	}
 
-    if ( ! empty( $_POST['branch_code'] ) ) {
-        update_user_meta( $user_id, 'branch_code', intval( $_POST['branch_code'] ) );
-    }
+	if ( ! empty( $_POST['branch_code'] ) ) {
+		update_user_meta( $user_id, 'branch_code', intval( $_POST['branch_code'] ) );
+	}
 
-    if ( ! empty( $_POST['account_type'] ) ) {
-        update_user_meta( $user_id, 'account_type', intval( $_POST['account_type'] ) );
-    }
+	if ( ! empty( $_POST['account_type'] ) ) {
+		update_user_meta( $user_id, 'account_type', intval( $_POST['account_type'] ) );
+	}
 }
 
 /**
  * Cancel Order
  */
-add_action('woocommerce_order_status_pending_to_cancelled', 'woocommerce_tradesafe_cancel_order', 0, 1);
-function woocommerce_tradesafe_cancel_order($order_id) {
-    $order = wc_get_order( $order_id );
+add_action( 'woocommerce_order_status_pending_to_cancelled', 'woocommerce_tradesafe_cancel_order', 0, 1 );
+function woocommerce_tradesafe_cancel_order( $order_id ) {
+	$order = wc_get_order( $order_id );
 
-    if ($order->meta_exists('tradesafe_id')) {
-        $data = array(
-                'step' => 'DECLINED',
-        );
+	if ( $order->meta_exists( 'tradesafe_id' ) ) {
+		$data = array(
+			'step' => 'DECLINED',
+		);
 
-        $response = woocommerce_tradesafe_api_request('contract/' . $order->get_meta('tradesafe_id'), array('body' => $data), 'PUT');
-    }
+		$response = woocommerce_tradesafe_api_request( 'contract/' . $order->get_meta( 'tradesafe_id' ), array( 'body' => $data ), 'PUT' );
+	}
 }
 
 /**
@@ -230,49 +236,52 @@ function woocommerce_tradesafe_cancel_order($order_id) {
  * @return bool|WP_Error
  */
 function woocommerce_tradesafe_api_request( $command, $api_args, $method = 'POST' ) {
-    $settings = get_option('woocommerce_tradesafe_settings');
-    $url = 'https://www.tradesafe.co.za/api';
-    $token = $settings['json_web_token'];
+	$settings = get_option( 'woocommerce_tradesafe_settings' );
+	$url      = 'https://www.tradesafe.co.za/api';
+	$token    = $settings['json_web_token'];
 
-    if ( 'yes' === $settings['testmode'] ) {
-        $url = 'https://sandbox.tradesafe.co.za/api';
-    }
+	if ( 'yes' === $settings['testmode'] ) {
+		$url = 'https://sandbox.tradesafe.co.za/api';
+		$url = 'http://local.tradesafe.co.za/api';
+	}
 
-    if ( empty( $token ) ) {
-        error_log( "Error posting API request: No token supplied", true );
-        return new WP_Error( '404', __( 'A token is required to submit a request to the TradeSafe API', 'woocommerce-gateway-tradesafe' ), null );
-    }
+	if ( empty( $token ) ) {
+		error_log( "Error posting API request: No token supplied", true );
 
-    $api_endpoint  = sprintf('%s/%s', $url, $command);
+		return new WP_Error( '404', __( 'A token is required to submit a request to the TradeSafe API', 'woocommerce-gateway-tradesafe' ), null );
+	}
 
-    $api_args['timeout'] = 45;
-    $api_args['headers'] = array(
-        'Authorization' => 'Bearer ' . $token,
-        'Content-Type'   => 'application/json',
-    );
+	$api_endpoint = sprintf( '%s/%s', $url, $command );
 
-    if (isset($api_args['body'])) {
-        $api_args['body'] = json_encode($api_args['body']);
-    }
-    $api_args['method'] = strtoupper( $method );
+	$api_args['timeout'] = 45;
+	$api_args['headers'] = array(
+		'Authorization' => 'Bearer ' . $token,
+		'Content-Type'  => 'application/json',
+	);
 
-    $results = wp_remote_request( $api_endpoint, $api_args );
+	if ( isset( $api_args['body'] ) ) {
+		$api_args['body'] = json_encode( $api_args['body'] );
+	}
+	$api_args['method'] = strtoupper( $method );
 
-    if (isset($results['response']['code']) && 200 !== $results['response']['code'] && 201 !== $results['response']['code']) {
-        error_log( "Error posting API request:\n" . print_r( $results['response'], true ) );
-        return new WP_Error( $results['response']['code'], $results['response']['message'], $results );
-    }
+	$results = wp_remote_request( $api_endpoint, $api_args );
 
-    $maybe_json = json_decode( $results['body'], true );
+	if ( isset( $results['response']['code'] ) && 200 !== $results['response']['code'] && 201 !== $results['response']['code'] ) {
+		error_log( "Error posting API request:\n" . print_r( $results['response'], true ) );
 
-    if ( ! is_null( $maybe_json ) && isset($maybe_json['error']) ) {
-        error_log( "Error posting API request:\n" . print_r( $results['body'], true ) );
+		return new WP_Error( $results['response']['code'], $results['response']['message'], $results );
+	}
 
-        // Use trim here to display it properly e.g. on an order note, since TradeSafe can include CRLF in a message.
-        return new WP_Error( 422, trim( $maybe_json['error'] ), $results['body'] );
-    }
+	$maybe_json = json_decode( $results['body'], true );
 
-    return $maybe_json;
+	if ( ! is_null( $maybe_json ) && isset( $maybe_json['error'] ) ) {
+		error_log( "Error posting API request:\n" . print_r( $results['body'], true ) );
+
+		// Use trim here to display it properly e.g. on an order note, since TradeSafe can include CRLF in a message.
+		return new WP_Error( 422, trim( $maybe_json['error'] ), $results['body'] );
+	}
+
+	return $maybe_json;
 }
 
 /**
@@ -281,154 +290,156 @@ function woocommerce_tradesafe_api_request( $command, $api_args, $method = 'POST
  */
 function woocommerce_tradesafe_add_gateway( $methods ) {
 	$methods[] = 'WC_Gateway_TradeSafe';
+
 	return $methods;
 }
 
 add_filter( 'woocommerce_available_payment_gateways', 'woocommerce_tradesafe_valid_transaction' );
-function woocommerce_tradesafe_valid_transaction($available_gateways) {
-    $user = wp_get_current_user();
-    $user_id = get_user_meta($user->ID, 'tradesafe_user_id', true);
+function woocommerce_tradesafe_valid_transaction( $available_gateways ) {
+	$user    = wp_get_current_user();
+	$user_id = get_user_meta( $user->ID, 'tradesafe_user_id', true );
 
-    if (!$user_id && isset($available_gateways['tradesafe'])) {
-        unset($available_gateways['tradesafe']);
-        if (isset($_REQUEST['wc-ajax'])) {
-            print "<div style='border: 1px solid #CA170F; padding: 10px; background-color: #f9e7e7'>To complete this action your must first complete <a style='font-weight: bold;' href='" . get_site_url(null, 'my-account/tradesafe/') . "'>your account</a></div>";
-        }
-    }
+	if ( ! $user_id && isset( $available_gateways['tradesafe'] ) ) {
+		unset( $available_gateways['tradesafe'] );
+		if ( isset( $_REQUEST['wc-ajax'] ) ) {
+			print "<div style='border: 1px solid #CA170F; padding: 10px; background-color: #f9e7e7'>To complete this action your must first complete <a style='font-weight: bold;' href='" . get_site_url( null, 'my-account/tradesafe/' ) . "'>your account</a></div>";
+		}
+	}
 
-    return $available_gateways;
+	return $available_gateways;
 }
 
-add_action( 'wp_loaded', function() {
-    if (is_user_logged_in() && !current_user_can('administrator')) {
-	    $user = wp_get_current_user();
+add_action( 'wp_loaded', function () {
+	if ( is_user_logged_in() && ! current_user_can( 'administrator' ) ) {
+		$user = wp_get_current_user();
 
-	    $first_name = get_user_meta($user->id, 'first_name',true);
-	    $last_name = get_user_meta($user->id, 'last_name',true);
+		$first_name = get_user_meta( $user->id, 'first_name', true );
+		$last_name  = get_user_meta( $user->id, 'last_name', true );
 
-	    $account_id_number =get_user_meta($user->id, 'account_id_number', true);
-        $account_mobile_number = get_user_meta($user->id, 'account_mobile_number', true);
-        $account_bank_name = get_user_meta($user->id, 'account_bank_name', true);
-        $account_bank_number = get_user_meta($user->id, 'account_bank_number', true);
-        $account_bank_type = get_user_meta($user->id, 'account_bank_type', true);
+		$account_id_number     = get_user_meta( $user->id, 'account_id_number', true );
+		$account_mobile_number = get_user_meta( $user->id, 'account_mobile_number', true );
+		$account_bank_name     = get_user_meta( $user->id, 'account_bank_name', true );
+		$account_bank_number   = get_user_meta( $user->id, 'account_bank_number', true );
+		$account_bank_type     = get_user_meta( $user->id, 'account_bank_type', true );
 
-	    if (!isset($first_name, $last_name) || $first_name == '' || $last_name == '') {
-		    $edit_account_url = wc_get_endpoint_url( 'edit-account', '', wc_get_page_permalink( 'myaccount' ) );
-		    $current_url = home_url($_SERVER['REQUEST_URI']);
+		if ( ! isset( $first_name, $last_name ) || $first_name == '' || $last_name == '' ) {
+			$edit_account_url = wc_get_endpoint_url( 'edit-account', '', wc_get_page_permalink( 'myaccount' ) );
+			$current_url      = home_url( $_SERVER['REQUEST_URI'] );
 
-		    if ($edit_account_url !== $current_url) {
-			    wp_redirect($edit_account_url);
-            }
-        }
+			if ( $edit_account_url !== $current_url ) {
+				wp_redirect( $edit_account_url );
+			}
+		}
 
-	    if (!isset($account_id_number, $account_mobile_number, $account_bank_name, $account_bank_number, $account_bank_type) ||
-	        $account_id_number == '' ||
-	        $account_mobile_number == '' ||
-	        $account_bank_name == '' ||
-	        $account_bank_number == '' ||
-	        $account_bank_type == ''
-        ) {
-		    $edit_account_url = wc_get_endpoint_url( 'tradesafe', '', wc_get_page_permalink( 'myaccount' ) );
-		    $current_url = home_url($_SERVER['REQUEST_URI']);
+		if ( ! isset( $account_id_number, $account_mobile_number, $account_bank_name, $account_bank_number, $account_bank_type ) ||
+		     $account_id_number == '' ||
+		     $account_mobile_number == '' ||
+		     $account_bank_name == '' ||
+		     $account_bank_number == '' ||
+		     $account_bank_type == ''
+		) {
+			$edit_account_url = wc_get_endpoint_url( 'tradesafe', '', wc_get_page_permalink( 'myaccount' ) );
+			$current_url      = home_url( $_SERVER['REQUEST_URI'] );
 
-		    if ($edit_account_url !== $current_url) {
-			    wp_redirect($edit_account_url);
-		    }
-	    }
+			if ( $edit_account_url !== $current_url ) {
+				wp_redirect( $edit_account_url );
+			}
+		}
 
-    }
-	if ( $_SERVER['REQUEST_METHOD'] === 'POST' && $_SERVER['HTTP_USER_AGENT'] === 'api.tradesafe.co.za') {
-	    $data = json_decode(file_get_contents('php://input'), true);
+	}
+	if ( $_SERVER['REQUEST_METHOD'] === 'POST' && $_SERVER['HTTP_USER_AGENT'] === 'api.tradesafe.co.za' ) {
+		$data = json_decode( file_get_contents( 'php://input' ), true );
 
 		$query = new WC_Order_Query();
-		$query->set('customer', $data['counterparty_buyer_email']);
+		$query->set( 'customer', $data['counterparty_buyer_email'] );
 		$orders = $query->get_orders();
 
-	    if (isset($data['step'])) {
-	        switch ($data['step']) {
-		        case "FUNDS_RECEIVED":
-			        foreach ( $orders as $order ) {
-				        $tradesafe_id = $order->get_meta('tradesafe_id');
-				        if ($tradesafe_id == $data['id']) {
-					        $order->update_status( 'processing', sprintf( __( 'Payment via TradeSafe.', 'woocommerce-gateway-tradesafe' ) ) );
-					        $data = array(
-						        'step' => 'SENT',
-					        );
+		if ( isset( $data['step'] ) ) {
+			switch ( $data['step'] ) {
+				case "FUNDS_RECEIVED":
+					foreach ( $orders as $order ) {
+						$tradesafe_id = $order->get_meta( 'tradesafe_id' );
+						if ( $tradesafe_id == $data['id'] ) {
+							$order->update_status( 'processing', sprintf( __( 'Payment via TradeSafe.', 'woocommerce-gateway-tradesafe' ) ) );
+							$data = array(
+								'step' => 'SENT',
+							);
 
-					        $response = woocommerce_tradesafe_api_request('contract/' . $tradesafe_id, array('body' => $data), 'PUT');
-                        }
-			        }
-			        break;
-                case "DECLINED":
-	                foreach ( $orders as $order ) {
-		                $tradesafe_id = $order->get_meta('tradesafe_id');
-		                if ($tradesafe_id == $data['id']) {
-			                $order->update_status( 'cancelled', sprintf( __( 'Payment via TradeSafe.', 'woocommerce-gateway-tradesafe' ) ) );
-		                }
-	                }
-                    break;
-	        }
-        }
+							$response = woocommerce_tradesafe_api_request( 'contract/' . $tradesafe_id, array( 'body' => $data ), 'PUT' );
+						}
+					}
+					break;
+				case "DECLINED":
+					foreach ( $orders as $order ) {
+						$tradesafe_id = $order->get_meta( 'tradesafe_id' );
+						if ( $tradesafe_id == $data['id'] ) {
+							$order->update_status( 'cancelled', sprintf( __( 'Payment via TradeSafe.', 'woocommerce-gateway-tradesafe' ) ) );
+						}
+					}
+					break;
+			}
+		}
 	}
-});
+} );
 
 add_filter( 'woocommerce_my_account_my_orders_actions', 'woocommerce_tradesafe_my_orders_actions', 100, 2 );
-function woocommerce_tradesafe_my_orders_actions($actions, $order) {
+function woocommerce_tradesafe_my_orders_actions( $actions, $order ) {
 
 	if ( $order->has_status( array( 'processing' ) ) ) {
 		// Set the action button
 		$actions['accept'] = array(
-			'url'       => '/tradesafe/accept/' . $order->get_id(),
-			'name'      => __( 'Accept', 'woocommerce-gateway-tradesafe' ),
-			'action'    => 'accept',
+			'url'    => '/tradesafe/accept/' . $order->get_id(),
+			'name'   => __( 'Accept', 'woocommerce-gateway-tradesafe' ),
+			'action' => 'accept',
 		);
 
 		// Set the action button
 		$actions['extend'] = array(
-			'url'       => '/tradesafe/extend/' . $order->get_id(),
-			'name'      => __( 'Extend', 'woocommerce-gateway-tradesafe' ),
-			'action'    => 'extend',
+			'url'    => '/tradesafe/extend/' . $order->get_id(),
+			'name'   => __( 'Extend', 'woocommerce-gateway-tradesafe' ),
+			'action' => 'extend',
 		);
 
 		// Set the action button
 		$actions['decline'] = array(
-			'url'       => '/tradesafe/decline/' . $order->get_id(),
-			'name'      => __( 'Decline', 'woocommerce-gateway-tradesafe' ),
-			'action'    => 'decline',
+			'url'    => '/tradesafe/decline/' . $order->get_id(),
+			'name'   => __( 'Decline', 'woocommerce-gateway-tradesafe' ),
+			'action' => 'decline',
 		);
 	}
+
 	return $actions;
 }
 
 /*
  * Add Link (Tab) to My Account menu
  */
-add_filter ( 'woocommerce_account_menu_items', 'woocommerce_tradesafe_account_tab', 40 );
-function woocommerce_tradesafe_account_tab($menu_links){
-    $menu_links = array_slice( $menu_links, 0, 5, true )
-        + array( 'tradesafe' => 'TradeSafe Details' )
-        + array_slice( $menu_links, 5, NULL, true );
+add_filter( 'woocommerce_account_menu_items', 'woocommerce_tradesafe_account_tab', 40 );
+function woocommerce_tradesafe_account_tab( $menu_links ) {
+	$menu_links = array_slice( $menu_links, 0, 5, true )
+	              + array( 'tradesafe' => 'TradeSafe Details' )
+	              + array_slice( $menu_links, 5, null, true );
 
-    return $menu_links;
+	return $menu_links;
 }
 
 add_action( 'init', 'woocommerce_tradesafe_account' );
 function woocommerce_tradesafe_account() {
-    add_rewrite_endpoint( 'tradesafe', EP_PERMALINK | EP_PAGES | EP_ROOT);
+	add_rewrite_endpoint( 'tradesafe', EP_PERMALINK | EP_PAGES | EP_ROOT );
 }
 
 add_action( 'pre_get_posts', 'woocommerce_tradesafe_order_actions' );
 function woocommerce_tradesafe_order_actions( $query ) {
 	if ( $query->is_main_query() ) {
-	    $action = $query->query['pagename'];
+		$action = $query->query['pagename'];
 
 		// this is for security!
-		$allowed_actions = array('tradesafe/accept', 'tradesafe/extend', 'tradesafe/decline');
+		$allowed_actions = array( 'tradesafe/accept', 'tradesafe/extend', 'tradesafe/decline' );
 
-		if ( in_array($action, $allowed_actions) ) {
-			$order_id = $query->query['page'];
-			$order = wc_get_order($order_id);
-			$tradesafe_id = $order->get_meta('tradesafe_id');
+		if ( in_array( $action, $allowed_actions ) ) {
+			$order_id     = $query->query['page'];
+			$order        = wc_get_order( $order_id );
+			$tradesafe_id = $order->get_meta( 'tradesafe_id' );
 
 			switch ( $action ) {
 				case 'tradesafe/accept':
@@ -436,17 +447,17 @@ function woocommerce_tradesafe_order_actions( $query ) {
 						'step' => 'GOODS_ACCEPTED',
 					);
 
-					$response = woocommerce_tradesafe_api_request('contract/' . $tradesafe_id, array('body' => $data), 'PUT');
+					$response = woocommerce_tradesafe_api_request( 'contract/' . $tradesafe_id, array( 'body' => $data ), 'PUT' );
 
 					$order->update_status( 'completed', sprintf( __( 'Payment via TradeSafe.', 'woocommerce-gateway-tradesafe' ) ) );
-				    break;
+					break;
 				case 'tradesafe/extend':
 					break;
 				case 'tradesafe/decline':
 					break;
 			}
 
-			wp_redirect('/my-account/orders/');
+			wp_redirect( '/my-account/orders/' );
 			exit;
 		}
 	}
@@ -454,101 +465,102 @@ function woocommerce_tradesafe_order_actions( $query ) {
 
 add_action( 'woocommerce_account_tradesafe_endpoint', 'woocommerce_tradesafe_account_content' );
 function woocommerce_tradesafe_account_content() {
-    $user = wp_get_current_user();
-	$gateway = new WC_Gateway_TradeSafe();
-	$tradesafe_id = get_user_meta($user->ID, 'tradesafe_user_id', true);
-	$settings = get_option('woocommerce_tradesafe_settings');
+	$user         = wp_get_current_user();
+	$gateway      = new WC_Gateway_TradeSafe();
+	$tradesafe_id = get_user_meta( $user->ID, 'tradesafe_user_id', true );
+	$settings     = get_option( 'woocommerce_tradesafe_settings' );
 
 	if ( 'yes' === $settings['testmode'] ) {
 		$url = 'https://sandbox.tradesafe.co.za';
+		$url = 'http://local.tradesafe.co.za';
 	} else {
 		$url = 'https://www.tradesafe.co.za';
 	}
 
-	if ($tradesafe_id != '') {
+	if ( $tradesafe_id != '' ) {
 		$tradesafe_user_data = array();
 
-        $tradesafe_user_data_request = $gateway->api_request('user/' . $tradesafe_id, array(), 'GET');
+		$tradesafe_user_data_request = $gateway->api_request( 'user/' . $tradesafe_id, array(), 'GET' );
 
-        if (!is_wp_error( $tradesafe_user_data_request )) {
-            $tradesafe_user_data['user']['name']['title'] = 'Name';
-            $tradesafe_user_data['user']['name']['value'] = $tradesafe_user_data_request['first_name'] . ' ' . $tradesafe_user_data_request['last_name'];
+		if ( ! is_wp_error( $tradesafe_user_data_request ) ) {
+			$tradesafe_user_data['user']['name']['title'] = 'Name';
+			$tradesafe_user_data['user']['name']['value'] = $tradesafe_user_data_request['first_name'] . ' ' . $tradesafe_user_data_request['last_name'];
 
-            $tradesafe_user_data['user']['id_number']['title'] = 'ID Number';
-            $tradesafe_user_data['user']['id_number']['value'] = $tradesafe_user_data_request['id_number'];
+			$tradesafe_user_data['user']['id_number']['title'] = 'ID Number';
+			$tradesafe_user_data['user']['id_number']['value'] = $tradesafe_user_data_request['id_number'];
 
-            $tradesafe_user_data['user']['email']['title'] = 'Email';
-            $tradesafe_user_data['user']['email']['value'] = $tradesafe_user_data_request['email'];
+			$tradesafe_user_data['user']['email']['title'] = 'Email';
+			$tradesafe_user_data['user']['email']['value'] = $tradesafe_user_data_request['email'];
 
-            $tradesafe_user_data['user']['mobile']['title'] = 'Mobile';
-            $tradesafe_user_data['user']['mobile']['value'] = $tradesafe_user_data_request['mobile'];
+			$tradesafe_user_data['user']['mobile']['title'] = 'Mobile';
+			$tradesafe_user_data['user']['mobile']['value'] = $tradesafe_user_data_request['mobile'];
 
-            if ($tradesafe_user_data_request['company']) {
-                $tradesafe_user_data['company']['name']['title'] = 'Name';
-                $tradesafe_user_data['company']['name']['value'] = $tradesafe_user_data_request['company']['name'] . ' ' . $tradesafe_user_data_request['company']['type'];
+			if ( $tradesafe_user_data_request['company'] ) {
+				$tradesafe_user_data['company']['name']['title'] = 'Name';
+				$tradesafe_user_data['company']['name']['value'] = $tradesafe_user_data_request['company']['name'] . ' ' . $tradesafe_user_data_request['company']['type'];
 
-                $tradesafe_user_data['company']['reg']['title'] = 'Registration Number';
-                $tradesafe_user_data['company']['reg']['value'] = $tradesafe_user_data_request['company']['reg_number'];
-            }
+				$tradesafe_user_data['company']['reg']['title'] = 'Registration Number';
+				$tradesafe_user_data['company']['reg']['value'] = $tradesafe_user_data_request['company']['reg_number'];
+			}
 
-            if ($tradesafe_user_data_request['bank']) {
-                $tradesafe_user_data['bank']['name']['title'] = 'Bank';
-                $tradesafe_user_data['bank']['name']['value'] = $tradesafe_user_data_request['bank']['name'];
+			if ( $tradesafe_user_data_request['bank'] ) {
+				$tradesafe_user_data['bank']['name']['title'] = 'Bank';
+				$tradesafe_user_data['bank']['name']['value'] = $tradesafe_user_data_request['bank']['name'];
 
-                $tradesafe_user_data['bank']['number']['title'] = 'Account Number';
-                $tradesafe_user_data['bank']['number']['value'] = $tradesafe_user_data_request['bank']['account'];
+				$tradesafe_user_data['bank']['number']['title'] = 'Account Number';
+				$tradesafe_user_data['bank']['number']['value'] = $tradesafe_user_data_request['bank']['account'];
 
-                $tradesafe_user_data['bank']['type']['title'] = 'Account Type';
-                $tradesafe_user_data['bank']['type']['value'] = $tradesafe_user_data_request['bank']['type'];
-            }
-        }
+				$tradesafe_user_data['bank']['type']['title'] = 'Account Type';
+				$tradesafe_user_data['bank']['type']['value'] = $tradesafe_user_data_request['bank']['type'];
+			}
+		}
 
-        printf('<div style="border: 1px solid #FFD700; background-color: #fffbe5; padding: 10px;"><strong>Please Note:</strong> This following information is not stored on <strong>%s</strong> and is provided for confirmation purposes only. If you would like your information please <a href="%s/login" target="_blank">login to your account</a> on the TradeSafe Website.</div>', get_bloginfo('name'), $url);
+		printf( '<div style="border: 1px solid #FFD700; background-color: #fffbe5; padding: 10px;"><strong>Please Note:</strong> This following information is not stored on <strong>%s</strong> and is provided for confirmation purposes only. If you would like your information please <a href="%s/login" target="_blank">login to your account</a> on the TradeSafe Website.</div>', get_bloginfo( 'name' ), $url );
 
-        if (!empty($tradesafe_user_data['user'])) {
-            print "<h3>Personal Details</h3>";
-            foreach ( $tradesafe_user_data['user'] as $tradesafe_user_data_key => $tradesafe_user_data_row ) {
-                echo "<div class=\"tradesafe-user-$tradesafe_user_data_key\">";
-                printf( "<strong>%s :</strong> %s", esc_attr( $tradesafe_user_data_row['title'] ), esc_attr( $tradesafe_user_data_row['value'] ) );
-                echo "</div>";
-            }
-        }
+		if ( ! empty( $tradesafe_user_data['user'] ) ) {
+			print "<h3>Personal Details</h3>";
+			foreach ( $tradesafe_user_data['user'] as $tradesafe_user_data_key => $tradesafe_user_data_row ) {
+				echo "<div class=\"tradesafe-user-$tradesafe_user_data_key\">";
+				printf( "<strong>%s :</strong> %s", esc_attr( $tradesafe_user_data_row['title'] ), esc_attr( $tradesafe_user_data_row['value'] ) );
+				echo "</div>";
+			}
+		}
 
-        if (!empty($tradesafe_user_data['company'])) {
-            print "<h3>Company Details</h3>";
-            foreach ( $tradesafe_user_data['company'] as $tradesafe_user_data_key => $tradesafe_user_data_row ) {
-                echo "<div class=\"tradesafe-company-$tradesafe_user_data_key\">";
-                printf( "<strong>%s :</strong> %s", esc_attr( $tradesafe_user_data_row['title'] ), esc_attr( $tradesafe_user_data_row['value'] ) );
-                echo "</div>";
-            }
-        }
+		if ( ! empty( $tradesafe_user_data['company'] ) ) {
+			print "<h3>Company Details</h3>";
+			foreach ( $tradesafe_user_data['company'] as $tradesafe_user_data_key => $tradesafe_user_data_row ) {
+				echo "<div class=\"tradesafe-company-$tradesafe_user_data_key\">";
+				printf( "<strong>%s :</strong> %s", esc_attr( $tradesafe_user_data_row['title'] ), esc_attr( $tradesafe_user_data_row['value'] ) );
+				echo "</div>";
+			}
+		}
 
-        if (!empty($tradesafe_user_data['bank'])) {
-            print "<h3>Banking Details</h3>";
-            foreach ($tradesafe_user_data['bank'] as $tradesafe_user_data_key => $tradesafe_user_data_row) {
-                echo "<div class=\"tradesafe-bank-$tradesafe_user_data_key\">";
-                printf("<strong>%s :</strong> %s", esc_attr($tradesafe_user_data_row['title']), esc_attr($tradesafe_user_data_row['value']));
-                echo "</div>";
-            }
-        }
+		if ( ! empty( $tradesafe_user_data['bank'] ) ) {
+			print "<h3>Banking Details</h3>";
+			foreach ( $tradesafe_user_data['bank'] as $tradesafe_user_data_key => $tradesafe_user_data_row ) {
+				echo "<div class=\"tradesafe-bank-$tradesafe_user_data_key\">";
+				printf( "<strong>%s :</strong> %s", esc_attr( $tradesafe_user_data_row['title'] ), esc_attr( $tradesafe_user_data_row['value'] ) );
+				echo "</div>";
+			}
+		}
 
 		echo "<br/>";
 
-        printf('<a href="%s" class="button">%s</a>', '/tradesafe/unlink', __( 'Unlink Account', 'woocommerce-gateway-tradesafe' ));
+		printf( '<a href="%s" class="button">%s</a>', '/tradesafe/unlink', __( 'Unlink Account', 'woocommerce-gateway-tradesafe' ) );
 	} else {
-	    $token_cache_id = 'tradesafe-token-' . $user->ID;
-	    $token = get_transient( $token_cache_id);
+		$token_cache_id = 'tradesafe-token-' . $user->ID;
+		$token          = get_transient( $token_cache_id );
 
-	    if (false === $token) {
-		    $tradesafe_auth_token_request = $gateway->api_request('authorize/token', array(), 'GET');
-		    if (!is_wp_error($tradesafe_auth_token_request)) {
-			    $token_lifetime = $tradesafe_auth_token_request['expire'] - $tradesafe_auth_token_request['created'];
-			    $token          = $tradesafe_auth_token_request['token'];
-			    set_transient( $token_cache_id, $token, $token_lifetime);
-		    }
-        }
+		if ( false === $token ) {
+			$tradesafe_auth_token_request = $gateway->api_request( 'authorize/token', array(), 'GET' );
+			if ( ! is_wp_error( $tradesafe_auth_token_request ) ) {
+				$token_lifetime = $tradesafe_auth_token_request['expire'] - $tradesafe_auth_token_request['created'];
+				$token          = $tradesafe_auth_token_request['token'];
+				set_transient( $token_cache_id, $token, $token_lifetime );
+			}
+		}
 
-		if (isset($token)) {
+		if ( isset( $token ) ) {
 			$edit_account_url = wc_get_endpoint_url( 'tradesafe', '', wc_get_page_permalink( 'myaccount' ) );
 			?>
             <form action="<?php print $url; ?>/api/register" method="post" target="_blank" style="display: inline">
@@ -557,10 +569,10 @@ function woocommerce_tradesafe_account_content() {
                 <input type="hidden" name="success_url" value="<?php print $edit_account_url; ?>">
                 <input type="hidden" name="failure_url" value="<?php print get_site_url(); ?>">
                 <input type="hidden" name="parameters[user_id]" value="<?php print $user->ID; ?>">
-                <input type="submit" value="Create a TradeSafe Account" disabled="disabled" class="disabled">
+                <input type="submit" value="Create a TradeSafe Account">
             </form>
-            <br />
-            <br />
+            <br/>
+            <br/>
             <form action="<?php print $url; ?>/api/authorize" method="post" target="_blank" style="display: inline">
                 <input type="hidden" name="auth_key" value="a68f4d96-f94e-4a4c-8335-54f41d87b9a5">
                 <input type="hidden" name="auth_token" value="<?php print $token; ?>">
@@ -569,7 +581,144 @@ function woocommerce_tradesafe_account_content() {
                 <input type="hidden" name="parameters[user_id]" value="<?php print $user->ID; ?>">
                 <input type="submit" value="Link Your TradeSafe Account">
             </form>
-            <?php
-        }
-    }
+			<?php
+		}
+	}
+}
+
+/**
+ * Front end registration
+ */
+
+add_action( 'register_form', 'woocommerce_tradesafe_registration_form' );
+function woocommerce_tradesafe_registration_form() {
+
+	$bank_account_types = array(
+		'CHEQUE'       => 'Cheque/Current Account',
+		'SAVINGS'      => 'Savings Account',
+		'TRANSMISSION' => 'Transmission Account',
+		'BOND'         => 'Bond Account',
+	);
+
+	$cbc_list = array(
+		"632005" => "Absa Bank",
+		"430000" => "African Bank",
+		"470010" => "Capitec Bank",
+		"250655" => "First National Bank / Rand Merchant Bank",
+		"580105" => "Investec Bank",
+		"450105" => "Mercantile Bank",
+		"490991" => "MTN Banking",
+		"198765" => "Nedbank (South Africa)",
+		"460005" => "Postbank",
+		"051001" => "Standard Bank (South Africa)",
+		"other"  => "Other Bank",
+	);
+
+	$fields = array(
+		'first_name'    => array( 'First Name', 'text' ),
+		'last_name'     => array( 'Last Name', 'text' ),
+		'mobile_number' => array( 'Mobile Number', 'text' ),
+		'id_number'     => array( 'ID Number', 'text' ),
+		'bank_name'     => array( 'Bank', 'select', $cbc_list ),
+		'bank_account'  => array( 'Account Number', 'text' ),
+//		'bank_branch'   => array( 'Branch', 'text' ),
+		'bank_type'     => array( 'Account Type', 'select', $bank_account_types ),
+	);
+
+	print "<h4>TradeSafe Details</h4>";
+
+	$count = 1;
+	foreach ( $fields as $field_name => $field_info ) {
+		$field_value = ! empty( $_POST[ $field_name ] ) ? $_POST[ $field_name ] : '';
+		?>
+        <p>
+            <label for="<?php print $field_name; ?>"><?php esc_html_e( $field_info[0], 'woocommerce-gateway-tradesafe' ) ?>
+                <br/>
+				<?php if ( 'select' == $field_info[1] ): ?>
+                    <select step="<?php print $count; ?>"
+                            id="<?php print $field_name; ?>"
+                            name="<?php print $field_name; ?>"
+                            class="input">
+						<?php
+						foreach ( $field_info[2] as $option_value => $option_name ) {
+							if ( $option_value == $field_value ) {
+								print '<option selected="selected" value="' . $option_value . '">' . $option_name . '</option>';
+							} else {
+								print '<option value="' . $option_value . '">' . $option_name . '</option>';
+							}
+						}
+						?>
+                    </select>
+				<?php else: ?>
+                    <input type="<?php print $field_info[1]; ?>"
+                           step="<?php print $count; ?>"
+                           id="<?php print $field_name; ?>"
+                           name="<?php print $field_name; ?>"
+                           value="<?php echo esc_attr( $field_value ); ?>"
+                           class="input"
+                    />
+				<?php endif; ?>
+            </label>
+        </p>
+		<?php
+		$count ++;
+	}
+}
+
+add_filter( 'registration_errors', 'woocommerce_tradesafe_registration_errors', 10, 3 );
+function woocommerce_tradesafe_registration_errors( $errors, $sanitized_user_login, $user_email ) {
+	$user = array(
+		'first_name'     => $_POST['first_name'],
+		'last_name'      => $_POST['last_name'],
+		'email'          => $user_email,
+		'mobile_country' => 'ZA',
+		'mobile'         => str_replace(' ', '', $_POST['mobile_number']),
+		'id_number'      => str_replace(' ', '', $_POST['id_number']),
+		'bank'           => $_POST['bank_name'],
+		'number'         => $_POST['bank_account'],
+		'branch_code'    => $_POST['bank_name'],
+		'type'           => $_POST['bank_type'],
+	);
+
+	$gateway = new WC_Gateway_TradeSafe();
+	$request = $gateway->api_request( 'verify/user', array( 'body' => $user ), 'POST' );
+
+	if ( is_wp_error( $request ) ) {
+		$errors->add( 'error', __( '<strong>ERROR</strong>: ' . $request->get_error_message(), 'woocommerce-gateway-tradesafe' ) );
+	}
+
+//	$request = $gateway->api_request( 'user', array( 'body' => $user ), 'POST' );
+//
+//	if ( is_wp_error( $request ) ) {
+//		print_r($request);
+//	}
+
+//	$errors->add( 'error', __( '<strong>ERROR</strong>: XXX', 'woocommerce-gateway-tradesafe' ) );
+
+	return $errors;
+}
+
+add_action( 'user_register', 'woocommerce_tradesafe_user_register' );
+function woocommerce_tradesafe_user_register( $user_id ) {
+	$user = get_user_by( 'ID', $user_id );
+
+	$user = array(
+		'first_name'     => $_POST['first_name'],
+		'last_name'      => $_POST['last_name'],
+		'email'          => $user->user_email,
+		'mobile_country' => 'ZA',
+		'mobile'         => str_replace(' ', '', $_POST['mobile_number']),
+		'id_number'      => str_replace(' ', '', $_POST['id_number']),
+		'bank'           => $_POST['bank_name'],
+		'number'         => $_POST['bank_account'],
+		'branch_code'    => $_POST['bank_name'],
+		'type'           => $_POST['bank_type'],
+	);
+
+	$gateway = new WC_Gateway_TradeSafe();
+	$request = $gateway->api_request( 'user', array( 'body' => $user ), 'POST' );
+
+	if ( ! is_wp_error( $request ) ) {
+		update_user_meta( $user_id, 'tradesafe_user_id', $request['user_id'] );
+	}
 }
