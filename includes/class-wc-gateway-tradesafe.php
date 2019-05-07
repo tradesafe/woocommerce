@@ -66,7 +66,6 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 		if ( 'yes' === $this->get_option( 'testmode' ) ) {
 			$this->testmode = 'yes';
 			$this->url      = 'https://sandbox.tradesafe.co.za/api';
-			$this->url      = 'http://local.tradesafe.co.za/api';
 			$this->add_testmode_admin_settings_notice();
 		} else {
 			$this->testmode         = 'no';
@@ -1103,7 +1102,6 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 		// Setup the test data, if in test mode.
 		if ( 'yes' === $this->get_option( 'testmode' ) ) {
 			$this->url = 'https://sandbox.tradesafe.co.za/api';
-			$this->url = 'http://local.tradesafe.co.za/api';
 		}
 
 		$api_endpoint = sprintf( '%s/%s', $this->url, $command );

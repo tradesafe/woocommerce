@@ -242,7 +242,6 @@ function woocommerce_tradesafe_api_request( $command, $api_args, $method = 'POST
 
 	if ( 'yes' === $settings['testmode'] ) {
 		$url = 'https://sandbox.tradesafe.co.za/api';
-		$url = 'http://local.tradesafe.co.za/api';
 	}
 
 	if ( empty( $token ) ) {
@@ -311,42 +310,9 @@ function woocommerce_tradesafe_valid_transaction( $available_gateways ) {
 
 add_action( 'wp_loaded', function () {
 	if ( is_user_logged_in() && ! current_user_can( 'administrator' ) ) {
-		$user = wp_get_current_user();
-
-		$first_name = get_user_meta( $user->id, 'first_name', true );
-		$last_name  = get_user_meta( $user->id, 'last_name', true );
-
-		$account_id_number     = get_user_meta( $user->id, 'account_id_number', true );
-		$account_mobile_number = get_user_meta( $user->id, 'account_mobile_number', true );
-		$account_bank_name     = get_user_meta( $user->id, 'account_bank_name', true );
-		$account_bank_number   = get_user_meta( $user->id, 'account_bank_number', true );
-		$account_bank_type     = get_user_meta( $user->id, 'account_bank_type', true );
-
-		if ( ! isset( $first_name, $last_name ) || $first_name == '' || $last_name == '' ) {
-			$edit_account_url = wc_get_endpoint_url( 'edit-account', '', wc_get_page_permalink( 'myaccount' ) );
-			$current_url      = home_url( $_SERVER['REQUEST_URI'] );
-
-			if ( $edit_account_url !== $current_url ) {
-				wp_redirect( $edit_account_url );
-			}
-		}
-
-		if ( ! isset( $account_id_number, $account_mobile_number, $account_bank_name, $account_bank_number, $account_bank_type ) ||
-		     $account_id_number == '' ||
-		     $account_mobile_number == '' ||
-		     $account_bank_name == '' ||
-		     $account_bank_number == '' ||
-		     $account_bank_type == ''
-		) {
-			$edit_account_url = wc_get_endpoint_url( 'tradesafe', '', wc_get_page_permalink( 'myaccount' ) );
-			$current_url      = home_url( $_SERVER['REQUEST_URI'] );
-
-			if ( $edit_account_url !== $current_url ) {
-				wp_redirect( $edit_account_url );
-			}
-		}
 
 	}
+
 	if ( $_SERVER['REQUEST_METHOD'] === 'POST' && $_SERVER['HTTP_USER_AGENT'] === 'api.tradesafe.co.za' ) {
 		$data = json_decode( file_get_contents( 'php://input' ), true );
 
@@ -472,7 +438,6 @@ function woocommerce_tradesafe_account_content() {
 
 	if ( 'yes' === $settings['testmode'] ) {
 		$url = 'https://sandbox.tradesafe.co.za';
-		$url = 'http://local.tradesafe.co.za';
 	} else {
 		$url = 'https://www.tradesafe.co.za';
 	}
@@ -591,7 +556,17 @@ function woocommerce_tradesafe_account_content() {
  */
 
 add_action( 'register_form', 'woocommerce_tradesafe_registration_form' );
+add_action( 'woocommerce_register_form_start', 'woocommerce_tradesafe_registration_form' );
 function woocommerce_tradesafe_registration_form() {
+	wp_enqueue_script('jquery');
+	wp_enqueue_script( 'woocommerce-tradesafe-register-js', plugins_url( '/assets/js/register.js', __FILE__ ));
+
+    $message = "<a href='#why-tradesafe' class='show-more' id='why-tradesafe'>Why do we require your bank account details if you are the one buying?</a>"
+               ."<div class='more-text'>"
+               ."<p>Your funds are paid into an independent escrow (trust) account managed by our escrow partners TradeSafe Escrow. If the goods or services are not what you ordered, then TradeSafe will refund you. This information is also required for regulatory reporting purposes (TradeSafe is accountable to both the South African Reserve Bank and the Financial Intelligence Centre). Your bank account details are secured and encrypted with industry leading technology standards which can be found in most banks.</p>"
+               ."<p>Please ensure you enter your banking account details correctly as neither us nor TradeSafe will be held responsible should the funds be paid into another account if you provide incorrect bank account details.</p>"
+               ."<p><a href='#why-tradesafe' class='show-more'>Hide</a></p>"
+               ."</div>";
 
 	$bank_account_types = array(
 		'CHEQUE'       => 'Cheque/Current Account',
@@ -619,21 +594,24 @@ function woocommerce_tradesafe_registration_form() {
 		'last_name'     => array( 'Last Name', 'text' ),
 		'mobile_number' => array( 'Mobile Number', 'text' ),
 		'id_number'     => array( 'ID Number', 'text' ),
+		'message'       => array('', 'html', $message),
 		'bank_name'     => array( 'Bank', 'select', $cbc_list ),
 		'bank_account'  => array( 'Account Number', 'text' ),
 //		'bank_branch'   => array( 'Branch', 'text' ),
 		'bank_type'     => array( 'Account Type', 'select', $bank_account_types ),
 	);
 
-	print "<h4>TradeSafe Details</h4>";
+//	print "<h4>TradeSafe Details</h4>";
 
 	$count = 1;
 	foreach ( $fields as $field_name => $field_info ) {
 		$field_value = ! empty( $_POST[ $field_name ] ) ? $_POST[ $field_name ] : '';
 		?>
-        <p>
+        <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
             <label for="<?php print $field_name; ?>"><?php esc_html_e( $field_info[0], 'woocommerce-gateway-tradesafe' ) ?>
-                <br/>
+                <?php if ('html' != $field_info[1]): ?>
+                    <span class="required">*</span>
+                <?php endif; ?>
 				<?php if ( 'select' == $field_info[1] ): ?>
                     <select step="<?php print $count; ?>"
                             id="<?php print $field_name; ?>"
@@ -649,13 +627,15 @@ function woocommerce_tradesafe_registration_form() {
 						}
 						?>
                     </select>
+			    <?php elseif ( 'html' == $field_info[1] ): ?>
+                    <?php print $field_info[2]; ?>
 				<?php else: ?>
                     <input type="<?php print $field_info[1]; ?>"
                            step="<?php print $count; ?>"
                            id="<?php print $field_name; ?>"
                            name="<?php print $field_name; ?>"
                            value="<?php echo esc_attr( $field_value ); ?>"
-                           class="input"
+                           class="input input-text"
                     />
 				<?php endif; ?>
             </label>
@@ -663,10 +643,21 @@ function woocommerce_tradesafe_registration_form() {
 		<?php
 		$count ++;
 	}
+
+	print "<div class=\"clear\"></div>";
 }
 
 add_filter( 'registration_errors', 'woocommerce_tradesafe_registration_errors', 10, 3 );
 function woocommerce_tradesafe_registration_errors( $errors, $sanitized_user_login, $user_email ) {
+	return _validate_registration_form($errors, $user_email);
+}
+
+add_action( 'woocommerce_register_post', 'woocommerce_tradesafe_my_account_registration_errors', 10, 3 );
+function woocommerce_tradesafe_my_account_registration_errors( $username, $email, $validation_errors ) {
+	return _validate_registration_form($validation_errors, $email);
+}
+
+function _validate_registration_form($errors, $user_email) {
 	$user = array(
 		'first_name'     => $_POST['first_name'],
 		'last_name'      => $_POST['last_name'],
@@ -699,6 +690,7 @@ function woocommerce_tradesafe_registration_errors( $errors, $sanitized_user_log
 }
 
 add_action( 'user_register', 'woocommerce_tradesafe_user_register' );
+add_action( 'woocommerce_created_customer', 'woocommerce_tradesafe_user_register' );
 function woocommerce_tradesafe_user_register( $user_id ) {
 	$user = get_user_by( 'ID', $user_id );
 
