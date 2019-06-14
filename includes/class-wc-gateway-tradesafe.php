@@ -53,7 +53,6 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 
 		// Setup default merchant data.
 		$this->api_key          = $this->get_option( 'json_web_token' );
-		$this->url              = 'https://www.tradesafe.co.za/api';
 		$this->title            = $this->get_option( 'title' );
 		$this->response_url     = add_query_arg( 'wc-api', 'WC_Gateway_TradeSafe', home_url( '/' ) );
 		$this->send_debug_email = 'yes' === $this->get_option( 'send_debug_email' );
@@ -62,15 +61,10 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 		$this->enable_logging   = 'yes' === $this->get_option( 'enable_logging' ) ? 'yes' : 'no';
 		$this->debug            = 'yes' === $this->get_option( 'enable_debugging' ) ? 'yes' : 'no';
 
-		// Setup the test data, if in test mode.
-		if ( 'yes' === $this->get_option( 'testmode' ) ) {
-			$this->testmode = 'yes';
-			$this->url      = 'https://sandbox.tradesafe.co.za/api';
-			$this->add_testmode_admin_settings_notice();
-		} else {
-			$this->testmode         = 'no';
-			$this->send_debug_email = false;
-		}
+		$this->testmode         = 'yes';
+		$this->send_debug_email = false;
+
+		$this->url = $this->get_api_url();
 
 		add_action( 'woocommerce_api_wc_gateway_tradesafe', array( $this, 'check_itn_response' ) );
 		add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array(
@@ -83,6 +77,25 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 
 		add_option( 'tradesafe_verify_last_check', '64', '', true );
 
+	}
+
+	/**
+	 * Generate API URL
+	 */
+	private function get_api_url() {
+		// Setup the test data, if in test mode.
+		if ( 'www.tradesafe.co.za' === $this->get_option( 'api_domain' ) ) {
+			$url = 'https://www.tradesafe.co.za/api';
+		} else {
+			$url = 'https://' . $this->get_option( 'api_domain' ) . '/api';
+			$this->add_testmode_admin_settings_notice();
+
+			if ( '' === $this->get_option( 'api_domain' ) ) {
+				$url = 'https://sandbox.tradesafe.co.za/api';
+			}
+		}
+
+		return $url;
 	}
 
 	/**
@@ -119,11 +132,11 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 				'default'     => '',
 				'desc_tip'    => true,
 			),
-			'testmode'         => array(
-				'title'       => __( 'TradeSafe Sandbox', 'woocommerce-gateway-tradesafe' ),
-				'type'        => 'checkbox',
-				'description' => __( 'Place the payment gateway in development mode.', 'woocommerce-gateway-tradesafe' ),
-				'default'     => 'yes',
+			'api_domain'       => array(
+				'title'       => __( 'API Domain', 'woocommerce-gateway-tradesafe' ),
+				'type'        => 'text',
+				'placeholder' => 'sandbox.tradesafe.co.za',
+				'default'     => 'sandbox.tradesafe.co.za',
 			),
 			'json_web_token'   => array(
 				'title'       => __( 'JSON Web Token', 'woocommerce-gateway-tradesafe' ),
@@ -196,7 +209,9 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 	 * @since 1.0.0
 	 */
 	public function add_testmode_admin_settings_notice() {
-		$this->form_fields['json_web_token']['description'] .= ' <strong>' . __( 'Sandbox Merchant API Key currently in use', 'woocommerce-gateway-tradesafe' ) . '.</strong>';
+		if ( ! isset( $this->form_fields['api_domain']['description'] ) ) {
+			$this->form_fields['api_domain']['description'] .= ' <strong>' . __( 'Testing API Key currently in use', 'woocommerce-gateway-tradesafe' ) . '.</strong>';
+		}
 	}
 
 	/**
@@ -204,8 +219,8 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 	 *
 	 * Check if this gateway is enabled and available in the base currency being traded with.
 	 *
-	 * @since 1.0.0
 	 * @return bool
+	 * @since 1.0.0
 	 */
 	public function is_valid_for_use() {
 		$is_available          = false;
@@ -215,28 +230,28 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 			$is_available = true;
 		}
 
-        $response = $this->api_request( 'verify/owner', array(), 'GET');
+		$response = $this->api_request( 'verify/owner', array(), 'GET' );
 
-        if ( is_wp_error( $response ) ) {
-            $is_available = false;
-            foreach ( $response->errors as $code => $message ) {
-                add_action( 'admin_notices', function () use ( $code, $message ) {
-                    echo '<div class="error tradesafe-' . $code . '"><p>'
-                         . '<strong>'
-                         . __( 'TradeSafe Escrow: ', 'woocommerce-gateway-tradesafe' )
-                         . '</strong><br />'
-                         . __( $message[0], 'woocommerce-gateway-tradesafe' )
-                         . '</p></div>';
-                } );
-            }
-        } else {
-	        $this->form_fields['json_web_token']['description'] .= '<strong>' . __( 'Account Details:', 'woocommerce-gateway-tradesafe' ) . '</strong><br/>'
-	                                                               . "<div><strong>Name: </strong> " . $response['first_name'] . " " . $response['last_name'] . "</div>"
-	                                                               . "<div><strong>Email: </strong>" . $response['email'] . "</div>"
-	                                                               . "<div><strong>Mobile: </strong>" . $response['mobile'] . "</div>"
-	                                                               . "<div><strong>ID Number: </strong>" . $response['id_number'] . "</div>"
-	                                                               . "<div><strong>Bank Details: </strong><br/>" . $response['bank']['name'] . "<br/>" . $response['bank']['account'] . "<br/>" . $response['bank']['type'] . "</div>";
-        }
+		if ( is_wp_error( $response ) ) {
+			$is_available = false;
+			foreach ( $response->errors as $code => $message ) {
+				add_action( 'admin_notices', function () use ( $code, $message ) {
+					echo '<div class="error tradesafe-' . $code . '"><p>'
+					     . '<strong>'
+					     . __( 'TradeSafe Escrow: ', 'woocommerce-gateway-tradesafe' )
+					     . '</strong><br />'
+					     . __( $message[0], 'woocommerce-gateway-tradesafe' )
+					     . '</p></div>';
+				} );
+			}
+		} else {
+			$this->form_fields['json_web_token']['description'] .= '<strong>' . __( 'Account Details:', 'woocommerce-gateway-tradesafe' ) . '</strong><br/>'
+			                                                       . "<div><strong>Name: </strong> " . $response['first_name'] . " " . $response['last_name'] . "</div>"
+			                                                       . "<div><strong>Email: </strong>" . $response['email'] . "</div>"
+			                                                       . "<div><strong>Mobile: </strong>" . $response['mobile'] . "</div>"
+			                                                       . "<div><strong>ID Number: </strong>" . $response['id_number'] . "</div>"
+			                                                       . "<div><strong>Bank Details: </strong><br/>" . $response['bank']['name'] . "<br/>" . $response['bank']['account'] . "<br/>" . $response['bank']['type'] . "</div>";
+		}
 
 		return $is_available;
 	}
@@ -278,26 +293,26 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 		} else {
 			$owner_details = $this->api_request( 'verify/owner', array(), 'GET' );
 
-			if (!is_wp_error($owner_details)) {
-			    $owner = array(
-			            'first_name' => $owner_details['first_name'],
-			            'email' => $owner_details['email'],
-			            'id_number' => $owner_details['id_number'],
-			            'mobile' => $owner_details['mobile'],
-			            'mobile_country' => 'ZA',
-                );
+			if ( ! is_wp_error( $owner_details ) ) {
+				$owner = array(
+					'first_name'     => $owner_details['first_name'],
+					'email'          => $owner_details['email'],
+					'id_number'      => $owner_details['id_number'],
+					'mobile'         => $owner_details['mobile'],
+					'mobile_country' => 'ZA',
+				);
 			}
 
-			$user = wp_get_current_user();
-			$user_id = get_user_meta($user->ID, 'tradesafe_user_id', true);
+			$user          = wp_get_current_user();
+			$user_id       = get_user_meta( $user->ID, 'tradesafe_user_id', true );
 			$buyer_details = $this->api_request( 'user/' . $user_id, array(), 'GET' );
 
-			if (!is_wp_error($buyer_details)) {
+			if ( ! is_wp_error( $buyer_details ) ) {
 				$buyer = array(
-					'first_name' => $buyer_details['first_name'],
-					'email' => $buyer_details['email'],
-					'id_number' => $buyer_details['id_number'],
-					'mobile' => $buyer_details['mobile'],
+					'first_name'     => $buyer_details['first_name'],
+					'email'          => $buyer_details['email'],
+					'id_number'      => $buyer_details['id_number'],
+					'mobile'         => $buyer_details['mobile'],
 					'mobile_country' => 'ZA',
 				);
 			}
@@ -319,12 +334,12 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 
 			$data["fee_allocation"] = 1;
 
-			$data["buyer"] = $buyer;
+			$data["buyer"]  = $buyer;
 			$data["seller"] = $owner;
 
 			if ( 'agent' === $this->get_option( 'service_role' ) ) {
 				$data["seller"] = array();
-				$data["agent"] = $owner;
+				$data["agent"]  = $owner;
 
 				$data["fee_allocation"]       = 3;
 				$data["agent_fee"]            = $this->get_option( 'agent_fee' );
@@ -685,10 +700,12 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 	/**
 	 * This function mainly responds to ITN cancel requests initiated on TradeSafe, but also acts
 	 * just in case they are not cancelled.
-	 * @version 1.4.3 Subscriptions flag
 	 *
 	 * @param array $data should be from the Gatewy ITN callback.
 	 * @param WC_Order $order
+	 *
+	 * @version 1.4.3 Subscriptions flag
+	 *
 	 */
 	public function handle_itn_payment_cancelled( $data, $order, $subscriptions ) {
 
@@ -704,10 +721,12 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 
 	/**
 	 * This function handles payment complete request by TradeSafe.
-	 * @version 1.4.3 Subscriptions flag
 	 *
 	 * @param array $data should be from the Gatewy ITN callback.
 	 * @param WC_Order $order
+	 *
+	 * @version 1.4.3 Subscriptions flag
+	 *
 	 */
 	public function handle_itn_payment_complete( $data, $order, $subscriptions ) {
 		$this->log( '- Complete' );
@@ -802,10 +821,11 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 	}
 
 	/**
-	 * @since 1.4.0 introduced
-	 *
 	 * @param $data
 	 * @param $order
+	 *
+	 * @since 1.4.0 introduced
+	 *
 	 */
 	public function handle_itn_payment_pending( $data, $order ) {
 		$this->log( '- Pending' );
@@ -898,10 +918,12 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 
 	/**
 	 * Store the TradeSafe renewal flag
-	 * @since 1.4.3
 	 *
 	 * @param string $token
 	 * @param WC_Subscription $subscription
+	 *
+	 * @since 1.4.3
+	 *
 	 */
 	protected function _set_renewal_flag( $subscription ) {
 		if ( version_compare( WC_VERSION, '3.0', '<' ) ) {
@@ -914,11 +936,12 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 
 	/**
 	 * Retrieve the TradeSafe renewal flag for a given order id.
-	 * @since 1.4.3
 	 *
 	 * @param WC_Subscription $subscription
 	 *
 	 * @return bool
+	 * @since 1.4.3
+	 *
 	 */
 	protected function _has_renewal_flag( $subscription ) {
 		if ( version_compare( WC_VERSION, '3.0', '<' ) ) {
@@ -930,11 +953,12 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 
 	/**
 	 * Retrieve the TradeSafe renewal flag for a given order id.
-	 * @since 1.4.3
 	 *
 	 * @param WC_Subscription $subscription
 	 *
 	 * @return mixed
+	 * @since 1.4.3
+	 *
 	 */
 	protected function _delete_renewal_flag( $subscription ) {
 		if ( version_compare( WC_VERSION, '3.0', '<' ) ) {
@@ -1059,14 +1083,14 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 	/**
 	 * Setup api data for the the adhoc payment.
 	 *
-	 * @since 1.4.0 introduced.
-	 *
 	 * @param string $token
 	 * @param double $amount_to_charge
 	 * @param string $item_name
 	 * @param string $item_description
 	 *
 	 * @return bool|WP_Error
+	 * @since 1.4.0 introduced.
+	 *
 	 */
 	public function submit_ad_hoc_payment( $token, $amount_to_charge, $item_name, $item_description ) {
 		$args = array(
@@ -1082,14 +1106,14 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 	/**
 	 * Send off API request.
 	 *
-	 * @since 1.4.0 introduced.
-	 *
 	 * @param $command
 	 * @param $token
 	 * @param $api_args
 	 * @param string $method GET | PUT | POST | DELETE.
 	 *
 	 * @return bool|WP_Error
+	 * @since 1.4.0 introduced.
+	 *
 	 */
 	public function api_request( $command, $api_args, $method = 'POST' ) {
 		$token = $this->get_option( 'json_web_token' );
@@ -1099,10 +1123,7 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 			return new WP_Error( '404', __( 'A token is required to submit a request to the TradeSafe API', 'woocommerce-gateway-tradesafe' ), null );
 		}
 
-		// Setup the test data, if in test mode.
-		if ( 'yes' === $this->get_option( 'testmode' ) ) {
-			$this->url = 'https://sandbox.tradesafe.co.za/api';
-		}
+		$this->url = $this->get_api_url();
 
 		$api_endpoint = sprintf( '%s/%s', $this->url, $command );
 
@@ -1110,6 +1131,7 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 		$api_args['headers'] = array(
 			'Authorization' => 'Bearer ' . $token,
 			'Content-Type'  => 'application/json',
+			'Accept'        => 'application/json',
 		);
 
 		if ( isset( $api_args['body'] ) ) {
@@ -1146,9 +1168,10 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 	/**
 	 * Responds to Subscriptions extension cancellation event.
 	 *
+	 * @param WC_Subscription $subscription
+	 *
 	 * @since 1.4.0 introduced.
 	 *
-	 * @param WC_Subscription $subscription
 	 */
 	public function cancel_subscription_listener( $subscription ) {
 		$token = $this->_get_subscription_token( $subscription );
@@ -1159,24 +1182,24 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 	}
 
 	/**
-	 * @since 1.4.0
-	 *
 	 * @param string $token
 	 *
 	 * @return bool|WP_Error
+	 * @since 1.4.0
+	 *
 	 */
 	public function cancel_pre_order_subscription( $token ) {
 //		return $this->api_request( 'cancel', $token, array(), 'PUT' );
 	}
 
 	/**
-	 * @since 1.4.0 introduced.
-	 *
 	 * @param      $api_data
 	 * @param bool $sort_data_before_merge ? default true.
 	 * @param bool $skip_empty_values Should key value pairs be ignored when generating signature?  Default true.
 	 *
 	 * @return string
+	 * @since 1.4.0 introduced.
+	 *
 	 */
 	protected function _generate_parameter_string( $api_data, $sort_data_before_merge = true, $skip_empty_values = true ) {
 
@@ -1215,9 +1238,10 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 	}
 
 	/**
+	 * @param WC_Order $order
+	 *
 	 * @since 1.4.0 introduced.
 	 *
-	 * @param WC_Order $order
 	 */
 	public function process_pre_order_payments( $order ) {
 
@@ -1324,8 +1348,8 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 	 * @param array $data
 	 * @param string $signature
 	 *
-	 * @since 1.0.0
 	 * @return string
+	 * @since 1.0.0
 	 */
 	public function validate_signature( $data, $signature ) {
 		$result = $data['signature'] === $signature;
@@ -1339,8 +1363,8 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 	 *
 	 * @param array $source_ip
 	 *
-	 * @since 1.0.0
 	 * @return bool
+	 * @since 1.0.0
 	 */
 	public function is_valid_ip( $source_ip ) {
 		// Variable initialization
@@ -1379,8 +1403,8 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 	 * @param array $post_data
 	 * @param string $proxy Address of proxy to use or NULL if no proxy.
 	 *
-	 * @since 1.0.0
 	 * @return bool
+	 * @since 1.0.0
 	 */
 	public function validate_response_data( $post_data, $proxy = null ) {
 		$this->log( 'Host = ' . $this->validate_url );
@@ -1425,13 +1449,13 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 	 *
 	 * eg. 100.00 is equal to 100.0001
 	 *
-	 * @author Jonathan Smit
-	 *
 	 * @param $amount1 Float 1st amount for comparison
 	 * @param $amount2 Float 2nd amount for comparison
 	 *
-	 * @since 1.0.0
 	 * @return bool
+	 * @since 1.0.0
+	 * @author Jonathan Smit
+	 *
 	 */
 	public function amounts_equal( $amount1, $amount2 ) {
 		return ! ( abs( floatval( $amount1 ) - floatval( $amount2 ) ) > PF_EPSILON );
@@ -1441,12 +1465,12 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 	 * Get order property with compatibility check on order getter introduced
 	 * in WC 3.0.
 	 *
-	 * @since 1.4.1
-	 *
 	 * @param WC_Order $order Order object.
 	 * @param string $prop Property name.
 	 *
 	 * @return mixed Property value
+	 * @since 1.4.1
+	 *
 	 */
 	public static function get_order_prop( $order, $prop ) {
 		switch ( $prop ) {
