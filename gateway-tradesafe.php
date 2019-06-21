@@ -696,7 +696,7 @@ function _validate_registration_form( $errors, $user_email ) {
 		$verification_token = hash( 'sha256', $token . $_GET['auth_key'] . $_GET['email'] );
 
 		if ( $_GET['verify'] !== $verification_token ) {
-			$errors->add( 'error', __( '<strong>ERROR</strong>: ' . 'Invalid verification token', 'woocommerce-gateway-tradesafe' ) );
+			$errors->add( 'error', __( 'Invalid verification token', 'woocommerce-gateway-tradesafe' ) );
 		}
 	} else {
 		$user = array(
@@ -706,17 +706,19 @@ function _validate_registration_form( $errors, $user_email ) {
 			'mobile_country' => 'ZA',
 			'mobile'         => str_replace( ' ', '', $_POST['mobile_number'] ),
 			'id_number'      => str_replace( ' ', '', $_POST['id_number'] ),
-			'bank'           => $_POST['bank_name'],
-			'number'         => $_POST['bank_account'],
-			'branch_code'    => $_POST['bank_name'],
-			'type'           => $_POST['bank_type'],
+			'bank_account'   => [
+				'bank'        => $_POST['bank_name'],
+				'number'      => $_POST['bank_account'],
+				'branch_code' => $_POST['bank_name'],
+				'type'        => $_POST['bank_type'],
+			],
 		);
 
 		$gateway = new WC_Gateway_TradeSafe();
 		$request = $gateway->api_request( 'verify/user', array( 'body' => $user ), 'POST' );
 
 		if ( is_wp_error( $request ) ) {
-			$errors->add( 'error', __( '<strong>ERROR</strong>: ' . $request->get_error_message(), 'woocommerce-gateway-tradesafe' ) );
+			$errors->add( 'error', __( $request->get_error_message(), 'woocommerce-gateway-tradesafe' ) );
 		}
 	}
 
@@ -725,6 +727,7 @@ function _validate_registration_form( $errors, $user_email ) {
 
 add_action( 'user_register', 'woocommerce_tradesafe_user_register' );
 add_action( 'woocommerce_created_customer', 'woocommerce_tradesafe_user_register' );
+
 function woocommerce_tradesafe_user_register( $user_id ) {
 	$user = get_user_by( 'ID', $user_id );
 

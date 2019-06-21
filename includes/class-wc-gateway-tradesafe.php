@@ -1155,8 +1155,10 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 
 		if ( isset( $results['response']['code'] ) && 200 !== $results['response']['code'] && 201 !== $results['response']['code'] ) {
 			$this->log( "Error posting API request:\n" . print_r( $results['response'], true ) );
-			$message        = json_decode( $results['body'], true );
-			$message_string = implode( '<br />', $message['errors'] );
+			$message = json_decode( $results['body'], true );
+			if ( isset( $message['errors'] ) ) {
+				$message_string = implode( '<br />', $message['errors'] );
+			}
 
 			return new WP_Error( $results['response']['code'], $message_string, $results );
 		}
