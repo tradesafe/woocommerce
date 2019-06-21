@@ -692,17 +692,17 @@ function _validate_registration_form( $errors, $user_email ) {
 		}
 	} else {
 		$user = array(
-			'first_name'     => $_POST['first_name'],
-			'last_name'      => $_POST['last_name'],
+			'first_name'     => sanitize_text_field( $_POST['first_name'] ),
+			'last_name'      => sanitize_text_field( $_POST['last_name'] ),
 			'email'          => $user_email,
 			'mobile_country' => 'ZA',
-			'mobile'         => str_replace( ' ', '', $_POST['mobile_number'] ),
-			'id_number'      => str_replace( ' ', '', $_POST['id_number'] ),
+			'mobile'         => str_replace( ' ', '', sanitize_text_field( $_POST['mobile_number'] ) ),
+			'id_number'      => str_replace( ' ', '', sanitize_text_field( $_POST['id_number'] ) ),
 			'bank_account'   => [
-				'bank'        => $_POST['bank_name'],
-				'number'      => $_POST['bank_account'],
-				'branch_code' => $_POST['bank_name'],
-				'type'        => $_POST['bank_type'],
+				'bank'        => sanitize_text_field( $_POST['bank_name'] ),
+				'number'      => sanitize_text_field( $_POST['bank_account'] ),
+				'branch_code' => sanitize_text_field( $_POST['bank_name'] ),
+				'type'        => sanitize_text_field( $_POST['bank_type'] ),
 			],
 		);
 
@@ -719,8 +719,8 @@ function _validate_registration_form( $errors, $user_email ) {
 
 add_action( 'user_register', 'woocommerce_tradesafe_user_register' );
 add_action( 'woocommerce_created_customer', 'woocommerce_tradesafe_user_register' );
-
 function woocommerce_tradesafe_user_register( $user_id ) {
+	static $request;
 	$user = get_user_by( 'ID', $user_id );
 
 	if ( isset( $_GET['auth_key'] ) && isset( $_GET['verify'] ) ) {
@@ -733,23 +733,36 @@ function woocommerce_tradesafe_user_register( $user_id ) {
 		}
 	} else {
 		$user = array(
-			'first_name'     => $_POST['first_name'],
-			'last_name'      => $_POST['last_name'],
+			'first_name'     => sanitize_text_field( $_POST['first_name'] ),
+			'last_name'      => sanitize_text_field( $_POST['last_name'] ),
 			'email'          => $user->user_email,
 			'mobile_country' => 'ZA',
-			'mobile'         => str_replace( ' ', '', $_POST['mobile_number'] ),
-			'id_number'      => str_replace( ' ', '', $_POST['id_number'] ),
-			'bank'           => $_POST['bank_name'],
-			'number'         => $_POST['bank_account'],
-			'branch_code'    => $_POST['bank_name'],
-			'type'           => $_POST['bank_type'],
+			'mobile'         => str_replace( ' ', '', sanitize_text_field( $_POST['mobile_number'] ) ),
+			'id_number'      => str_replace( ' ', '', sanitize_text_field( $_POST['id_number'] ) ),
+			'bank_account'   => [
+				'bank'        => sanitize_text_field( $_POST['bank_name'] ),
+				'number'      => sanitize_text_field( $_POST['bank_account'] ),
+				'branch_code' => sanitize_text_field( $_POST['bank_name'] ),
+				'type'        => sanitize_text_field( $_POST['bank_type'] ),
+			],
 		);
 
-		$gateway = new WC_Gateway_TradeSafe();
-		$request = $gateway->api_request( 'user', array( 'body' => $user ), 'POST' );
+		if ( ! isset( $request ) ) {
+			$gateway = new WC_Gateway_TradeSafe();
+			$request = $gateway->api_request( 'user', array( 'body' => $user ), 'POST' );
+		}
 
 		if ( ! is_wp_error( $request ) ) {
 			update_user_meta( $user_id, 'tradesafe_user_id', $request['user_id'] );
+		}
+
+		if ( isset( $_POST['first_name'] ) ) {
+			update_user_meta( $user_id, 'billing_first_name', sanitize_text_field( $_POST['first_name'] ) );
+			update_user_meta( $user_id, 'first_name', sanitize_text_field( $_POST['first_name'] ) );
+		}
+		if ( isset( $_POST['last_name'] ) ) {
+			update_user_meta( $user_id, 'billing_last_name', sanitize_text_field( $_POST['last_name'] ) );
+			update_user_meta( $user_id, 'last_name', sanitize_text_field( $_POST['last_name'] ) );
 		}
 	}
 
