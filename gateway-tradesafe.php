@@ -62,15 +62,6 @@ function order_status_cancelled( $order ) {
 //    wp_die();
 }
 
-function woocommerce_tradesafe_plugin_callback_rewrite_rule( $wp_rewrite ) {
-	$wp_rewrite->rules = array_merge(
-		[ 'tradesafe/(.+)/?$' => 'index.php?tradesafe=1&action=$matches[1]' ],
-		$wp_rewrite->rules
-	);
-}
-
-add_filter( 'generate_rewrite_rules', 'woocommerce_tradesafe_plugin_callback_rewrite_rule' );
-
 // Adding the id var so that WP recognizes it
 function woocommerce_tradesafe_plugin_callback_query_vars( $vars ) {
 	$vars[] = 'tradesafe';
@@ -395,6 +386,7 @@ function woocommerce_tradesafe_account_tab( $menu_links ) {
 
 add_action( 'init', 'woocommerce_tradesafe_account' );
 function woocommerce_tradesafe_account() {
+	add_rewrite_rule( '^tradesafe/(.*)/?$', 'index.php?tradesafe=1&action=$matches[1]', 'top' );
 	add_rewrite_endpoint( 'tradesafe', EP_PERMALINK | EP_PAGES | EP_ROOT );
 }
 
