@@ -237,11 +237,15 @@ function woocommerce_tradesafe_cancel_order( $order_id ) {
  */
 function woocommerce_tradesafe_api_request( $command, $api_args, $method = 'POST' ) {
 	$settings = get_option( 'woocommerce_tradesafe_settings' );
-	$url      = 'https://www.tradesafe.co.za/api';
 	$token    = $settings['json_web_token'];
 
-	if ( 'yes' === $settings['testmode'] ) {
-		$url = 'https://sandbox.tradesafe.co.za/api';
+	if ( 'www.tradesafe.co.za' === $settings['api_domain'] ) {
+		$url = 'https://www.tradesafe.co.za/api';
+	} else {
+		$url = 'https://' . $settings['api_domain'] . '/api';
+		if ( '' === $settings['api_domain'] ) {
+			$url = 'https://sandbox.tradesafe.co.za/api';
+		}
 	}
 
 	if ( empty( $token ) ) {
@@ -436,10 +440,13 @@ function woocommerce_tradesafe_account_content() {
 	$tradesafe_id = get_user_meta( $user->ID, 'tradesafe_user_id', true );
 	$settings     = get_option( 'woocommerce_tradesafe_settings' );
 
-	if ( 'yes' === $settings['testmode'] ) {
-		$url = 'https://sandbox.tradesafe.co.za';
+	if ( 'www.tradesafe.co.za' === $settings['api_domain'] ) {
+		$url = 'https://www.tradesafe.co.za/api';
 	} else {
-		$url = 'https://www.tradesafe.co.za';
+		$url = 'https://' . $settings['api_domain'] . '/api';
+		if ( '' === $settings['api_domain'] ) {
+			$url = 'https://sandbox.tradesafe.co.za/api';
+		}
 	}
 
 	if ( $tradesafe_id != '' ) {
@@ -558,8 +565,13 @@ function woocommerce_tradesafe_account_content() {
 add_action( 'register_form', 'woocommerce_tradesafe_registration_form' );
 add_action( 'woocommerce_register_form_start', 'woocommerce_tradesafe_registration_form' );
 function woocommerce_tradesafe_registration_form() {
+	$settings = get_option( 'woocommerce_tradesafe_settings' );
 	wp_enqueue_script( 'jquery' );
 	wp_enqueue_script( 'woocommerce-tradesafe-register-js', plugins_url( '/assets/js/register.js', __FILE__ ) );
+
+	wp_register_script( 'tradesafe-settings', false );
+	wp_localize_script( 'tradesafe-settings', 'tradesafe_params', array( 'api_url' => $settings['api_domain'] ) );
+	wp_enqueue_script( 'tradesafe-settings' );
 
 	$message = "<a href='#why-tradesafe' class='show-more' id='why-tradesafe'>Why do we require your bank account details if you are the one buying?</a>"
 	           . "<div class='more-text'>"

@@ -17,7 +17,7 @@ jQuery(function ($) {
 
         jQuery.post(woocommerce_params.ajax_url, data, function(response) {
             var auth_data = $.parseJSON(response);
-            var url = 'https://sandbox.tradesafe.co.za/api/authorize';
+            var url = 'https://' + tradesafe_params.api_url + '/api/authorize';
             var form_html = '<form action="' + url + '" method="POST">';
             $.each(auth_data, function (i,v) {
                 form_html += '<input type="hidden" name="' + i + '" value="' + v + '">';
