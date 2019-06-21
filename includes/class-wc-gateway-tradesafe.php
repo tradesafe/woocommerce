@@ -104,10 +104,7 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 	 * @since 1.0.0
 	 */
 	public function init_form_fields() {
-		$countries_obj = new WC_Countries();
-		$countries     = $countries_obj->get_countries();
 		$this->update_option( 'tradesafe_verify_last_check', 0 );
-		$token = $this->get_option( 'json_web_token' );
 
 		$this->form_fields = array(
 			'enabled'          => array(
@@ -198,6 +195,13 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 				'type'    => 'checkbox',
 				'label'   => __( 'Enable API debugging for the gateway.', 'woocommerce-gateway-tradesafe' ),
 				'default' => 'no',
+			),
+			'ca_certificate'   => array(
+				'title'       => __( 'CA Certificate', 'woocommerce-gateway-tradesafe' ),
+				'type'        => 'text',
+				'description' => __( 'Path to a valid CA certificate bundle.', 'woocommerce-gateway-tradesafe' ),
+				'placeholder' => '/path/ca-bundle.crt',
+				'default'     => '',
 			),
 		);
 	}
@@ -1138,6 +1142,10 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 			$api_args['body'] = json_encode( $api_args['body'] );
 		}
 		$api_args['method'] = strtoupper( $method );
+
+		if ( '' !== $this->get_option( 'ca_certificate' ) ) {
+			$api_args['sslcertificates'] = $this->get_option( 'ca_certificate' );
+		}
 
 		$results = wp_remote_request( $api_endpoint, $api_args );
 
