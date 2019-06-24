@@ -712,6 +712,9 @@ function _validate_registration_form( $errors, $user_email ) {
 		if ( is_wp_error( $request ) ) {
 			$errors->add( 'error', __( $request->get_error_message(), 'woocommerce-gateway-tradesafe' ) );
 		}
+
+		$logger = new WC_Logger();
+		$logger->add( 'tradesafe', 'Verified User' );
 	}
 
 	return $errors;
@@ -754,6 +757,9 @@ function woocommerce_tradesafe_user_register( $user_id ) {
 
 		if ( ! is_wp_error( $request ) ) {
 			update_user_meta( $user_id, 'tradesafe_user_id', $request['user_id'] );
+
+			$logger = new WC_Logger();
+			$logger->add( 'tradesafe', 'Created / Linked User Account ' . $user_id . '-' . $request['user_id'] );
 		}
 
 		if ( isset( $_POST['first_name'] ) ) {
