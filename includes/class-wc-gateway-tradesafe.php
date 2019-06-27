@@ -355,14 +355,19 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 			}
 
 			$response = $this->api_request( 'contract', array( 'body' => $data ) );
-			$response = $response['Contract'];
+			if ( is_wp_error( $response ) ) {
+				$output = '<p>An error occured.</p>';
+				$output .= '<a class="button cancel" href="' . $order->get_cancel_order_url() . '">' . __( 'Cancel order &amp; restore cart', 'woocommerce-gateway-tradesafe' ) . '</a>';
 
-			$order->update_meta_data( 'tradesafe_id', $response['id'] );
-			$order->save();
+				return $output;
+			} else {
+				$response = $response['Contract'];
+				$order->update_meta_data( 'tradesafe_id', $response['id'] );
+				$order->save();
+			}
 		}
 
-		$ecentric_request = wp_remote_request( $response['ecentric_payment_url'], array( 'method' => 'GET' ) );
-		$ecentric_json    = json_decode( $ecentric_request['body'], true );
+		$ecentric_request = $this->api_request( 'payment/ecentric/' . $response['id'], array(), 'GET' );
 
 		$payments = array(
 			'eftsecure' => array(
@@ -371,7 +376,7 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 			),
 			'ecentric'  => array(
 				'title' => 'Ecentric (Credit / Debit Card)',
-				'data'  => $ecentric_json['ecentric_payment_button'],
+				'data'  => $ecentric_request['ecentric_payment_button'],
 			),
 			'manual'    => array(
 				'title' => 'Pay via Manual EFT',
