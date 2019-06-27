@@ -708,11 +708,12 @@ function _validate_registration_form( $errors, $user_email ) {
 
 		$gateway = new WC_Gateway_TradeSafe();
 		$request = $gateway->api_request( 'verify/user', array( 'body' => $user ), 'POST' );
-		$logger = new WC_Logger();
+		$logger  = new WC_Logger();
 
 		if ( is_wp_error( $request ) ) {
-			$errors->add( 'error', __( $request->get_error_message(), 'woocommerce-gateway-tradesafe' ) );
-			$logger->add( 'tradesafe', 'Verified Failed: ' .  __( $request->get_error_message(), 'woocommerce-gateway-tradesafe' ) );
+			$message = __( 'Account Creation Failed. If you already have a TradeSafe account please link your account instead.', 'woocommerce-gateway-tradesafe' );
+			$errors->add( 'error', $message );
+			$logger->add( 'tradesafe', 'Verified Failed: ' . __( $request->get_error_message(), 'woocommerce-gateway-tradesafe' ) );
 		}
 
 		$logger->add( 'tradesafe', 'Verified User' );
@@ -761,8 +762,8 @@ function woocommerce_tradesafe_user_register( $user_id ) {
 			update_user_meta( $user_id, 'tradesafe_user_id', $request['user_id'] );
 			$logger->add( 'tradesafe', 'Created / Linked User Account ' . $user_id . '-' . $request['user_id'] );
 		} else {
-			$logger->add( 'tradesafe', 'Account Creation Failed: ' .  __( $request->get_error_message(), 'woocommerce-gateway-tradesafe' ) );
-        }
+			$logger->add( 'tradesafe', 'Account Creation Failed ' . __( $request->get_error_message(), 'woocommerce-gateway-tradesafe' ) );
+		}
 
 		if ( isset( $_POST['first_name'] ) ) {
 			update_user_meta( $user_id, 'billing_first_name', sanitize_text_field( $_POST['first_name'] ) );
