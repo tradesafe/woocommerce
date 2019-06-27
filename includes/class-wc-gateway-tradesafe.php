@@ -298,28 +298,11 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 			$owner_details = $this->api_request( 'verify/owner', array(), 'GET' );
 
 			if ( ! is_wp_error( $owner_details ) ) {
-				$owner = array(
-					'first_name'     => $owner_details['first_name'],
-					'email'          => $owner_details['email'],
-					'id_number'      => $owner_details['id_number'],
-					'mobile'         => $owner_details['mobile'],
-					'mobile_country' => 'ZA',
-				);
+				$owner = $owner_details['id'];
 			}
 
-			$user          = wp_get_current_user();
-			$user_id       = get_user_meta( $user->ID, 'tradesafe_user_id', true );
-			$buyer_details = $this->api_request( 'user/' . $user_id, array(), 'GET' );
-
-			if ( ! is_wp_error( $buyer_details ) ) {
-				$buyer = array(
-					'first_name'     => $buyer_details['first_name'],
-					'email'          => $buyer_details['email'],
-					'id_number'      => $buyer_details['id_number'],
-					'mobile'         => $buyer_details['mobile'],
-					'mobile_country' => 'ZA',
-				);
-			}
+			$user  = wp_get_current_user();
+			$buyer = get_user_meta( $user->ID, 'tradesafe_user_id', true );
 
 			$data = array(
 				"name"              => get_bloginfo( 'name' ) . ' - Order ' . $order->get_order_number(),
