@@ -561,6 +561,10 @@ function woocommerce_tradesafe_registration_form() {
 	wp_enqueue_script( 'jquery' );
 	wp_enqueue_script( 'woocommerce-tradesafe-register-js', plugins_url( '/assets/js/register.js', __FILE__ ) );
 
+	if ($settings['api_domain'] == '') {
+		$settings['api_domain'] = 'sandbox.tradesafe.co.za';
+    }
+
 	wp_register_script( 'tradesafe-settings', false );
 	wp_localize_script( 'tradesafe-settings', 'tradesafe_params', array( 'api_url' => $settings['api_domain'] ) );
 	wp_enqueue_script( 'tradesafe-settings' );
