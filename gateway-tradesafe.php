@@ -711,7 +711,7 @@ function _validate_registration_form( $errors, $user_email ) {
 		$logger  = new WC_Logger();
 
 		if ( is_wp_error( $request ) ) {
-			$message = __( 'Account Creation Failed. If you already have a TradeSafe account please link your account instead.', 'woocommerce-gateway-tradesafe' );
+			$message = __( 'Account Creation Failed. If you already have a TradeSafe account or have used TradeSafe in the past, please link your account instead.', 'woocommerce-gateway-tradesafe' );
 			$errors->add( 'error', $message );
 			$logger->add( 'tradesafe', 'Verified Failed: ' . __( $request->get_error_message(), 'woocommerce-gateway-tradesafe' ) );
 		}
