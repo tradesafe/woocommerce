@@ -419,11 +419,11 @@ function woocommerce_tradesafe_my_orders_actions( $actions, $order ) {
 		);
 
 		// Set the action button
-		$actions['decline'] = array(
-			'url'    => '/tradesafe/decline/' . $order->get_id() . '/',
-			'name'   => __( 'Decline', 'woocommerce-gateway-tradesafe' ),
-			'action' => 'decline',
-		);
+//		$actions['decline'] = array(
+//			'url'    => '/tradesafe/decline/' . $order->get_id() . '/',
+//			'name'   => __( 'Decline', 'woocommerce-gateway-tradesafe' ),
+//			'action' => 'decline',
+//		);
 	}
 
 	return $actions;
