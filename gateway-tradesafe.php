@@ -66,6 +66,7 @@ function order_status_cancelled( $order ) {
 function woocommerce_tradesafe_plugin_callback_query_vars( $vars ) {
 	$vars[] = 'tradesafe';
 	$vars[] = 'action';
+	$vars[] = 'action_id';
 
 	return $vars;
 }
@@ -92,6 +93,58 @@ function woocommerce_tradesafe_plugin_callback_parse_request( $wp ) {
 					$edit_account_url = wc_get_endpoint_url( 'tradesafe', '', wc_get_page_permalink( 'myaccount' ) );
 					wp_redirect( $edit_account_url );
 				}
+				break;
+			case "accept":
+				$order        = wc_get_order( $wp->query_vars['action_id'] );
+				$tradesafe_id = $order->get_meta( 'tradesafe_id' );
+				$data         = array(
+					'step' => 'GOODS_ACCEPTED',
+				);
+
+				$response = woocommerce_tradesafe_api_request( 'contract/' . $tradesafe_id, array( 'body' => $data ), 'PUT' );
+				$order->update_status( 'completed', sprintf( __( 'Payment via TradeSafe.', 'woocommerce-gateway-tradesafe' ) ) );
+
+				wp_redirect( '/my-account/orders/' );
+				break;
+			case "extend":
+				$order        = wc_get_order( $wp->query_vars['action_id'] );
+				$tradesafe_id = $order->get_meta( 'tradesafe_id' );
+				$response     = woocommerce_tradesafe_api_request( 'contract/' . $tradesafe_id, array(), 'GET' );
+
+				if ( is_wp_error( $response ) ) {
+					wp_redirect( '/my-account/orders/' );
+				}
+
+				if ('' !== $response['Contract']['completion_days_renegotiated'] ) {
+					$days = $response['Contract']['completion_days_renegotiated'] + 3;
+                } else {
+					$days = $response['Contract']['completion_total_days'] + 3;
+                }
+
+				$data = array(
+					'step'  => 'SENT',
+					'amend' => array(
+						'completion_days' => $days,
+					),
+				);
+
+				$response = woocommerce_tradesafe_api_request( 'contract/' . $tradesafe_id, array( 'body' => $data ), 'PUT' );
+				$order->update_status( 'processing', sprintf( __( 'Extended Delivery Time.', 'woocommerce-gateway-tradesafe' ) ) );
+
+				wp_redirect( '/my-account/orders/' );
+				break;
+			case "decline":
+				wp_die();
+				$order        = wc_get_order( $wp->query_vars['action_id'] );
+				$tradesafe_id = $order->get_meta( 'tradesafe_id' );
+				$data         = array(
+					'step' => 'DISPUTED',
+				);
+
+				$response = woocommerce_tradesafe_api_request( 'contract/' . $tradesafe_id, array( 'body' => $data ), 'PUT' );
+				$order->update_status( 'completed', sprintf( __( 'Payment via TradeSafe.', 'woocommerce-gateway-tradesafe' ) ) );
+
+				wp_redirect( '/my-account/orders/' );
 				break;
 			default:
 				status_header( 404 );
@@ -258,6 +311,10 @@ function woocommerce_tradesafe_api_request( $command, $api_args, $method = 'POST
 	}
 	$api_args['method'] = strtoupper( $method );
 
+	if ( '' !== $settings['ca_certificate'] ) {
+		$api_args['sslcertificates'] = $settings['ca_certificate'];
+	}
+
 	$results = wp_remote_request( $api_endpoint, $api_args );
 
 	if ( isset( $results['response']['code'] ) && 200 !== $results['response']['code'] && 201 !== $results['response']['code'] ) {
@@ -320,7 +377,7 @@ add_action( 'wp_loaded', function () {
 				case "FUNDS_RECEIVED":
 					foreach ( $orders as $order ) {
 						$tradesafe_id = $order->get_meta( 'tradesafe_id' );
-						if ( $tradesafe_id == $data['id'] ) {
+						if ( '' !== $tradesafe_id && $tradesafe_id == $data['id'] ) {
 							$order->update_status( 'processing', sprintf( __( 'Payment via TradeSafe.', 'woocommerce-gateway-tradesafe' ) ) );
 							$data = array(
 								'step' => 'SENT',
@@ -386,43 +443,9 @@ function woocommerce_tradesafe_account_tab( $menu_links ) {
 
 add_action( 'init', 'woocommerce_tradesafe_account' );
 function woocommerce_tradesafe_account() {
+	add_rewrite_rule( '^tradesafe/(.*)/(.*)/?$', 'index.php?tradesafe=1&action=$matches[1]&action_id=$matches[2]', 'top' );
 	add_rewrite_rule( '^tradesafe/(.*)/?$', 'index.php?tradesafe=1&action=$matches[1]', 'top' );
 	add_rewrite_endpoint( 'tradesafe', EP_PERMALINK | EP_PAGES | EP_ROOT );
-}
-
-add_action( 'pre_get_posts', 'woocommerce_tradesafe_order_actions' );
-function woocommerce_tradesafe_order_actions( $query ) {
-	if ( $query->is_main_query() ) {
-		$action = $query->query['pagename'];
-
-		// this is for security!
-		$allowed_actions = array( 'tradesafe/accept', 'tradesafe/extend', 'tradesafe/decline' );
-
-		if ( in_array( $action, $allowed_actions ) ) {
-			$order_id     = $query->query['page'];
-			$order        = wc_get_order( $order_id );
-			$tradesafe_id = $order->get_meta( 'tradesafe_id' );
-
-			switch ( $action ) {
-				case 'tradesafe/accept':
-					$data = array(
-						'step' => 'GOODS_ACCEPTED',
-					);
-
-					$response = woocommerce_tradesafe_api_request( 'contract/' . $tradesafe_id, array( 'body' => $data ), 'PUT' );
-
-					$order->update_status( 'completed', sprintf( __( 'Payment via TradeSafe.', 'woocommerce-gateway-tradesafe' ) ) );
-					break;
-				case 'tradesafe/extend':
-					break;
-				case 'tradesafe/decline':
-					break;
-			}
-
-			wp_redirect( '/my-account/orders/' );
-			exit;
-		}
-	}
 }
 
 add_action( 'woocommerce_account_tradesafe_endpoint', 'woocommerce_tradesafe_account_content' );
@@ -561,9 +584,9 @@ function woocommerce_tradesafe_registration_form() {
 	wp_enqueue_script( 'jquery' );
 	wp_enqueue_script( 'woocommerce-tradesafe-register-js', plugins_url( '/assets/js/register.js', __FILE__ ) );
 
-	if ($settings['api_domain'] == '') {
+	if ( $settings['api_domain'] == '' ) {
 		$settings['api_domain'] = 'sandbox.tradesafe.co.za';
-    }
+	}
 
 	wp_register_script( 'tradesafe-settings', false );
 	wp_localize_script( 'tradesafe-settings', 'tradesafe_params', array( 'api_url' => $settings['api_domain'] ) );
@@ -594,7 +617,7 @@ function woocommerce_tradesafe_registration_form() {
 		"198765" => "Nedbank (South Africa)",
 		"460005" => "Postbank",
 		"051001" => "Standard Bank (South Africa)",
-		"other"  => "Other Bank",
+//		"other"  => "Other Bank",
 	);
 
 	$fields = array(
