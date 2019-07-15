@@ -406,21 +406,21 @@ function woocommerce_tradesafe_my_orders_actions( $actions, $order ) {
 	if ( $order->has_status( array( 'processing' ) ) ) {
 		// Set the action button
 		$actions['accept'] = array(
-			'url'    => '/tradesafe/accept/' . $order->get_id(),
+			'url'    => '/tradesafe/accept/' . $order->get_id() . '/',
 			'name'   => __( 'Accept', 'woocommerce-gateway-tradesafe' ),
 			'action' => 'accept',
 		);
 
 		// Set the action button
 		$actions['extend'] = array(
-			'url'    => '/tradesafe/extend/' . $order->get_id(),
+			'url'    => '/tradesafe/extend/' . $order->get_id() . '/',
 			'name'   => __( 'Extend', 'woocommerce-gateway-tradesafe' ),
 			'action' => 'extend',
 		);
 
 		// Set the action button
 		$actions['decline'] = array(
-			'url'    => '/tradesafe/decline/' . $order->get_id(),
+			'url'    => '/tradesafe/decline/' . $order->get_id() . '/',
 			'name'   => __( 'Decline', 'woocommerce-gateway-tradesafe' ),
 			'action' => 'decline',
 		);
