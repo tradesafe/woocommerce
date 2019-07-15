@@ -407,13 +407,17 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 			'custom_str1'      => self::get_order_prop( $order, 'order_key' ),
 			'custom_str2'      => 'WooCommerce/' . WC_VERSION . '; ' . get_site_url(),
 			'custom_str3'      => self::get_order_prop( $order, 'id' ),
-			'source'           => 'WooCommerce-Free-Plugin',
+			'source'           => 'WooCommerce-TradeSafe-Plugin',
 		);
 
-		$output = $payments['ecentric']['data']
-		          . '<a class="button" href="' . $payments['eftsecure']['data'] . '">' . __( $payments['eftsecure']['title'], 'woocommerce-gateway-tradesafe' ) . '</a>'
-		          . '<a class="button" target="_blank" href="' . $payments['manual']['data'] . '">' . __( $payments['manual']['title'], 'woocommerce-gateway-tradesafe' ) . '</a>'
-		          . '<a class="button cancel" href="' . $order->get_cancel_order_url() . '">' . __( 'Cancel order &amp; restore cart', 'woocommerce-gateway-tradesafe' ) . '</a>';
+		if ('ACCEPTED' === $response['step']) {
+			$output = $payments['ecentric']['data']
+			          . '<a class="button" href="' . $payments['eftsecure']['data'] . '">' . __( $payments['eftsecure']['title'], 'woocommerce-gateway-tradesafe' ) . '</a>'
+			          . '<a class="button" target="_blank" href="' . $payments['manual']['data'] . '">' . __( $payments['manual']['title'], 'woocommerce-gateway-tradesafe' ) . '</a>'
+			          . '<a class="button cancel" href="' . $order->get_cancel_order_url() . '">' . __( 'Cancel order &amp; restore cart', 'woocommerce-gateway-tradesafe' ) . '</a>';
+        } else {
+			$output = __( 'Payment has been made. Waiting for TradeSafe to confirm receipt of the funds.', 'woocommerce-gateway-tradesafe' );
+        }
 
 		return $output;
 	}
