@@ -548,10 +548,13 @@ function woocommerce_tradesafe_account_content() {
 		}
 
 		if ( isset( $token ) ) {
+			$owner_data = $gateway->api_request( 'verify/owner', array(), 'GET' );
+			$auth_key = $owner_data['id'];
+			unset($owner_data);
 			$edit_account_url = wc_get_endpoint_url( 'tradesafe', '', wc_get_page_permalink( 'myaccount' ) );
 			?>
-            <form action="<?php print $url; ?>/api/register" method="post" target="_blank" style="display: inline">
-                <input type="hidden" name="auth_key" value="a68f4d96-f94e-4a4c-8335-54f41d87b9a5">
+            <form action="<?php print $url; ?>/register" method="post" target="_blank" style="display: inline">
+                <input type="hidden" name="auth_key" value="<?php print $auth_key; ?>">
                 <input type="hidden" name="auth_token" value="<?php print $token; ?>">
                 <input type="hidden" name="success_url" value="<?php print $edit_account_url; ?>">
                 <input type="hidden" name="failure_url" value="<?php print get_site_url(); ?>">
@@ -560,8 +563,8 @@ function woocommerce_tradesafe_account_content() {
             </form>
             <br/>
             <br/>
-            <form action="<?php print $url; ?>/api/authorize" method="post" target="_blank" style="display: inline">
-                <input type="hidden" name="auth_key" value="a68f4d96-f94e-4a4c-8335-54f41d87b9a5">
+            <form action="<?php print $url; ?>/authorize" method="post" target="_blank" style="display: inline">
+                <input type="hidden" name="auth_key" value="<?php print $auth_key; ?>">
                 <input type="hidden" name="auth_token" value="<?php print $token; ?>">
                 <input type="hidden" name="success_url" value="<?php print $edit_account_url; ?>">
                 <input type="hidden" name="failure_url" value="<?php print get_site_url(); ?>">
