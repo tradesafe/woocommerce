@@ -165,9 +165,8 @@ function woocommerce_tradesafe_plugin_callback_auth() {
 		status_header( 200 );
 	} else {
 		status_header( 404 );
-		wp_die();
 	}
-	wp_die();
+	exit(0);
 }
 
 add_action( 'show_user_profile', 'edit_tradesafe_profile' );
