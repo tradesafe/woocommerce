@@ -17,7 +17,7 @@ class TradeSafeAPIWrapper {
 		$this->debugging  = get_option( 'tradesafe_api_debugging' );
 		$this->production = get_option( 'tradesafe_api_production' );
 
-		if ( $this->debugging && null !== TRADESAFE_API_DEBUG_DOMAIN ) {
+		if ( $this->debugging && '' !== TRADESAFE_API_DEBUG_DOMAIN ) {
 			$domain = TRADESAFE_API_DEBUG_DOMAIN;
 		} else {
 			if ( $this->production ) {
@@ -109,8 +109,19 @@ class TradeSafeAPIWrapper {
 				$this->logger = new WC_Logger();
 			}
 
-			$this->logger->add( TRADESAFE_PLUGIN_NAME, $message );
-			error_log( json_encode( $message ) );
+			$error_message = '';
+			if (is_wp_error($message)) {
+				foreach ($message->errors as $errors) {
+					foreach ($errors as $error_code => $error) {
+						$error_message .= sprintf("%s: %s\n", $error_code, $error);
+					}
+				}
+			} else {
+				$error_message = $error_message;
+			}
+
+			$this->logger->add( TRADESAFE_PLUGIN_NAME, $error_message );
+			error_log( json_encode( $error_message ) );
 		}
 	}
 
