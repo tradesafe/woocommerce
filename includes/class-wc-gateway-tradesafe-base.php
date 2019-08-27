@@ -70,7 +70,7 @@ class WC_Gateway_TradeSafe_Base extends WC_Payment_Gateway {
 				);
 			}
 		} else {
-			$owner = $tradesafe->owner()['id'];
+			$owner = $tradesafe->owner();
 
 			$user  = wp_get_current_user();
 			$buyer = get_user_meta( $user->ID, 'tradesafe_user_id', true );
@@ -104,9 +104,8 @@ class WC_Gateway_TradeSafe_Base extends WC_Payment_Gateway {
 					$sellers[ $author_id ][] = $item_data;
 				}
 
-				unset( $sellers[1] );
-
 				if ( count( $sellers ) > 1 ) {
+					wc_add_notice('Multiple sellers are not currently supported.', 'error');
 					return array(
 						'result'   => 'failure',
 						'messages' => 'Multiple sellers are not currently supported.',
@@ -118,6 +117,7 @@ class WC_Gateway_TradeSafe_Base extends WC_Payment_Gateway {
 				$seller    = get_user_meta( $seller_id, 'tradesafe_user_id', true );
 
 				if ( '' === $seller ) {
+					wc_add_notice('Seller is not registered with TradeSafe or has not linked their account.', 'error');
 					return array(
 						'result'   => 'failure',
 						'messages' => 'Seller is not registered with TradeSafe or has not linked their account.',
@@ -125,12 +125,12 @@ class WC_Gateway_TradeSafe_Base extends WC_Payment_Gateway {
 				}
 
 				$data['seller']               = $seller;
-				$data['agent']                = $owner;
+				$data['agent']                = $owner['id'];
 				$data['fee_allocation']       = 3;
 				$data['agent_fee']            = get_option( 'tradesafe_site_fee' );
 				$data['agent_fee_allocation'] = (int) get_option( 'tradesafe_site_fee_allocation', '1' );
 			} else {
-				$data['seller']         = $owner;
+				$data['seller']         = $owner['id'];
 				$data['fee_allocation'] = 1;
 			}
 
@@ -146,6 +146,7 @@ class WC_Gateway_TradeSafe_Base extends WC_Payment_Gateway {
 					}
 				}
 
+				wc_add_notice($messages, 'error');
 				return array(
 					'result'   => 'failure',
 					'messages' => $messages,
@@ -164,6 +165,7 @@ class WC_Gateway_TradeSafe_Base extends WC_Payment_Gateway {
 					}
 				}
 
+				wc_add_notice($messages, 'error');
 				return array(
 					'result'   => 'failure',
 					'messages' => $messages,
@@ -187,6 +189,7 @@ class WC_Gateway_TradeSafe_Base extends WC_Payment_Gateway {
 				$redirect = $contract['Contract']['ecentric_payment_redirect'];
 				break;
 			default:
+				wc_add_notice('There was a problem processing the payment.', 'error');
 				return array(
 					'result'   => 'failure',
 					'messages' => 'There was a problem processing the payment.'
