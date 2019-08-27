@@ -1,0 +1,52 @@
+{
+  "name": "tradesafe/woocommerce-tradesafe-gateway",
+  "description": "Adds TradeSafe as a payment gateway for WooCommerce.",
+  "homepage": "https://www.tradesafe.co.za/",
+  "type": "wordpress-plugin",
+  "license": "GPL-3.0-or-later",
+  "prefer-stable": true,
+  "minimum-stability": "dev",
+  "require": {
+    "php": ">=5.6|>=7.0",
+    "composer/installers": "1.6.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "7.5.15",
+    "woocommerce/woocommerce-sniffs": "0.0.6"
+  },
+  "config": {
+    "platform": {
+      "php": "7.1"
+    },
+    "preferred-install": {
+    },
+    "sort-packages": true
+  },
+  "autoload": {
+    "exclude-from-classmap": [
+      "includes/legacy",
+      "includes/libraries"
+    ]
+  },
+  "scripts": {
+    "test": [
+      "phpunit"
+    ],
+    "phpcs": [
+      "phpcs -s -p"
+    ],
+    "phpcs-pre-commit": [
+      "phpcs -s -p -n"
+    ],
+    "phpcbf": [
+      "phpcbf -p"
+    ]
+  },
+  "extra": {
+    "scripts-description": {
+      "test": "Run unit tests",
+      "phpcs": "Analyze code against the WordPress coding standards with PHP_CodeSniffer",
+      "phpcbf": "Fix coding standards warnings/errors automatically with PHP Code Beautifier"
+    }
+  }
+}
