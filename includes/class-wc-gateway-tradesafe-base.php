@@ -84,7 +84,7 @@ class WC_Gateway_TradeSafe_Base extends WC_Payment_Gateway {
 				'reference'         => $order->get_order_key(),
 				'success_url'       => $checkout_url,
 				'failure_url'       => $order_url,
-				'industry'          => get_option( 'tradesafe_site_industry' ),
+				'industry'          => get_option( 'tradesafe_site_industry', 'GENERAL_GOODS_SERVICES' ),
 				'description'       => sprintf( __( 'New order from %s. Order ID: %s', TRADESAFE_PLUGIN_NAME ), get_bloginfo( 'name' ), $order->get_order_number() ),
 				'value'             => (float) number_format_i18n( $base_value, 2 ),
 				'completion_days'   => 30,
@@ -104,7 +104,7 @@ class WC_Gateway_TradeSafe_Base extends WC_Payment_Gateway {
 					$sellers[ $author_id ][] = $item_data;
 				}
 
-				unset($sellers[1]);
+				unset( $sellers[1] );
 
 				if ( count( $sellers ) > 1 ) {
 					return array(
@@ -117,18 +117,18 @@ class WC_Gateway_TradeSafe_Base extends WC_Payment_Gateway {
 				$seller_id = key( $sellers );
 				$seller    = get_user_meta( $seller_id, 'tradesafe_user_id', true );
 
-				if ('' === $seller) {
+				if ( '' === $seller ) {
 					return array(
 						'result'   => 'failure',
 						'messages' => 'Seller is not registered with TradeSafe or has not linked their account.',
 					);
-                }
+				}
 
 				$data['seller']               = $seller;
 				$data['agent']                = $owner;
 				$data['fee_allocation']       = 3;
 				$data['agent_fee']            = get_option( 'tradesafe_site_fee' );
-				$data['agent_fee_allocation'] = (int) get_option( 'tradesafe_site_fee_allocation' );
+				$data['agent_fee_allocation'] = (int) get_option( 'tradesafe_site_fee_allocation', '1' );
 			} else {
 				$data['seller']         = $owner;
 				$data['fee_allocation'] = 1;

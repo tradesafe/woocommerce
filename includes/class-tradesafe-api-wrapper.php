@@ -14,8 +14,8 @@ class TradeSafeAPIWrapper {
 	 * TradeSafeAPIWrapper constructor.
 	 */
 	public function __construct() {
-		$this->debugging  = get_option( 'tradesafe_api_debugging' );
-		$this->production = get_option( 'tradesafe_api_production' );
+		$this->debugging  = get_option( 'tradesafe_api_debugging', false );
+		$this->production = get_option( 'tradesafe_api_production', false );
 
 		if ( $this->debugging && '' !== TRADESAFE_API_DEBUG_DOMAIN ) {
 			$domain = TRADESAFE_API_DEBUG_DOMAIN;
@@ -89,12 +89,12 @@ class TradeSafeAPIWrapper {
 				}
 
 				if ( isset( $response_body['errors'] ) ) {
-					foreach ($response_body['errors'] as $error) {
+					foreach ( $response_body['errors'] as $error ) {
 						$messages[] = $error;
 					}
 				}
 
-				$message_string = implode('<br />', $messages);
+				$message_string = implode( '<br />', $messages );
 
 				return new WP_Error( $response['response']['code'], $message_string, $response );
 		}
@@ -110,10 +110,10 @@ class TradeSafeAPIWrapper {
 			}
 
 			$error_message = '';
-			if (is_wp_error($message)) {
-				foreach ($message->errors as $errors) {
-					foreach ($errors as $error_code => $error) {
-						$error_message .= sprintf("%s: %s\n", $error_code, $error);
+			if ( is_wp_error( $message ) ) {
+				foreach ( $message->errors as $errors ) {
+					foreach ( $errors as $error_code => $error ) {
+						$error_message .= sprintf( "%s: %s\n", $error_code, $error );
 					}
 				}
 			} else {
