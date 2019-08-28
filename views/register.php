@@ -4,7 +4,7 @@ function render_fields( $fields, $count ) {
 		$field_value = ! empty( $_POST[ $field_name ] ) ? $_POST[ $field_name ] : '';
 		?>
         <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
-            <label for="<?php print $field_name; ?>"><?php esc_html_e( $field_info[0], 'woocommerce-gateway-tradesafe' ) ?>
+            <label for="<?php print $field_name; ?>"><?php esc_html_e( $field_info[0], 'woocommerce-tradesafe-gateway' ) ?>
 				<?php if ( 'html' != $field_info[1] ): ?>
                     <span class="required">*</span>
 				<?php endif; ?>

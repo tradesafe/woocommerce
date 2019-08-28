@@ -46,7 +46,7 @@ class TradeSafeOrders {
 
 		$response = $tradesafe->update_contract( $tradesafe_id, $data );
 		if ( ! is_wp_error( $response ) ) {
-			$order->update_status( 'completed', sprintf( __( 'Accepted Goods or Services.', TRADESAFE_PLUGIN_NAME ) ) );
+			$order->update_status( 'completed', sprintf( __( 'Accepted Goods or Services.', 'woocommerce-tradesafe-gateway' ) ) );
 
 			wp_redirect( '/my-account/orders/' );
 		} else {
@@ -82,7 +82,7 @@ class TradeSafeOrders {
 
 		$response = $tradesafe->update_contract( $tradesafe_id, $data );
 		if ( ! is_wp_error( $response ) ) {
-			$order->update_status( 'processing', sprintf( __( 'Extended Delivery Time.', TRADESAFE_PLUGIN_NAME ) ) );
+			$order->update_status( 'processing', sprintf( __( 'Extended Delivery Time.', 'woocommerce-tradesafe-gateway' ) ) );
 
 			wp_redirect( '/my-account/orders/' );
 		} else {
@@ -104,7 +104,7 @@ class TradeSafeOrders {
 
 		$response = $tradesafe->update_contract( $tradesafe_id, $data );
 		if ( ! is_wp_error( $response ) ) {
-			$order->update_status( 'canceled', sprintf( __( 'Canceled Order.', TRADESAFE_PLUGIN_NAME ) ) );
+			$order->update_status( 'canceled', sprintf( __( 'Canceled Order.', 'woocommerce-tradesafe-gateway' ) ) );
 
 			wp_redirect( '/my-account/orders/' );
 		} else {
@@ -126,7 +126,7 @@ class TradeSafeOrders {
 
 		$response = $tradesafe->update_contract( $tradesafe_id, $data );
 		if ( ! is_wp_error( $response ) ) {
-			$order->update_status( 'on-hold', sprintf( __( 'Order is disputed.', TRADESAFE_PLUGIN_NAME ) ) );
+			$order->update_status( 'on-hold', sprintf( __( 'Order is disputed.', 'woocommerce-tradesafe-gateway' ) ) );
 
 			wp_redirect( '/my-account/orders/' );
 		} else {
@@ -145,21 +145,21 @@ class TradeSafeOrders {
 			// Set the action button
 			$actions['accept'] = array(
 				'url'    => site_url( '/tradesafe/accept/' . $order->get_id() . '/' ),
-				'name'   => __( 'Accept', TRADESAFE_PLUGIN_NAME ),
+				'name'   => __( 'Accept', 'woocommerce-tradesafe-gateway' ),
 				'action' => 'accept',
 			);
 
 			// Set the action button
 			$actions['extend'] = array(
 				'url'    => site_url( '/tradesafe/extend/' . $order->get_id() . '/' ),
-				'name'   => __( 'Extend', TRADESAFE_PLUGIN_NAME ),
+				'name'   => __( 'Extend', 'woocommerce-tradesafe-gateway' ),
 				'action' => 'extend',
 			);
 
 			// Set the action button
 			$actions['decline'] = array(
 				'url'    => site_url( '/tradesafe/decline/' . $order->get_id() . '/' ),
-				'name'   => __( 'Decline', TRADESAFE_PLUGIN_NAME ),
+				'name'   => __( 'Decline', 'woocommerce-tradesafe-gateway' ),
 				'action' => 'decline',
 			);
 		}
@@ -182,7 +182,7 @@ class TradeSafeOrders {
 				if ( $order->meta_exists( 'tradesafe_id' ) && $request['id'] === $order->get_meta( 'tradesafe_id' ) ) {
 					switch ( $request['step'] ) {
 						case "FUNDS_RECEIVED":
-							$order->update_status( 'processing', sprintf( __( 'Payment via TradeSafe.', TRADESAFE_PLUGIN_NAME ) ) );
+							$order->update_status( 'processing', sprintf( __( 'Payment via TradeSafe.', 'woocommerce-tradesafe-gateway' ) ) );
 							$data = array(
 								'step' => 'SENT',
 							);
@@ -191,13 +191,13 @@ class TradeSafeOrders {
 							$response  = $tradesafe->update_contract( $request['id'], $data );
 
 							if ( is_wp_error( $response ) ) {
-								$order->update_status( 'on-hold', sprintf( __( 'Reset to on On Hold because of error.', TRADESAFE_PLUGIN_NAME ) ) );
+								$order->update_status( 'on-hold', sprintf( __( 'Reset to on On Hold because of error.', 'woocommerce-tradesafe-gateway' ) ) );
 								status_header( 400 );
 								die();
 							}
 							break;
 						case "DECLINED":
-							$order->update_status( 'cancelled', sprintf( __( 'Order canceled.', TRADESAFE_PLUGIN_NAME ) ) );
+							$order->update_status( 'cancelled', sprintf( __( 'Order canceled.', 'woocommerce-tradesafe-gateway' ) ) );
 							break;
 						default:
 							status_header( 400 );
@@ -234,7 +234,7 @@ class TradeSafeOrders {
 			$order->set_payment_method( $payment_gateways[ $payment_method ] );
 
 			foreach ( $order->get_fees() as $fee_id => $item_fee ) {
-				if ( __( 'Processing Fee', TRADESAFE_PLUGIN_NAME ) === $item_fee->get_name() ) {
+				if ( __( 'Processing Fee', 'woocommerce-tradesafe-gateway' ) === $item_fee->get_name() ) {
 					$item_fee->set_amount( $fee );
 					$item_fee->set_total( $fee );
 					$item_fee->save();

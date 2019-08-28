@@ -248,7 +248,7 @@ class TradeSafeProfile {
 			$verification_token = hash( 'sha256', $token . $_GET['auth_key'] . $_GET['email'] );
 
 			if ( $_GET['verify'] !== $verification_token ) {
-				$errors->add( 'error', __( 'Invalid verification token', TRADESAFE_PLUGIN_NAME ) );
+				$errors->add( 'error', __( 'Invalid verification token', 'woocommerce-tradesafe-gateway' ) );
 			}
 		} else {
 			$user = array(
@@ -271,7 +271,7 @@ class TradeSafeProfile {
 			$logger    = new WC_Logger();
 
 			if ( is_wp_error( $request ) ) {
-				$message[] = __( 'Account Creation Failed.', TRADESAFE_PLUGIN_NAME );
+				$message[] = __( 'Account Creation Failed.', 'woocommerce-tradesafe-gateway' );
 
 				foreach ( $request->errors as $error_messages ) {
 					foreach ( $error_messages as $error_message ) {
@@ -280,7 +280,7 @@ class TradeSafeProfile {
 				}
 
 				$errors->add( 'error', implode( '<br />', $message ) );
-				$logger->add( 'tradesafe', 'Verified Failed: ' . __( $request->get_error_message(), TRADESAFE_PLUGIN_NAME ) );
+				$logger->add( 'tradesafe', 'Verified Failed: ' . __( $request->get_error_message(), 'woocommerce-tradesafe-gateway' ) );
 			}
 
 			$logger->add( 'tradesafe', 'Verified User' );
@@ -327,7 +327,7 @@ class TradeSafeProfile {
 				update_user_meta( $user_id, 'tradesafe_user_id', $request['user_id'] );
 				$logger->add( 'tradesafe', 'Created / Linked User Account ' . $user_id . '-' . $request['user_id'] );
 			} else {
-				$logger->add( 'tradesafe', 'Account Creation Failed ' . __( $request->get_error_message(), 'woocommerce-gateway-tradesafe' ) );
+				$logger->add( 'tradesafe', 'Account Creation Failed ' . __( $request->get_error_message(), 'woocommerce-tradesafe-gateway' ) );
 			}
 
 			if ( isset( $_POST['first_name'] ) ) {

@@ -1,8 +1,8 @@
 <?php
 $sections = [
-	'user'    => esc_html__( 'Personal Details', TRADESAFE_PLUGIN_NAME ),
-	'company' => esc_html__( 'Company Details', TRADESAFE_PLUGIN_NAME ),
-	'bank'    => esc_html__( 'Banking Details', TRADESAFE_PLUGIN_NAME ),
+	'user'    => esc_html__( 'Personal Details', 'woocommerce-tradesafe-gateway' ),
+	'company' => esc_html__( 'Company Details', 'woocommerce-tradesafe-gateway' ),
+	'bank'    => esc_html__( 'Banking Details', 'woocommerce-tradesafe-gateway' ),
 ];
 ?>
 
@@ -25,4 +25,4 @@ foreach ( $profile as $section_name => $rows ) {
 
 ?>
 
-<p><a href="<?php print get_site_url(); ?>/tradesafe/unlink/" class="button"><?php esc_html_e( 'Unlink Account', TRADESAFE_PLUGIN_NAME ) ?></a></p>
+<p><a href="<?php print get_site_url(); ?>/tradesafe/unlink/" class="button"><?php esc_html_e( 'Unlink Account', 'woocommerce-tradesafe-gateway' ) ?></a></p>
