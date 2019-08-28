@@ -12,6 +12,9 @@ notifications:
 #  only:
 #    - master
 
+services:
+  - mysql
+
 cache:
   directories:
     - vendor
