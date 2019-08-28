@@ -116,8 +116,10 @@ class TradeSafeAPIWrapper {
 						$error_message .= sprintf( "%s: %s\n", $error_code, $error );
 					}
 				}
+			} elseif ( is_string( $message ) ) {
+				$error_message = $message;
 			} else {
-				$error_message = $error_message;
+				$error_message = serialize( $message );
 			}
 
 			$this->logger->add( TRADESAFE_PLUGIN_NAME, $error_message );
