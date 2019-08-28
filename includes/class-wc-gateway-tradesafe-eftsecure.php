@@ -11,9 +11,9 @@ class WC_Gateway_TradeSafe_Eftsecure extends WC_Gateway_TradeSafe_Base {
 		$this->id                 = 'tradesafe_eftsecure';
 		$this->icon               = WP_PLUGIN_URL . '/' . plugin_basename( dirname( dirname( __FILE__ ) ) ) . '/assets/images/icon.png';
 		$this->has_fields         = true;
-		$this->method_title       = __( 'TradeSafe Escrow', TRADESAFE_PLUGIN_NAME );
-		$this->method_description = __( 'Redirects user to EftSecure to make a Online Payment', TRADESAFE_PLUGIN_NAME );
-		$this->order_button_text  = __( 'Proceed to EftSecure', TRADESAFE_PLUGIN_NAME );
+		$this->method_title       = __( 'TradeSafe Escrow', 'woocommerce-tradesafe-gateway' );
+		$this->method_description = __( 'Redirects user to EftSecure to make a Online Payment', 'woocommerce-tradesafe-gateway' );
+		$this->order_button_text  = __( 'Proceed to EftSecure', 'woocommerce-tradesafe-gateway' );
 		$this->supports           = array(
 			'products',
 //			'refunds',
@@ -43,23 +43,23 @@ class WC_Gateway_TradeSafe_Eftsecure extends WC_Gateway_TradeSafe_Base {
 	public function init_form_fields() {
 		$this->form_fields = array(
 			'enabled'     => array(
-				'title'   => __( 'Enable/Disable', TRADESAFE_PLUGIN_NAME ),
+				'title'   => __( 'Enable/Disable', 'woocommerce-tradesafe-gateway' ),
 				'type'    => 'checkbox',
-				'label'   => __( 'Enable Instant EFT Payment', TRADESAFE_PLUGIN_NAME ),
+				'label'   => __( 'Enable Instant EFT Payment', 'woocommerce-tradesafe-gateway' ),
 				'default' => 'yes'
 			),
 			'title'       => array(
-				'title'       => __( 'Title', TRADESAFE_PLUGIN_NAME ),
+				'title'       => __( 'Title', 'woocommerce-tradesafe-gateway' ),
 				'type'        => 'text',
-				'description' => __( 'This controls the title which the user sees during checkout.', TRADESAFE_PLUGIN_NAME ),
-				'default'     => __( 'Instant EFT', TRADESAFE_PLUGIN_NAME ),
+				'description' => __( 'This controls the title which the user sees during checkout.', 'woocommerce-tradesafe-gateway' ),
+				'default'     => __( 'Instant EFT', 'woocommerce-tradesafe-gateway' ),
 				'desc_tip'    => true,
 			),
 			'description' => array(
-				'title'       => __( 'Description', TRADESAFE_PLUGIN_NAME ),
+				'title'       => __( 'Description', 'woocommerce-tradesafe-gateway' ),
 				'type'        => 'textarea',
-				'description' => __( 'This controls the description which the user sees during checkout.', TRADESAFE_PLUGIN_NAME ),
-				'default'     => __( 'Make payment using EFT through EftSecure.', TRADESAFE_PLUGIN_NAME ),
+				'description' => __( 'This controls the description which the user sees during checkout.', 'woocommerce-tradesafe-gateway' ),
+				'default'     => __( 'Make payment using EFT through EftSecure.', 'woocommerce-tradesafe-gateway' ),
 				'desc_tip'    => true,
 			)
 		);

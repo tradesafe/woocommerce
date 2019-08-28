@@ -35,7 +35,7 @@ class TradeSafeAPIWrapper {
 		if ( empty( $this->token ) ) {
 			$this->log( "No token configured", true );
 
-			return new WP_Error( '400', __( 'A token is required to submit a request to the TradeSafe API', TRADESAFE_PLUGIN_NAME ), null );
+			return new WP_Error( '400', __( 'A token is required to submit a request to the TradeSafe API', 'woocommerce-tradesafe-gateway' ), null );
 		}
 
 		// Create request
@@ -122,7 +122,7 @@ class TradeSafeAPIWrapper {
 				$error_message = serialize( $message );
 			}
 
-			$this->logger->add( TRADESAFE_PLUGIN_NAME, $error_message );
+			$this->logger->add( 'woocommerce-tradesafe-gateway', $error_message );
 			error_log( json_encode( $error_message ) );
 		}
 	}

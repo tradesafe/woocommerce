@@ -33,10 +33,10 @@ class WC_Gateway_TradeSafe_Base extends WC_Payment_Gateway {
 			parent::admin_options();
 		} else {
 			?>
-            <h3><?php _e( 'TradeSafe', TRADESAFE_PLUGIN_NAME ); ?></h3>
+            <h3><?php _e( 'TradeSafe', 'woocommerce-tradesafe-gateway' ); ?></h3>
             <div class="inline error"><p>
-                    <strong><?php _e( 'Gateway Disabled', TRADESAFE_PLUGIN_NAME ); ?></strong> <?php /* translators: 1: a href link 2: closing href */
-					echo sprintf( __( 'Choose South African Rand as your store currency in %1$sGeneral Settings%2$s to enable the TradeSafe Gateway.', TRADESAFE_PLUGIN_NAME ), '<a href="' . esc_url( admin_url( 'admin.php?page=wc-settings&tab=general' ) ) . '">', '</a>' ); ?>
+                    <strong><?php _e( 'Gateway Disabled', 'woocommerce-tradesafe-gateway' ); ?></strong> <?php /* translators: 1: a href link 2: closing href */
+					echo sprintf( __( 'Choose South African Rand as your store currency in %1$sGeneral Settings%2$s to enable the TradeSafe Gateway.', 'woocommerce-tradesafe-gateway' ), '<a href="' . esc_url( admin_url( 'admin.php?page=wc-settings&tab=general' ) ) . '">', '</a>' ); ?>
                 </p></div>
 			<?php
 		}
@@ -85,7 +85,7 @@ class WC_Gateway_TradeSafe_Base extends WC_Payment_Gateway {
 				'success_url'       => $checkout_url,
 				'failure_url'       => $order_url,
 				'industry'          => get_option( 'tradesafe_site_industry', 'GENERAL_GOODS_SERVICES' ),
-				'description'       => sprintf( __( 'New order from %s. Order ID: %s', TRADESAFE_PLUGIN_NAME ), get_bloginfo( 'name' ), $order->get_order_number() ),
+				'description'       => sprintf( __( 'New order from %s. Order ID: %s', 'woocommerce-tradesafe-gateway' ), get_bloginfo( 'name' ), $order->get_order_number() ),
 				'value'             => (float) number_format_i18n( $base_value, 2 ),
 				'completion_days'   => 30,
 				'completion_months' => 0,
@@ -173,7 +173,7 @@ class WC_Gateway_TradeSafe_Base extends WC_Payment_Gateway {
 			}
 
 			// Mark as on-hold
-			$order->update_status( 'pending', __( 'Awaiting payment.', TRADESAFE_PLUGIN_NAME ) );
+			$order->update_status( 'pending', __( 'Awaiting payment.', 'woocommerce-tradesafe-gateway' ) );
 			$order->update_meta_data( 'tradesafe_id', $contract['Contract']['id'] );
 			$order->save();
 		}

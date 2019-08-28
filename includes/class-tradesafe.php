@@ -19,13 +19,13 @@ class TradeSafe {
 		self::$initiated = true;
 
 		// Set test domain
-		load_plugin_textdomain( TRADESAFE_PLUGIN_NAME, false, trailingslashit( TRADESAFE_PLUGIN_NAME ) );
+		load_plugin_textdomain( 'woocommerce-tradesafe-gateway', false, trailingslashit( 'woocommerce-tradesafe-gateway' ) );
 
 		// Payment Gateways
-		require_once( TRADESAFE_PLUGIN_DIR . 'includes/class-wc-gateway-tradesafe-base.php' );
-		require_once( TRADESAFE_PLUGIN_DIR . 'includes/class-wc-gateway-tradesafe-eftsecure.php' );
-		require_once( TRADESAFE_PLUGIN_DIR . 'includes/class-wc-gateway-tradesafe-manualeft.php' );
-		require_once( TRADESAFE_PLUGIN_DIR . 'includes/class-wc-gateway-tradesafe-ecentric.php' );
+		require_once( TRADESAFE_PLUGIN_DIR . '/includes/class-wc-gateway-tradesafe-base.php' );
+		require_once( TRADESAFE_PLUGIN_DIR . '/includes/class-wc-gateway-tradesafe-eftsecure.php' );
+		require_once( TRADESAFE_PLUGIN_DIR . '/includes/class-wc-gateway-tradesafe-manualeft.php' );
+		require_once( TRADESAFE_PLUGIN_DIR . '/includes/class-wc-gateway-tradesafe-ecentric.php' );
 
 		// Endpoints
 		add_rewrite_rule( '^tradesafe/(.*)/(.*)/?$', 'index.php?tradesafe=1&action=$matches[1]&action_id=$matches[2]', 'top' );
@@ -41,7 +41,10 @@ class TradeSafe {
 		add_action( 'woocommerce_pay_order_before_submit', [ 'TradeSafe', 'payment_method_change_order' ] );
 
 		// Filters
-		add_filter( 'plugin_action_links_' . TRADESAFE_PLUGIN_BASE_NAME, [ 'TradeSafe', 'plugin_links' ] );
+		add_filter( 'plugin_action_links_' . plugin_basename( TRADESAFE_PLUGIN_FILE_PATH ), [
+			'TradeSafe',
+			'plugin_links'
+		] );
 		add_filter( 'query_vars', [ 'TradeSafe', 'query_vars' ] );
 		add_filter( 'woocommerce_payment_gateways', [ 'TradeSafe', 'add_payment_methods' ] );
 		add_filter( 'woocommerce_available_payment_gateways', [ 'TradeSafe', 'valid_transaction' ] );
@@ -61,9 +64,9 @@ class TradeSafe {
 		);
 
 		$plugin_links = array(
-			'<a href="' . esc_url( $settings_url ) . '">' . __( 'Settings', TRADESAFE_PLUGIN_NAME ) . '</a>',
-			'<a href="https://www.tradesafe.co.za/page/contact">' . __( 'Support', TRADESAFE_PLUGIN_NAME ) . '</a>',
-			'<a href="https://www.tradesafe.co.za/page/API">' . __( 'Docs', TRADESAFE_PLUGIN_NAME ) . '</a>',
+			'<a href="' . esc_url( $settings_url ) . '">' . __( 'Settings', 'woocommerce-tradesafe-gateway' ) . '</a>',
+			'<a href="https://www.tradesafe.co.za/page/contact">' . __( 'Support', 'woocommerce-tradesafe-gateway' ) . '</a>',
+			'<a href="https://www.tradesafe.co.za/page/API">' . __( 'Docs', 'woocommerce-tradesafe-gateway' ) . '</a>',
 		);
 
 		return array_merge( $plugin_links, $links );
@@ -166,7 +169,7 @@ class TradeSafe {
 		$fee            = self::calculate_fee( $base_value, $payment_method );
 
 		if ( 0 < $fee ) {
-			WC()->cart->add_fee( __( 'Processing Fee', TRADESAFE_PLUGIN_NAME ), $fee );
+			WC()->cart->add_fee( __( 'Processing Fee', 'woocommerce-tradesafe-gateway' ), $fee );
 		}
 	}
 
@@ -230,13 +233,13 @@ class TradeSafe {
 	 */
 	public static function payment_method_change_checkout() {
 		?>
-        <script type="text/javascript">
+		<script type="text/javascript">
             (function ($) {
                 $('form.checkout').on('change', 'input[name^="payment_method"]', function () {
                     $('body').trigger('update_checkout');
                 });
             })(jQuery);
-        </script>
+		</script>
 		<?php
 	}
 
@@ -249,7 +252,7 @@ class TradeSafe {
 		$order          = new WC_Order( $order_id );
 		$payment_method = $order->get_payment_method();
 		?>
-        <script type="text/javascript">
+		<script type="text/javascript">
             (function ($) {
                 $('input[name^="payment_method"][value^="<?php esc_attr_e( $payment_method ); ?>"]').prop('checked', true);
 
@@ -264,7 +267,7 @@ class TradeSafe {
                     });
                 });
             })(jQuery);
-        </script>
+		</script>
 		<?php
 	}
 
@@ -289,7 +292,7 @@ class TradeSafe {
 			} else {
 				$configured    = true;
 				self::$enabled = true;
-				$owner_data    = '<strong>' . __( 'Account Details:', TRADESAFE_PLUGIN_NAME ) . '</strong><br/>'
+				$owner_data    = '<strong>' . __( 'Account Details:', 'woocommerce-tradesafe-gateway' ) . '</strong><br/>'
 				                 . "<div><strong>Name: </strong> " . $owner_details['first_name'] . " " . $owner_details['last_name'] . "</div>"
 				                 . "<div><strong>Email: </strong>" . $owner_details['email'] . "</div>"
 				                 . "<div><strong>Mobile: </strong>" . $owner_details['mobile'] . "</div>"
@@ -393,8 +396,8 @@ class TradeSafe {
 					'id'          => 'tradesafe_site_role',
 					'type'        => 'select',
 					'options'     => [
-						'seller'      => __( 'Seller', TRADESAFE_PLUGIN_NAME ),
-						'marketplace' => __( 'Marketplace, Agent or Broker', TRADESAFE_PLUGIN_NAME )
+						'seller'      => __( 'Seller', 'woocommerce-tradesafe-gateway' ),
+						'marketplace' => __( 'Marketplace, Agent or Broker', 'woocommerce-tradesafe-gateway' )
 					],
 					'description' => 'Are you selling products or running a marketplace?',
 				]
@@ -439,9 +442,9 @@ class TradeSafe {
 					'id'          => 'tradesafe_site_fee_allocation',
 					'type'        => 'select',
 					'options'     => [
-						'0' => __( 'Buyer Pays', TRADESAFE_PLUGIN_NAME ),
-						'1' => __( 'Seller Pays', TRADESAFE_PLUGIN_NAME ),
-						'2' => __( '50/50 Split', TRADESAFE_PLUGIN_NAME ),
+						'0' => __( 'Buyer Pays', 'woocommerce-tradesafe-gateway' ),
+						'1' => __( 'Seller Pays', 'woocommerce-tradesafe-gateway' ),
+						'2' => __( '50/50 Split', 'woocommerce-tradesafe-gateway' ),
 					],
 					'description' => 'How will the Marketplace / Agent fee be paid.',
 				]
@@ -500,12 +503,12 @@ class TradeSafe {
 			'auth_callback' => site_url( '/tradesafe/auth/' ),
 		];
 
-		require_once( TRADESAFE_PLUGIN_DIR . 'views/settings.php' );
+		require_once( TRADESAFE_PLUGIN_DIR . '/views/settings.php' );
 	}
 
 	// Post notice
 	public static function notice( $type, $message ) {
-		return sprintf( '<div class="notice-%s notice"><p>%s</p></div>', $type, __( $message, TRADESAFE_PLUGIN_NAME ) );
+		return sprintf( '<div class="notice-%s notice"><p>%s</p></div>', $type, __( $message, 'woocommerce-tradesafe-gateway' ) );
 	}
 
 	/**
@@ -514,17 +517,17 @@ class TradeSafe {
 
 	// Intro test for API section
 	public static function section_api_settings_intro() {
-		echo '<p>' . sprintf( __( 'An API token can be obtained from your <a href="%s" target="_blank">TradeSafe</a> account.', TRADESAFE_PLUGIN_NAME ), 'https://' . TRADESAFE_DOMAIN ) . '</p>';
+		echo '<p>' . sprintf( __( 'An API token can be obtained from your <a href="%s" target="_blank">TradeSafe</a> account.', 'woocommerce-tradesafe-gateway' ), 'https://' . TRADESAFE_DOMAIN ) . '</p>';
 	}
 
 	// Intro User section
 	public static function section_site_settings_intro() {
-		echo '<p>' . sprintf( __( 'Set the defaults for each transaction.', TRADESAFE_PLUGIN_NAME ) ) . '</p>';
+		echo '<p>' . sprintf( __( 'Set the defaults for each transaction.', 'woocommerce-tradesafe-gateway' ) ) . '</p>';
 	}
 
 	// Intro Debugging section
 	public static function section_site_debugging_intro() {
-		echo '<p>' . sprintf( __( 'Turn on debugging to help diagnose errors.', TRADESAFE_PLUGIN_NAME ) ) . '</p>';
+		echo '<p>' . sprintf( __( 'Turn on debugging to help diagnose errors.', 'woocommerce-tradesafe-gateway' ) ) . '</p>';
 	}
 
 	// Sanitize fields
@@ -548,7 +551,7 @@ class TradeSafe {
 				break;
 			case 'select':
 				$option = get_option( $args['id'] );
-				$field  .= sprintf( '<select name="%1$s" id="%1$s" cols="60" rows="5"><option value="">' . __( '-- SELECT --', TRADESAFE_PLUGIN_NAME ) . '</option>', $args['id'] );
+				$field  .= sprintf( '<select name="%1$s" id="%1$s" cols="60" rows="5"><option value="">' . __( '-- SELECT --', 'woocommerce-tradesafe-gateway' ) . '</option>', $args['id'] );
 
 				foreach ( $args['options'] as $value => $name ) {
 					if ( $option === (string) $value ) {

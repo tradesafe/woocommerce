@@ -1,0 +1,56 @@
+sudo: false
+dist: xenial
+
+language: php
+
+notifications:
+  email:
+    on_success: never
+    on_failure: change
+
+#branches:
+#  only:
+#    - master
+
+cache:
+  directories:
+    - vendor
+    - $HOME/.composer/cache
+    - node_modules
+
+matrix:
+  fast_finish: true
+  include:
+    - php: 7.3
+      env: WP_VERSION=latest SNIFF=1 LINT=1 CODE_COVERAGE=1
+    - php: 7.2
+      env: WP_VERSION=latest
+    - php: 7.1
+      env: WP_VERSION=latest
+
+
+before_script:
+  - export PATH="$HOME/.composer/vendor/bin:$PATH"
+  - |
+    # Remove Xdebug for a huge performance increase:
+    if [ -f ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini ]; then
+      phpenv config-rm xdebug.ini
+    else
+      echo "xdebug.ini does not exist"
+    fi
+  - composer self-update
+  - composer install
+  - bash tests/bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
+
+script:
+  - if [[ "$LINT" == "1" ]]; then find -L . -path ./ -o -path ./vendor/* -prune -o -name '*.php' -print0 | xargs -0 -n 1 -P 4 php -l; fi
+  - |
+    if [[ "$CODE_COVERAGE" == "1" ]]; then
+      php vendor/bin/phpunit --coverage-clover /tmp/clover.xml
+    else
+      php vendor/bin/phpunit
+    fi
+  - if [[ "$SNIFF" == "1" ]]; then php vendor/bin/phpcs; fi
+
+after_script:
+  - if [[ "$CODE_COVERAGE" == "1" ]]; then travis_retry php vendor/bin/codacycoverage clover /tmp/clover.xml; fi
