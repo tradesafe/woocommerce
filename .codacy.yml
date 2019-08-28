@@ -2,7 +2,7 @@
 engines:
   phpcs:
     enabled: true
-    php_version: 7.2
+    php_version: 7.3
 exclude_paths:
   - 'tests/**'
   - 'composer.*'
