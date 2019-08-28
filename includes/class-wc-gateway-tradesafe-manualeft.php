@@ -16,12 +16,12 @@ class WC_Gateway_TradeSafe_Manualeft extends WC_Gateway_TradeSafe_Base {
 		$this->order_button_text  = __( 'Proceed to TradeSafe', 'woocommerce-tradesafe-gateway' );
 		$this->supports           = array(
 			'products',
-//			'refunds',
+		// 'refunds',
 		);
 
 		// Supported Countries
 		$this->countries = [
-			'ZA'
+			'ZA',
 		];
 
 		$this->init_form_fields();
@@ -31,10 +31,13 @@ class WC_Gateway_TradeSafe_Manualeft extends WC_Gateway_TradeSafe_Base {
 		$this->description = $this->get_option( 'description' );
 		$this->enabled     = $this->is_available() ? 'yes' : 'no';
 
-		add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array(
-			$this,
-			'process_admin_options'
-		) );
+		add_action(
+			'woocommerce_update_options_payment_gateways_' . $this->id,
+			array(
+				$this,
+				'process_admin_options',
+			)
+		);
 	}
 
 	/**
@@ -46,7 +49,7 @@ class WC_Gateway_TradeSafe_Manualeft extends WC_Gateway_TradeSafe_Base {
 				'title'   => __( 'Enable/Disable', 'woocommerce-tradesafe-gateway' ),
 				'type'    => 'checkbox',
 				'label'   => __( 'Enable Manual EFT Payment', 'woocommerce-tradesafe-gateway' ),
-				'default' => 'no'
+				'default' => 'no',
 			),
 			'title'       => array(
 				'title'       => __( 'Title', 'woocommerce-tradesafe-gateway' ),
@@ -61,7 +64,7 @@ class WC_Gateway_TradeSafe_Manualeft extends WC_Gateway_TradeSafe_Base {
 				'description' => __( 'This controls the description which the user sees during checkout.', 'woocommerce-tradesafe-gateway' ),
 				'default'     => __( 'Make payment using online banking.', 'woocommerce-tradesafe-gateway' ),
 				'desc_tip'    => true,
-			)
+			),
 		);
 	}
 }

@@ -20,7 +20,7 @@ class TestClassTradesafe extends TestCase {
 		$expected = [
 			'<a href="http://example.org/wp-admin/options-general.php?page=tradesafe">Settings</a>',
 			'<a href="https://www.tradesafe.co.za/page/contact">Support</a>',
-			'<a href="https://www.tradesafe.co.za/page/API">Docs</a>'
+			'<a href="https://www.tradesafe.co.za/page/API">Docs</a>',
 		];
 
 		$this->assertEquals( $expected, $result );
@@ -31,7 +31,7 @@ class TestClassTradesafe extends TestCase {
 		$expected = [
 			'WC_Gateway_TradeSafe_Ecentric',
 			'WC_Gateway_TradeSafe_EftSecure',
-			'WC_Gateway_TradeSafe_ManualEft'
+			'WC_Gateway_TradeSafe_ManualEft',
 		];
 
 		$this->assertEquals( $expected, $result );

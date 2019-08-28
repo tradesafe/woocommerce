@@ -20,7 +20,7 @@ class TradeSafeOrders {
 		}
 	}
 
-	//Initializes WordPress hooks
+	// Initializes WordPress hooks
 	private static function init_hooks() {
 		self::$initiated = true;
 
@@ -50,7 +50,14 @@ class TradeSafeOrders {
 
 			wp_redirect( '/my-account/orders/' );
 		} else {
-			wp_die( $response, 'An error occurred', [ 'response' => 400, 'back_link' => true ] );
+			wp_die(
+				$response,
+				'An error occurred',
+				[
+					'response'  => 400,
+					'back_link' => true,
+				]
+			);
 		}
 	}
 
@@ -86,7 +93,14 @@ class TradeSafeOrders {
 
 			wp_redirect( '/my-account/orders/' );
 		} else {
-			wp_die( $response, 'An error occurred', [ 'response' => 400, 'back_link' => true ] );
+			wp_die(
+				$response,
+				'An error occurred',
+				[
+					'response'  => 400,
+					'back_link' => true,
+				]
+			);
 		}
 	}
 
@@ -108,7 +122,14 @@ class TradeSafeOrders {
 
 			wp_redirect( '/my-account/orders/' );
 		} else {
-			wp_die( $response, 'An error occurred', [ 'response' => 400, 'back_link' => true ] );
+			wp_die(
+				$response,
+				'An error occurred',
+				[
+					'response'  => 400,
+					'back_link' => true,
+				]
+			);
 		}
 	}
 
@@ -130,7 +151,14 @@ class TradeSafeOrders {
 
 			wp_redirect( '/my-account/orders/' );
 		} else {
-			wp_die( $response, 'An error occurred', [ 'response' => 400, 'back_link' => true ] );
+			wp_die(
+				$response,
+				'An error occurred',
+				[
+					'response'  => 400,
+					'back_link' => true,
+				]
+			);
 		}
 	}
 
@@ -181,7 +209,7 @@ class TradeSafeOrders {
 
 				if ( $order->meta_exists( 'tradesafe_id' ) && $request['id'] === $order->get_meta( 'tradesafe_id' ) ) {
 					switch ( $request['step'] ) {
-						case "FUNDS_RECEIVED":
+						case 'FUNDS_RECEIVED':
 							$order->update_status( 'processing', sprintf( __( 'Payment via TradeSafe.', 'woocommerce-tradesafe-gateway' ) ) );
 							$data = array(
 								'step' => 'SENT',
@@ -196,7 +224,7 @@ class TradeSafeOrders {
 								die();
 							}
 							break;
-						case "DECLINED":
+						case 'DECLINED':
 							$order->update_status( 'cancelled', sprintf( __( 'Order canceled.', 'woocommerce-tradesafe-gateway' ) ) );
 							break;
 						default:
@@ -248,6 +276,6 @@ class TradeSafeOrders {
 			status_header( 400 );
 		}
 
-		die(':^)');
+		die( ':^)' );
 	}
 }

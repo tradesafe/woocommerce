@@ -16,7 +16,7 @@ class TradeSafeProfile {
 		}
 	}
 
-	//Initializes WordPress hooks
+	// Initializes WordPress hooks
 	private static function init_hooks() {
 		self::$initiated = true;
 
@@ -48,7 +48,7 @@ class TradeSafeProfile {
 		$tradesafe_id        = get_user_meta( $user->ID, 'tradesafe_user_id', true );
 		$tradesafe_user_data = $tradesafe->get_user( $tradesafe_id );
 
-		if ( "" === $tradesafe_id ) {
+		if ( '' === $tradesafe_id ) {
 			$token_cache_id   = 'tradesafe-token-' . $user->ID;
 			$token            = get_transient( $token_cache_id );
 			$url              = $tradesafe->endpoint;
@@ -64,9 +64,8 @@ class TradeSafeProfile {
 				}
 			}
 
-			require_once( TRADESAFE_PLUGIN_DIR . 'views/profile_edit.php' );
+			require_once TRADESAFE_PLUGIN_DIR . '/templates/profile-edit.php';
 		} else {
-
 			if ( ! is_wp_error( $tradesafe_user_data ) ) {
 				$profile['user']['name']['title'] = 'Name';
 				$profile['user']['name']['value'] = $tradesafe_user_data['first_name'] . ' ' . $tradesafe_user_data['last_name'];
@@ -80,7 +79,7 @@ class TradeSafeProfile {
 				$profile['user']['mobile']['title'] = 'Mobile';
 				$profile['user']['mobile']['value'] = $tradesafe_user_data['mobile'];
 
-				if ( isset( $tradesafe_user_data['company'] ) && "" !== $tradesafe_user_data['company']['name'] ) {
+				if ( isset( $tradesafe_user_data['company'] ) && '' !== $tradesafe_user_data['company']['name'] ) {
 					$profile['company']['name']['title'] = 'Name';
 					$profile['company']['name']['value'] = $tradesafe_user_data['company']['name'] . ' ' . $tradesafe_user_data['company']['type'];
 
@@ -100,7 +99,7 @@ class TradeSafeProfile {
 				}
 			}
 
-			require_once( TRADESAFE_PLUGIN_DIR . 'views/profile_view.php' );
+			require_once TRADESAFE_PLUGIN_DIR . '/templates/profile-view.php';
 		}
 	}
 
@@ -111,8 +110,8 @@ class TradeSafeProfile {
 	 */
 	public static function menu_link( $menu_links ) {
 		$menu_links = array_slice( $menu_links, 0, 5, true )
-		              + array( 'tradesafe' => 'TradeSafe' )
-		              + array_slice( $menu_links, 5, null, true );
+					  + array( 'tradesafe' => 'TradeSafe' )
+					  + array_slice( $menu_links, 5, null, true );
 
 		return $menu_links;
 	}
@@ -126,7 +125,7 @@ class TradeSafeProfile {
 		$request_owner = $tradesafe->owner();
 		$data          = array(
 			'success_url' => $_POST['page_url'],
-			'failure_url' => $_POST['page_url']
+			'failure_url' => $_POST['page_url'],
 		);
 
 		if ( ! is_wp_error( $request_token ) && ! is_wp_error( $request_owner ) ) {
@@ -151,7 +150,7 @@ class TradeSafeProfile {
 			status_header( 200 );
 		} else {
 			status_header( 404 );
-			include( get_query_template( '404' ) );
+			include get_query_template( '404' );
 		}
 
 		die();
@@ -168,7 +167,7 @@ class TradeSafeProfile {
 			wp_redirect( $edit_account_url );
 		} else {
 			status_header( 404 );
-			include( get_query_template( '404' ) );
+			include get_query_template( '404' );
 			die();
 		}
 	}
@@ -190,7 +189,7 @@ class TradeSafeProfile {
 
 			if ( ! is_wp_error( $request ) ) {
 				$_POST['email'] = esc_html( $_GET['email'] );
-				require_once( TRADESAFE_PLUGIN_DIR . 'views/register_with_token.php' );
+				require_once TRADESAFE_PLUGIN_DIR . '/tamplates/register-token.php';
 			}
 		} else {
 			$bank_account_types = $tradesafe->constant( 'bank-account-types' );
@@ -204,13 +203,13 @@ class TradeSafeProfile {
 			];
 
 			$bank_fields = [
-				'bank_name'    => array( 'Bank', 'select', $cbc_list ),
-				'bank_account' => array( 'Account Number', 'text' ),
-//				'bank_branch'  => array( 'Branch', 'text' ),
-				'bank_type'    => array( 'Account Type', 'select', $bank_account_types ),
+				'bank_name'                     => array( 'Bank', 'select', $cbc_list ),
+				'bank_account'                  => array( 'Account Number', 'text' ),
+				// 'bank_branch'  => array( 'Branch', 'text' ),
+									'bank_type' => array( 'Account Type', 'select', $bank_account_types ),
 			];
 
-			require_once( TRADESAFE_PLUGIN_DIR . 'views/register.php' );
+			require_once TRADESAFE_PLUGIN_DIR . '/templates/register.php';
 		}
 	}
 
@@ -340,6 +339,5 @@ class TradeSafeProfile {
 				update_user_meta( $user_id, 'last_name', sanitize_text_field( $_POST['last_name'] ) );
 			}
 		}
-
 	}
 }

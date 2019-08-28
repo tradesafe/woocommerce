@@ -10,7 +10,6 @@
  * Tested up to: 5.2
  * WC tested up to: 3.6
  * WC requires at least: 3.6
- *
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -32,10 +31,10 @@ define( 'TRADESAFE_API_DEBUG_DOMAIN', $debug_domain );
 define( 'TRADESAFE_API_DEBUG_CA_PATH', $debug_ca_path );
 
 // Load classes
-require_once( TRADESAFE_PLUGIN_DIR . '/includes/class-tradesafe.php' );
-require_once( TRADESAFE_PLUGIN_DIR . '/includes/class-tradesafe-api-wrapper.php' );
-require_once( TRADESAFE_PLUGIN_DIR . '/includes/class-tradesafe-profile.php' );
-require_once( TRADESAFE_PLUGIN_DIR . '/includes/class-tradesafe-orders.php' );
+require_once TRADESAFE_PLUGIN_DIR . '/includes/class-tradesafe.php';
+require_once TRADESAFE_PLUGIN_DIR . '/includes/class-tradesafe-api-wrapper.php';
+require_once TRADESAFE_PLUGIN_DIR . '/includes/class-tradesafe-profile.php';
+require_once TRADESAFE_PLUGIN_DIR . '/includes/class-tradesafe-orders.php';
 
 // Init Plugin
 add_action( 'init', [ 'TradeSafe', 'init' ] );

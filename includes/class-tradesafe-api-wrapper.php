@@ -5,10 +5,10 @@
  */
 class TradeSafeAPIWrapper {
 	// Variables
-	private $token = '';
-	public $endpoint = '';
+	private $token      = '';
+	public $endpoint    = '';
 	private $production = false;
-	private $debugging = false;
+	private $debugging  = false;
 
 	/**
 	 * TradeSafeAPIWrapper constructor.
@@ -33,7 +33,7 @@ class TradeSafeAPIWrapper {
 
 	private function request( $route, $data = null, $method = 'GET' ) {
 		if ( empty( $this->token ) ) {
-			$this->log( "No token configured", true );
+			$this->log( 'No token configured', true );
 
 			return new WP_Error( '400', __( 'A token is required to submit a request to the TradeSafe API', 'woocommerce-tradesafe-gateway' ), null );
 		}
@@ -47,7 +47,7 @@ class TradeSafeAPIWrapper {
 				'Authorization' => 'Bearer ' . $this->token,
 				'Content-Type'  => 'application/json',
 				'Accept'        => 'application/json',
-			]
+			],
 		];
 
 		if ( isset( $data ) ) {
@@ -141,7 +141,7 @@ class TradeSafeAPIWrapper {
 		static $owner;
 
 		if ( ! isset( $owner ) || is_wp_error( $owner ) ) {
-			$owner = $this->request( 'verify/owner' );;
+			$owner = $this->request( 'verify/owner' );
 		}
 
 		return $owner;
