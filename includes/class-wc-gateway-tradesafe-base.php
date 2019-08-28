@@ -33,11 +33,14 @@ class WC_Gateway_TradeSafe_Base extends WC_Payment_Gateway {
 			parent::admin_options();
 		} else {
 			?>
-            <h3><?php _e( 'TradeSafe', 'woocommerce-tradesafe-gateway' ); ?></h3>
-            <div class="inline error"><p>
-                    <strong><?php _e( 'Gateway Disabled', 'woocommerce-tradesafe-gateway' ); ?></strong> <?php /* translators: 1: a href link 2: closing href */
-					echo sprintf( __( 'Choose South African Rand as your store currency in %1$sGeneral Settings%2$s to enable the TradeSafe Gateway.', 'woocommerce-tradesafe-gateway' ), '<a href="' . esc_url( admin_url( 'admin.php?page=wc-settings&tab=general' ) ) . '">', '</a>' ); ?>
-                </p></div>
+			<h3><?php _e( 'TradeSafe', 'woocommerce-tradesafe-gateway' ); ?></h3>
+			<div class="inline error"><p>
+					<strong><?php _e( 'Gateway Disabled', 'woocommerce-tradesafe-gateway' ); ?></strong> 
+									  <?php
+										/* translators: 1: a href link 2: closing href */
+										echo sprintf( __( 'Choose South African Rand as your store currency in %1$sGeneral Settings%2$s to enable the TradeSafe Gateway.', 'woocommerce-tradesafe-gateway' ), '<a href="' . esc_url( admin_url( 'admin.php?page=wc-settings&tab=general' ) ) . '">', '</a>' );
+										?>
+				</p></div>
 			<?php
 		}
 	}
@@ -85,7 +88,7 @@ class WC_Gateway_TradeSafe_Base extends WC_Payment_Gateway {
 				'success_url'       => $checkout_url,
 				'failure_url'       => $order_url,
 				'industry'          => get_option( 'tradesafe_site_industry', 'GENERAL_GOODS_SERVICES' ),
-				'description'       => sprintf( __( 'New order from %s. Order ID: %s', 'woocommerce-tradesafe-gateway' ), get_bloginfo( 'name' ), $order->get_order_number() ),
+				'description'       => sprintf( __( 'New order from %1$s. Order ID: %2$s', 'woocommerce-tradesafe-gateway' ), get_bloginfo( 'name' ), $order->get_order_number() ),
 				'value'             => (float) number_format_i18n( $base_value, 2 ),
 				'completion_days'   => 30,
 				'completion_months' => 0,
@@ -105,7 +108,8 @@ class WC_Gateway_TradeSafe_Base extends WC_Payment_Gateway {
 				}
 
 				if ( count( $sellers ) > 1 ) {
-					wc_add_notice('Multiple sellers are not currently supported.', 'error');
+					wc_add_notice( 'Multiple sellers are not currently supported.', 'error' );
+
 					return array(
 						'result'   => 'failure',
 						'messages' => 'Multiple sellers are not currently supported.',
@@ -117,7 +121,8 @@ class WC_Gateway_TradeSafe_Base extends WC_Payment_Gateway {
 				$seller    = get_user_meta( $seller_id, 'tradesafe_user_id', true );
 
 				if ( '' === $seller ) {
-					wc_add_notice('Seller is not registered with TradeSafe or has not linked their account.', 'error');
+					wc_add_notice( 'Seller is not registered with TradeSafe or has not linked their account.', 'error' );
+
 					return array(
 						'result'   => 'failure',
 						'messages' => 'Seller is not registered with TradeSafe or has not linked their account.',
@@ -146,7 +151,8 @@ class WC_Gateway_TradeSafe_Base extends WC_Payment_Gateway {
 					}
 				}
 
-				wc_add_notice($messages, 'error');
+				wc_add_notice( $messages, 'error' );
+
 				return array(
 					'result'   => 'failure',
 					'messages' => $messages,
@@ -165,7 +171,8 @@ class WC_Gateway_TradeSafe_Base extends WC_Payment_Gateway {
 					}
 				}
 
-				wc_add_notice($messages, 'error');
+				wc_add_notice( $messages, 'error' );
+
 				return array(
 					'result'   => 'failure',
 					'messages' => $messages,
@@ -179,20 +186,21 @@ class WC_Gateway_TradeSafe_Base extends WC_Payment_Gateway {
 		}
 
 		switch ( $order->get_payment_method() ) {
-			case "tradesafe_manualeft":
+			case 'tradesafe_manualeft':
 				$redirect = $contract['Contract']['payment_url'];
 				break;
-			case "tradesafe_eftsecure":
+			case 'tradesafe_eftsecure':
 				$redirect = $contract['Contract']['eftsecure_payment_url'];
 				break;
-			case "tradesafe_ecentric":
+			case 'tradesafe_ecentric':
 				$redirect = $contract['Contract']['ecentric_payment_redirect'];
 				break;
 			default:
-				wc_add_notice('There was a problem processing the payment.', 'error');
+				wc_add_notice( 'There was a problem processing the payment.', 'error' );
+
 				return array(
 					'result'   => 'failure',
-					'messages' => 'There was a problem processing the payment.'
+					'messages' => 'There was a problem processing the payment.',
 				);
 		}
 
@@ -202,13 +210,13 @@ class WC_Gateway_TradeSafe_Base extends WC_Payment_Gateway {
 		// Return thankyou redirect
 		return array(
 			'result'   => 'success',
-			'redirect' => $redirect
+			'redirect' => $redirect,
 		);
 	}
 
 	/**
-	 * @param int $order_id
-	 * @param null $amount
+	 * @param int    $order_id
+	 * @param null   $amount
 	 * @param string $reason
 	 *
 	 * @return bool

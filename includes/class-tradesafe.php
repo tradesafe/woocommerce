@@ -1,8 +1,11 @@
 <?php
 
+/**
+ * Class TradeSafe
+ */
 class TradeSafe {
 	private static $initiated = false;
-	public static $enabled = false;
+	public static $enabled    = false;
 
 	public static function init() {
 		if ( ! class_exists( 'WC_Payment_Gateway' ) ) {
@@ -14,7 +17,7 @@ class TradeSafe {
 		}
 	}
 
-	//Initializes WordPress hooks
+	// Initializes WordPress hooks
 	private static function init_hooks() {
 		self::$initiated = true;
 
@@ -22,10 +25,10 @@ class TradeSafe {
 		load_plugin_textdomain( 'woocommerce-tradesafe-gateway', false, trailingslashit( 'woocommerce-tradesafe-gateway' ) );
 
 		// Payment Gateways
-		require_once( TRADESAFE_PLUGIN_DIR . '/includes/class-wc-gateway-tradesafe-base.php' );
-		require_once( TRADESAFE_PLUGIN_DIR . '/includes/class-wc-gateway-tradesafe-eftsecure.php' );
-		require_once( TRADESAFE_PLUGIN_DIR . '/includes/class-wc-gateway-tradesafe-manualeft.php' );
-		require_once( TRADESAFE_PLUGIN_DIR . '/includes/class-wc-gateway-tradesafe-ecentric.php' );
+		include_once TRADESAFE_PLUGIN_DIR . '/includes/class-wc-gateway-tradesafe-base.php';
+		include_once TRADESAFE_PLUGIN_DIR . '/includes/class-wc-gateway-tradesafe-eftsecure.php';
+		include_once TRADESAFE_PLUGIN_DIR . '/includes/class-wc-gateway-tradesafe-manualeft.php';
+		include_once TRADESAFE_PLUGIN_DIR . '/includes/class-wc-gateway-tradesafe-ecentric.php';
 
 		// Endpoints
 		add_rewrite_rule( '^tradesafe/(.*)/(.*)/?$', 'index.php?tradesafe=1&action=$matches[1]&action_id=$matches[2]', 'top' );
@@ -41,10 +44,13 @@ class TradeSafe {
 		add_action( 'woocommerce_pay_order_before_submit', [ 'TradeSafe', 'payment_method_change_order' ] );
 
 		// Filters
-		add_filter( 'plugin_action_links_' . plugin_basename( TRADESAFE_PLUGIN_FILE_PATH ), [
-			'TradeSafe',
-			'plugin_links'
-		] );
+		add_filter(
+			'plugin_action_links_' . plugin_basename( TRADESAFE_PLUGIN_FILE_PATH ),
+			[
+				'TradeSafe',
+				'plugin_links',
+			]
+		);
 		add_filter( 'query_vars', [ 'TradeSafe', 'query_vars' ] );
 		add_filter( 'woocommerce_payment_gateways', [ 'TradeSafe', 'add_payment_methods' ] );
 		add_filter( 'woocommerce_available_payment_gateways', [ 'TradeSafe', 'valid_transaction' ] );
@@ -126,7 +132,8 @@ class TradeSafe {
 	 */
 	public static function callback_parse_request( $wp ) {
 		if ( array_key_exists( 'tradesafe', $wp->query_vars )
-		     && $wp->query_vars['tradesafe'] == '1' ) {
+			 && $wp->query_vars['tradesafe'] == '1'
+		) {
 			switch ( $wp->query_vars['action'] ) {
 				case 'auth':
 					// run auth check
@@ -152,7 +159,7 @@ class TradeSafe {
 					break;
 				default:
 					status_header( 404 );
-					include( get_query_template( '404' ) );
+					include get_query_template( '404' );
 					die();
 			}
 		}
@@ -187,10 +194,10 @@ class TradeSafe {
 		}
 
 		switch ( $payment_method ) {
-			case "tradesafe_manualeft":
-			case "tradesafe_eftsecure":
+			case 'tradesafe_manualeft':
+			case 'tradesafe_eftsecure':
 				break;
-			case "tradesafe_ecentric":
+			case 'tradesafe_ecentric':
 				$fee += $base_value * 0.015;
 				break;
 		}
@@ -234,11 +241,11 @@ class TradeSafe {
 	public static function payment_method_change_checkout() {
 		?>
 		<script type="text/javascript">
-            (function ($) {
-                $('form.checkout').on('change', 'input[name^="payment_method"]', function () {
-                    $('body').trigger('update_checkout');
-                });
-            })(jQuery);
+			(function ($) {
+				$('form.checkout').on('change', 'input[name^="payment_method"]', function () {
+					$('body').trigger('update_checkout');
+				});
+			})(jQuery);
 		</script>
 		<?php
 	}
@@ -253,20 +260,20 @@ class TradeSafe {
 		$payment_method = $order->get_payment_method();
 		?>
 		<script type="text/javascript">
-            (function ($) {
-                $('input[name^="payment_method"][value^="<?php esc_attr_e( $payment_method ); ?>"]').prop('checked', true);
+			(function ($) {
+				$('input[name^="payment_method"][value^="<?php esc_attr_e( $payment_method ); ?>"]').prop('checked', true);
 
-                $('form#order_review').on('change', 'input[name^="payment_method"]', function () {
-                    var data = {
-                        "payment_method": this.value
-                    };
+				$('form#order_review').on('change', 'input[name^="payment_method"]', function () {
+					var data = {
+						"payment_method": this.value
+					};
 
-                    $('#place_order').prop('disabled', 'disabled');
-                    $.post("<?php esc_attr_e( $url ); ?>", data, function () {
-                        window.location.reload();
-                    });
-                });
-            })(jQuery);
+					$('#place_order').prop('disabled', 'disabled');
+					$.post("<?php esc_attr_e( $url ); ?>", data, function () {
+						window.location.reload();
+					});
+				});
+			})(jQuery);
 		</script>
 		<?php
 	}
@@ -293,11 +300,11 @@ class TradeSafe {
 				$configured    = true;
 				self::$enabled = true;
 				$owner_data    = '<strong>' . __( 'Account Details:', 'woocommerce-tradesafe-gateway' ) . '</strong><br/>'
-				                 . "<div><strong>Name: </strong> " . $owner_details['first_name'] . " " . $owner_details['last_name'] . "</div>"
-				                 . "<div><strong>Email: </strong>" . $owner_details['email'] . "</div>"
-				                 . "<div><strong>Mobile: </strong>" . $owner_details['mobile'] . "</div>"
-				                 . "<div><strong>ID Number: </strong>" . $owner_details['id_number'] . "</div>"
-				                 . "<div><strong>Bank Details: </strong><br/>" . $owner_details['bank']['name'] . "<br/>" . $owner_details['bank']['account'] . "<br/>" . $owner_details['bank']['type'] . "</div>";
+								 . '<div><strong>Name: </strong> ' . $owner_details['first_name'] . ' ' . $owner_details['last_name'] . '</div>'
+								 . '<div><strong>Email: </strong>' . $owner_details['email'] . '</div>'
+								 . '<div><strong>Mobile: </strong>' . $owner_details['mobile'] . '</div>'
+								 . '<div><strong>ID Number: </strong>' . $owner_details['id_number'] . '</div>'
+								 . '<div><strong>Bank Details: </strong><br/>' . $owner_details['bank']['name'] . '<br/>' . $owner_details['bank']['account'] . '<br/>' . $owner_details['bank']['type'] . '</div>';
 				$industries    = $tradesafe->constant( 'industry-types' );
 			}
 		} else {
@@ -326,12 +333,16 @@ class TradeSafe {
 			]
 		);
 
-		register_setting( 'tradesafe', 'tradesafe_api_token', [
-			'type'              => 'string',
-			'description'       => 'The token to use for API calls.',
-			'sanitize_callback' => [ 'TradeSafe', 'settings_field_sanitize' ],
-			'default'           => '',
-		] );
+		register_setting(
+			'tradesafe',
+			'tradesafe_api_token',
+			[
+				'type'              => 'string',
+				'description'       => 'The token to use for API calls.',
+				'sanitize_callback' => [ 'TradeSafe', 'settings_field_sanitize' ],
+				'default'           => '',
+			]
+		);
 
 		// Enable Production
 		add_settings_field(
@@ -347,12 +358,16 @@ class TradeSafe {
 			]
 		);
 
-		register_setting( 'tradesafe', 'tradesafe_api_production', [
-			'type'              => 'boolean',
-			'description'       => 'Should the production API be used.',
-			'sanitize_callback' => [ 'TradeSafe', 'settings_field_sanitize' ],
-			'default'           => false,
-		] );
+		register_setting(
+			'tradesafe',
+			'tradesafe_api_production',
+			[
+				'type'              => 'boolean',
+				'description'       => 'Should the production API be used.',
+				'sanitize_callback' => [ 'TradeSafe', 'settings_field_sanitize' ],
+				'default'           => false,
+			]
+		);
 
 		if ( $configured ) {
 			// Add the user settings section
@@ -378,12 +393,16 @@ class TradeSafe {
 				]
 			);
 
-			register_setting( 'tradesafe', 'tradesafe_site_industry', [
-				'type'              => 'string',
-				'description'       => 'The role that this store will fulfill.',
-				'sanitize_callback' => [ 'TradeSafe', 'settings_field_sanitize' ],
-				'default'           => 'GENERAL_GOODS_SERVICES',
-			] );
+			register_setting(
+				'tradesafe',
+				'tradesafe_site_industry',
+				[
+					'type'              => 'string',
+					'description'       => 'The role that this store will fulfill.',
+					'sanitize_callback' => [ 'TradeSafe', 'settings_field_sanitize' ],
+					'default'           => 'GENERAL_GOODS_SERVICES',
+				]
+			);
 
 			// Store role
 			add_settings_field(
@@ -397,18 +416,22 @@ class TradeSafe {
 					'type'        => 'select',
 					'options'     => [
 						'seller'      => __( 'Seller', 'woocommerce-tradesafe-gateway' ),
-						'marketplace' => __( 'Marketplace, Agent or Broker', 'woocommerce-tradesafe-gateway' )
+						'marketplace' => __( 'Marketplace, Agent or Broker', 'woocommerce-tradesafe-gateway' ),
 					],
 					'description' => 'Are you selling products or running a marketplace?',
 				]
 			);
 
-			register_setting( 'tradesafe', 'tradesafe_site_role', [
-				'type'              => 'string',
-				'description'       => 'The role that this store will fulfill.',
-				'sanitize_callback' => [ 'TradeSafe', 'settings_field_sanitize' ],
-				'default'           => '',
-			] );
+			register_setting(
+				'tradesafe',
+				'tradesafe_site_role',
+				[
+					'type'              => 'string',
+					'description'       => 'The role that this store will fulfill.',
+					'sanitize_callback' => [ 'TradeSafe', 'settings_field_sanitize' ],
+					'default'           => '',
+				]
+			);
 
 			// Marketplace fee
 			add_settings_field(
@@ -424,12 +447,16 @@ class TradeSafe {
 				]
 			);
 
-			register_setting( 'tradesafe', 'tradesafe_site_fee', [
-				'type'              => 'string',
-				'description'       => 'The role that this store will fulfill.',
-				'sanitize_callback' => [ 'TradeSafe', 'settings_field_sanitize' ],
-				'default'           => '',
-			] );
+			register_setting(
+				'tradesafe',
+				'tradesafe_site_fee',
+				[
+					'type'              => 'string',
+					'description'       => 'The role that this store will fulfill.',
+					'sanitize_callback' => [ 'TradeSafe', 'settings_field_sanitize' ],
+					'default'           => '',
+				]
+			);
 
 			// Fee allocation
 			add_settings_field(
@@ -450,12 +477,16 @@ class TradeSafe {
 				]
 			);
 
-			register_setting( 'tradesafe', 'tradesafe_site_fee_allocation', [
-				'type'              => 'string',
-				'description'       => 'The role that this store will fulfill.',
-				'sanitize_callback' => [ 'TradeSafe', 'settings_field_sanitize' ],
-				'default'           => '1',
-			] );
+			register_setting(
+				'tradesafe',
+				'tradesafe_site_fee_allocation',
+				[
+					'type'              => 'string',
+					'description'       => 'The role that this store will fulfill.',
+					'sanitize_callback' => [ 'TradeSafe', 'settings_field_sanitize' ],
+					'default'           => '1',
+				]
+			);
 		}
 
 		// Add the user settings section
@@ -480,20 +511,30 @@ class TradeSafe {
 			]
 		);
 
-		register_setting( 'tradesafe', 'tradesafe_api_debugging', [
-			'type'              => 'boolean',
-			'description'       => 'Enable debugging.',
-			'sanitize_callback' => [ 'TradeSafe', 'settings_field_sanitize' ],
-			'default'           => false,
-		] );
+		register_setting(
+			'tradesafe',
+			'tradesafe_api_debugging',
+			[
+				'type'              => 'boolean',
+				'description'       => 'Enable debugging.',
+				'sanitize_callback' => [ 'TradeSafe', 'settings_field_sanitize' ],
+				'default'           => false,
+			]
+		);
 	}
 
 	// Add the link to the settings menu
 	public static function register_options_page() {
-		add_options_page( 'TradeSafe Settings', 'TradeSafe', 'manage_options', 'tradesafe', [
+		add_options_page(
+			'TradeSafe Settings',
 			'TradeSafe',
-			'settings_page'
-		] );
+			'manage_options',
+			'tradesafe',
+			[
+				'TradeSafe',
+				'settings_page',
+			]
+		);
 	}
 
 	// Display settings page
@@ -503,7 +544,7 @@ class TradeSafe {
 			'auth_callback' => site_url( '/tradesafe/auth/' ),
 		];
 
-		require_once( TRADESAFE_PLUGIN_DIR . '/views/settings.php' );
+		include_once TRADESAFE_PLUGIN_DIR . '/views/settings.php';
 	}
 
 	// Post notice
@@ -551,7 +592,7 @@ class TradeSafe {
 				break;
 			case 'select':
 				$option = get_option( $args['id'] );
-				$field  .= sprintf( '<select name="%1$s" id="%1$s" cols="60" rows="5"><option value="">' . __( '-- SELECT --', 'woocommerce-tradesafe-gateway' ) . '</option>', $args['id'] );
+				$field .= sprintf( '<select name="%1$s" id="%1$s" cols="60" rows="5"><option value="">' . __( '-- SELECT --', 'woocommerce-tradesafe-gateway' ) . '</option>', $args['id'] );
 
 				foreach ( $args['options'] as $value => $name ) {
 					if ( $option === (string) $value ) {

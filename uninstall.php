@@ -24,5 +24,5 @@ delete_site_option( 'tradesafe_site_fee_allocation' );
 delete_site_option( 'tradesafe_api_debugging' );
 
 // Remove Post meta
-delete_metadata('post', null, 'tradesafe_id', '', true);
-delete_metadata('user', null, 'tradesafe_user_id', '', true);
+delete_metadata( 'post', null, 'tradesafe_id', '', true );
+delete_metadata( 'user', null, 'tradesafe_user_id', '', true );
