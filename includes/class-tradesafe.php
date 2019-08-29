@@ -132,7 +132,7 @@ class TradeSafe {
 	 */
 	public static function callback_parse_request( $wp ) {
 		if ( array_key_exists( 'tradesafe', $wp->query_vars )
-			 && $wp->query_vars['tradesafe'] == '1'
+			 && $wp->query_vars['tradesafe'] === '1'
 		) {
 			switch ( $wp->query_vars['action'] ) {
 				case 'auth':
@@ -189,8 +189,11 @@ class TradeSafe {
 	public static function calculate_fee( $base_value, $payment_method ) {
 		$fee = 0;
 
+		$fee = self::calculate_tradesafe_fee( $base_value );
+
 		if ( 'marketplace' === get_option( 'tradesafe_site_role' ) ) {
-			$fee = self::calculate_marketplace_fee( $base_value );
+			$marketplace_fee = self::calculate_marketplace_fee( $base_value );
+			$fee            += $marketplace_fee;
 		}
 
 		switch ( $payment_method ) {
@@ -213,26 +216,57 @@ class TradeSafe {
 	 * @return float|int|mixed|void
 	 */
 	public static function calculate_marketplace_fee( $base_value ) {
-		$fee            = get_option( 'tradesafe_site_fee' );
-		$fee_allocation = get_option( 'tradesafe_site_fee_allocation', 1 );
+		$base_fee       = get_option( 'tradesafe_site_fee' );
+		$fee_allocation = (int) get_option( 'tradesafe_site_fee_allocation', '1' );
 
-		if ( substr_count( $fee, '%' ) ) {
-			$percentage = str_replace( '%', '', $fee );
-			$fee_value  = $base_value * ( $percentage / 100 );
+		if ( substr_count( $base_fee, '%' ) ) {
+			$percentage = str_replace( '%', '', $base_fee );
+			$fee        = $base_value * ( $percentage / 100 );
 		} else {
-			$fee_value = $fee;
+			$fee = $base_fee;
 		}
 
 		switch ( $fee_allocation ) {
 			case 1:
-				$fee_value = 0;
+				$fee = 0;
 				break;
 			case 2:
-				$fee_value /= 2;
+				$fee /= 2;
 				break;
 		}
 
-		return $fee_value;
+		return $fee;
+	}
+
+	/**
+	 * Calculate the fee payable by the buyer
+	 *
+	 * @param $base_value
+	 *
+	 * @return float|int|mixed|void
+	 */
+	public static function calculate_tradesafe_fee( $base_value ) {
+		$base_fee       = 20;
+		$percentage     = 0.015;
+		$tradesafe_fee  = ( $base_value * $percentage ) + $base_fee;
+		$fee_allocation = (int) get_option( 'tradesafe_escrow_fee_allocation', '3' );
+
+		$fee = 0;
+
+		switch ( $fee_allocation ) {
+			case 0:
+				$fee = $tradesafe_fee;
+				break;
+			case 2:
+			case 4:
+				$fee = $tradesafe_fee / 2;
+				break;
+			case 6:
+				$fee = $tradesafe_fee / 3;
+				break;
+		}
+
+		return $fee;
 	}
 
 	/**
@@ -297,15 +331,16 @@ class TradeSafe {
 					print self::notice( 'error', $message );
 				}
 			} else {
-				$configured    = true;
-				self::$enabled = true;
-				$owner_data    = '<strong>' . __( 'Account Details:', 'woocommerce-tradesafe-gateway' ) . '</strong><br/>'
-								 . '<div><strong>Name: </strong> ' . $owner_details['first_name'] . ' ' . $owner_details['last_name'] . '</div>'
-								 . '<div><strong>Email: </strong>' . $owner_details['email'] . '</div>'
-								 . '<div><strong>Mobile: </strong>' . $owner_details['mobile'] . '</div>'
-								 . '<div><strong>ID Number: </strong>' . $owner_details['id_number'] . '</div>'
-								 . '<div><strong>Bank Details: </strong><br/>' . $owner_details['bank']['name'] . '<br/>' . $owner_details['bank']['account'] . '<br/>' . $owner_details['bank']['type'] . '</div>';
-				$industries    = $tradesafe->constant( 'industry-types' );
+				$configured     = true;
+				self::$enabled  = true;
+				$owner_data     = '<strong>' . __( 'Account Details:', 'woocommerce-tradesafe-gateway' ) . '</strong><br/>'
+								  . '<div><strong>Name: </strong> ' . $owner_details['first_name'] . ' ' . $owner_details['last_name'] . '</div>'
+								  . '<div><strong>Email: </strong>' . $owner_details['email'] . '</div>'
+								  . '<div><strong>Mobile: </strong>' . $owner_details['mobile'] . '</div>'
+								  . '<div><strong>ID Number: </strong>' . $owner_details['id_number'] . '</div>'
+								  . '<div><strong>Bank Details: </strong><br/>' . $owner_details['bank']['name'] . '<br/>' . $owner_details['bank']['account'] . '<br/>' . $owner_details['bank']['type'] . '</div>';
+				$industries     = $tradesafe->constant( 'industry-types' );
+				$fee_allocation = $tradesafe->constant( 'fee-allocation-types' );
 			}
 		} else {
 			print self::notice( 'info', 'A valid API token is required to continue setup' );
@@ -314,7 +349,7 @@ class TradeSafe {
 		// Add the api settings section
 		add_settings_section(
 			'tradesafe_api_settings',
-			'API Details',
+			__( 'API Details', 'woocommerce-tradesafe-gateway' ),
 			[ 'TradeSafe', 'section_api_settings_intro' ],
 			'tradesafe'
 		);
@@ -322,7 +357,7 @@ class TradeSafe {
 		// API Token
 		add_settings_field(
 			'tradesafe_api_token',
-			'Token',
+			__( 'Token', 'woocommerce-tradesafe-gateway' ),
 			[ 'TradeSafe', 'settings_field_render' ],
 			'tradesafe',
 			'tradesafe_api_settings',
@@ -347,7 +382,7 @@ class TradeSafe {
 		// Enable Production
 		add_settings_field(
 			'tradesafe_api_production',
-			'Use Production API',
+			__( 'Use Production API', 'woocommerce-tradesafe-gateway' ),
 			[ 'TradeSafe', 'settings_field_render' ],
 			'tradesafe',
 			'tradesafe_api_settings',
@@ -373,7 +408,7 @@ class TradeSafe {
 			// Add the user settings section
 			add_settings_section(
 				'tradesafe_site_settings',
-				'Default Contract Details',
+				__( 'Contract Settings', 'woocommerce-tradesafe-gateway' ),
 				[ 'TradeSafe', 'section_site_settings_intro' ],
 				'tradesafe'
 			);
@@ -381,7 +416,7 @@ class TradeSafe {
 			// Industry
 			add_settings_field(
 				'tradesafe_site_industry',
-				'Industry',
+				__( 'Industry', 'woocommerce-tradesafe-gateway' ),
 				[ 'TradeSafe', 'settings_field_render' ],
 				'tradesafe',
 				'tradesafe_site_settings',
@@ -407,7 +442,7 @@ class TradeSafe {
 			// Store role
 			add_settings_field(
 				'tradesafe_site_role',
-				'Role',
+				__( 'Role', 'woocommerce-tradesafe-gateway' ),
 				[ 'TradeSafe', 'settings_field_render' ],
 				'tradesafe',
 				'tradesafe_site_settings',
@@ -436,7 +471,7 @@ class TradeSafe {
 			// Marketplace fee
 			add_settings_field(
 				'tradesafe_site_fee',
-				'Agent / Marketplace Fee',
+				__( 'Agent / Marketplace Fee', 'woocommerce-tradesafe-gateway' ),
 				[ 'TradeSafe', 'settings_field_render' ],
 				'tradesafe',
 				'tradesafe_site_settings',
@@ -461,7 +496,7 @@ class TradeSafe {
 			// Fee allocation
 			add_settings_field(
 				'tradesafe_site_fee_allocation',
-				'Fee Allocation',
+				__( 'Agent / Marketplace Fee Allocation', 'woocommerce-tradesafe-gateway' ),
 				[ 'TradeSafe', 'settings_field_render' ],
 				'tradesafe',
 				'tradesafe_site_settings',
@@ -473,7 +508,7 @@ class TradeSafe {
 						'1' => __( 'Seller Pays', 'woocommerce-tradesafe-gateway' ),
 						'2' => __( '50/50 Split', 'woocommerce-tradesafe-gateway' ),
 					],
-					'description' => 'How will the Marketplace / Agent fee be paid.',
+					'description' => 'Who will pay the Marketplace / Agent fee.',
 				]
 			);
 
@@ -491,8 +526,42 @@ class TradeSafe {
 
 		// Add the user settings section
 		add_settings_section(
+			'tradesafe_escrow_settings',
+			__( 'TradeSafe Settings', 'woocommerce-tradesafe-gateway' ),
+			[ 'TradeSafe', 'section_escrow_settings_intro' ],
+			'tradesafe'
+		);
+
+		// Enable Production
+		add_settings_field(
+			'tradesafe_escrow_fee_allocation',
+			__( 'TradeSafe Fee Allocation', 'woocommerce-tradesafe-gateway' ),
+			[ 'TradeSafe', 'settings_field_render' ],
+			'tradesafe',
+			'tradesafe_escrow_settings',
+			[
+				'id'          => 'tradesafe_escrow_fee_allocation',
+				'type'        => 'select',
+				'options'     => $fee_allocation,
+				'description' => 'Who will pay the TradeSafe\'s fee.',
+			]
+		);
+
+		register_setting(
+			'tradesafe',
+			'tradesafe_escrow_fee_allocation',
+			[
+				'type'              => 'boolean',
+				'description'       => 'Enable debugging.',
+				'sanitize_callback' => [ 'TradeSafe', 'settings_field_sanitize' ],
+				'default'           => '3',
+			]
+		);
+
+		// Add the user settings section
+		add_settings_section(
 			'tradesafe_site_debugging',
-			'Debugging',
+			__( 'Debugging', 'woocommerce-tradesafe-gateway' ),
 			[ 'TradeSafe', 'section_site_debugging_intro' ],
 			'tradesafe'
 		);
@@ -500,7 +569,7 @@ class TradeSafe {
 		// Enable Production
 		add_settings_field(
 			'tradesafe_api_debugging',
-			'Enable Debugging',
+			__( 'Enable Debugging', 'woocommerce-tradesafe-gateway' ),
 			[ 'TradeSafe', 'settings_field_render' ],
 			'tradesafe',
 			'tradesafe_site_debugging',
@@ -544,12 +613,12 @@ class TradeSafe {
 			'auth_callback' => site_url( '/tradesafe/auth/' ),
 		];
 
-		include_once TRADESAFE_PLUGIN_DIR . '/views/settings.php';
+		include_once TRADESAFE_PLUGIN_DIR . '/templates/settings.php';
 	}
 
 	// Post notice
 	public static function notice( $type, $message ) {
-		return sprintf( '<div class="notice-%s notice"><p>%s</p></div>', $type, __( $message, 'woocommerce-tradesafe-gateway' ) );
+		return sprintf( '<div class="notice-%s notice"><p>%s</p></div>', $type, $message );
 	}
 
 	/**
@@ -564,6 +633,11 @@ class TradeSafe {
 	// Intro User section
 	public static function section_site_settings_intro() {
 		echo '<p>' . sprintf( __( 'Set the defaults for each transaction.', 'woocommerce-tradesafe-gateway' ) ) . '</p>';
+	}
+
+	// Intro TradeSafe section
+	public static function section_escrow_settings_intro() {
+		echo '<p>' . sprintf( __( 'Assign how the TradeSafe\'s Fee should be split. By default this is paid out of the Marketplace / Agent fee.', 'woocommerce-tradesafe-gateway' ) ) . '</p>';
 	}
 
 	// Intro Debugging section
