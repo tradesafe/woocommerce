@@ -12,6 +12,7 @@ delete_option( 'tradesafe_site_industry' );
 delete_option( 'tradesafe_site_role' );
 delete_option( 'tradesafe_site_fee' );
 delete_option( 'tradesafe_site_fee_allocation' );
+delete_option( 'tradesafe_escrow_fee_allocation' );
 delete_option( 'tradesafe_api_debugging' );
 
 // Delete multisite options
@@ -21,6 +22,7 @@ delete_site_option( 'tradesafe_site_industry' );
 delete_site_option( 'tradesafe_site_role' );
 delete_site_option( 'tradesafe_site_fee' );
 delete_site_option( 'tradesafe_site_fee_allocation' );
+delete_site_option( 'tradesafe_escrow_fee_allocation' );
 delete_site_option( 'tradesafe_api_debugging' );
 
 // Remove Post meta

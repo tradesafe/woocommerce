@@ -35,11 +35,11 @@ class WC_Gateway_TradeSafe_Base extends WC_Payment_Gateway {
 			?>
 			<h3><?php _e( 'TradeSafe', 'woocommerce-tradesafe-gateway' ); ?></h3>
 			<div class="inline error"><p>
-					<strong><?php _e( 'Gateway Disabled', 'woocommerce-tradesafe-gateway' ); ?></strong> 
-									  <?php
-										/* translators: 1: a href link 2: closing href */
-										echo sprintf( __( 'Choose South African Rand as your store currency in %1$sGeneral Settings%2$s to enable the TradeSafe Gateway.', 'woocommerce-tradesafe-gateway' ), '<a href="' . esc_url( admin_url( 'admin.php?page=wc-settings&tab=general' ) ) . '">', '</a>' );
-										?>
+					<strong><?php _e( 'Gateway Disabled', 'woocommerce-tradesafe-gateway' ); ?></strong>
+					<?php
+					/* translators: 1: a href link 2: closing href */
+					echo sprintf( __( 'Choose South African Rand as your store currency in %1$sGeneral Settings%2$s to enable the TradeSafe Gateway.', 'woocommerce-tradesafe-gateway' ), '<a href="' . esc_url( admin_url( 'admin.php?page=wc-settings&tab=general' ) ) . '">', '</a>' );
+					?>
 				</p></div>
 			<?php
 		}
@@ -129,14 +129,21 @@ class WC_Gateway_TradeSafe_Base extends WC_Payment_Gateway {
 					);
 				}
 
-				$data['seller']               = $seller;
-				$data['agent']                = $owner['id'];
-				$data['fee_allocation']       = 3;
-				$data['agent_fee']            = get_option( 'tradesafe_site_fee' );
+				$data['seller']         = $seller;
+				$data['agent']          = $owner['id'];
+				$data['fee_allocation'] = (int) get_option( 'tradesafe_escrow_fee_allocation', '3' );
+
+				if ( substr_count( get_option( 'tradesafe_site_fee' ), '%' ) > 0 ) {
+					$data['agent_fee']      = str_replace( '%', '', get_option( 'tradesafe_site_fee' ) );
+					$data['agent_fee_type'] = 1;
+				} else {
+					$data['agent_fee']      = get_option( 'tradesafe_site_fee' );
+					$data['agent_fee_type'] = 0;
+				}
+
 				$data['agent_fee_allocation'] = (int) get_option( 'tradesafe_site_fee_allocation', '1' );
 			} else {
-				$data['seller']         = $owner['id'];
-				$data['fee_allocation'] = 1;
+				$data['seller'] = $owner['id'];
 			}
 
 			// Check if contract data is valid
