@@ -48,58 +48,60 @@ class TradeSafeProfile {
 		$tradesafe_id        = get_user_meta( $user->ID, 'tradesafe_user_id', true );
 		$tradesafe_user_data = $tradesafe->get_user( $tradesafe_id );
 
-		if ( '' === $tradesafe_id ) {
-			$token_cache_id   = 'tradesafe-token-' . $user->ID;
-			$token            = get_transient( $token_cache_id );
-			$url              = $tradesafe->endpoint;
-			$auth_key         = $tradesafe->owner()['id'];
-			$edit_account_url = wc_get_endpoint_url( 'tradesafe', '', wc_get_page_permalink( 'myaccount' ) );
+		if ( ! is_admin() ) {
+			if ( '' === $tradesafe_id ) {
+				$token_cache_id   = 'tradesafe-token-' . $user->ID;
+				$token            = get_transient( $token_cache_id );
+				$url              = $tradesafe->endpoint;
+				$auth_key         = $tradesafe->owner()['id'];
+				$edit_account_url = wc_get_endpoint_url( 'tradesafe', '', wc_get_page_permalink( 'myaccount' ) );
 
-			if ( false === $token ) {
-				$token_request = $tradesafe->auth_token();
-				if ( ! is_wp_error( $token_request ) ) {
-					$token_lifetime = $token_request['expire'] - $token_request['created'];
-					$token          = $token_request['token'];
-					set_transient( $token_cache_id, $token, $token_lifetime );
+				if ( false === $token ) {
+					$token_request = $tradesafe->auth_token();
+					if ( ! is_wp_error( $token_request ) ) {
+						$token_lifetime = $token_request['expire'] - $token_request['created'];
+						$token          = $token_request['token'];
+						set_transient( $token_cache_id, $token, $token_lifetime );
+					}
 				}
+
+				require_once TRADESAFE_PLUGIN_DIR . '/templates/profile-edit.php';
+			} else {
+				if ( ! is_wp_error( $tradesafe_user_data ) ) {
+					$profile['user']['name']['title'] = 'Name';
+					$profile['user']['name']['value'] = $tradesafe_user_data['first_name'] . ' ' . $tradesafe_user_data['last_name'];
+
+					$profile['user']['id_number']['title'] = 'ID Number';
+					$profile['user']['id_number']['value'] = $tradesafe_user_data['id_number'];
+
+					$profile['user']['email']['title'] = 'Email';
+					$profile['user']['email']['value'] = $tradesafe_user_data['email'];
+
+					$profile['user']['mobile']['title'] = 'Mobile';
+					$profile['user']['mobile']['value'] = $tradesafe_user_data['mobile'];
+
+					if ( isset( $tradesafe_user_data['company'] ) && '' !== $tradesafe_user_data['company']['name'] ) {
+						$profile['company']['name']['title'] = 'Name';
+						$profile['company']['name']['value'] = $tradesafe_user_data['company']['name'] . ' ' . $tradesafe_user_data['company']['type'];
+
+						$profile['company']['reg']['title'] = 'Registration Number';
+						$profile['company']['reg']['value'] = $tradesafe_user_data['company']['reg_number'];
+					}
+
+					if ( isset( $tradesafe_user_data['bank'] ) ) {
+						$profile['bank']['name']['title'] = 'Bank';
+						$profile['bank']['name']['value'] = $tradesafe_user_data['bank']['name'];
+
+						$profile['bank']['number']['title'] = 'Account Number';
+						$profile['bank']['number']['value'] = $tradesafe_user_data['bank']['account'];
+
+						$profile['bank']['type']['title'] = 'Account Type';
+						$profile['bank']['type']['value'] = $tradesafe_user_data['bank']['type'];
+					}
+				}
+
+				require_once TRADESAFE_PLUGIN_DIR . '/templates/profile-view.php';
 			}
-
-			require_once TRADESAFE_PLUGIN_DIR . '/templates/profile-edit.php';
-		} else {
-			if ( ! is_wp_error( $tradesafe_user_data ) ) {
-				$profile['user']['name']['title'] = 'Name';
-				$profile['user']['name']['value'] = $tradesafe_user_data['first_name'] . ' ' . $tradesafe_user_data['last_name'];
-
-				$profile['user']['id_number']['title'] = 'ID Number';
-				$profile['user']['id_number']['value'] = $tradesafe_user_data['id_number'];
-
-				$profile['user']['email']['title'] = 'Email';
-				$profile['user']['email']['value'] = $tradesafe_user_data['email'];
-
-				$profile['user']['mobile']['title'] = 'Mobile';
-				$profile['user']['mobile']['value'] = $tradesafe_user_data['mobile'];
-
-				if ( isset( $tradesafe_user_data['company'] ) && '' !== $tradesafe_user_data['company']['name'] ) {
-					$profile['company']['name']['title'] = 'Name';
-					$profile['company']['name']['value'] = $tradesafe_user_data['company']['name'] . ' ' . $tradesafe_user_data['company']['type'];
-
-					$profile['company']['reg']['title'] = 'Registration Number';
-					$profile['company']['reg']['value'] = $tradesafe_user_data['company']['reg_number'];
-				}
-
-				if ( isset( $tradesafe_user_data['bank'] ) ) {
-					$profile['bank']['name']['title'] = 'Bank';
-					$profile['bank']['name']['value'] = $tradesafe_user_data['bank']['name'];
-
-					$profile['bank']['number']['title'] = 'Account Number';
-					$profile['bank']['number']['value'] = $tradesafe_user_data['bank']['account'];
-
-					$profile['bank']['type']['title'] = 'Account Type';
-					$profile['bank']['type']['value'] = $tradesafe_user_data['bank']['type'];
-				}
-			}
-
-			require_once TRADESAFE_PLUGIN_DIR . '/templates/profile-view.php';
 		}
 	}
 
@@ -178,7 +180,7 @@ class TradeSafeProfile {
 	public static function registration_form() {
 		$tradesafe = new TradeSafeAPIWrapper();
 		wp_enqueue_script( 'jquery' );
-		wp_enqueue_script( 'woocommerce-tradesafe-register-js', plugins_url( '/assets/js/register.js', TRADESAFE_PLUGIN_BASE_NAME ) );
+		wp_enqueue_script( 'woocommerce-tradesafe-register-js', plugins_url( '/assets/js/register.js', 'woocommerce-tradesafe-gateway' ) );
 
 		wp_register_script( 'tradesafe-settings', false );
 		wp_localize_script( 'tradesafe-settings', 'tradesafe_params', array( 'api_url' => $tradesafe->endpoint ) );
@@ -203,10 +205,10 @@ class TradeSafeProfile {
 			];
 
 			$bank_fields = [
-				'bank_name'                     => array( 'Bank', 'select', $cbc_list ),
-				'bank_account'                  => array( 'Account Number', 'text' ),
+				'bank_name'    => array( 'Bank', 'select', $cbc_list ),
+				'bank_account' => array( 'Account Number', 'text' ),
 				// 'bank_branch'  => array( 'Branch', 'text' ),
-									'bank_type' => array( 'Account Type', 'select', $bank_account_types ),
+				'bank_type'    => array( 'Account Type', 'select', $bank_account_types ),
 			];
 
 			require_once TRADESAFE_PLUGIN_DIR . '/templates/register.php';
