@@ -48,7 +48,8 @@ class TradeSafeOrders {
 		if ( ! is_wp_error( $response ) ) {
 			$order->update_status( 'completed', sprintf( __( 'Accepted Goods or Services.', 'woocommerce-tradesafe-gateway' ) ) );
 
-			wp_redirect( '/my-account/orders/' );
+			$redirect = home_url( '/my-account/orders/' );
+			wp_redirect( $redirect );
 		} else {
 			wp_die(
 				$response,
@@ -71,7 +72,8 @@ class TradeSafeOrders {
 		$response     = $tradesafe->get_contract( $tradesafe_id );
 
 		if ( is_wp_error( $response ) ) {
-			wp_redirect( '/my-account/orders/' );
+			$redirect = home_url( '/my-account/orders/' );
+			wp_redirect( $redirect );
 		}
 
 		if ( '' !== $response['Contract']['completion_days_renegotiated'] ) {
@@ -91,7 +93,8 @@ class TradeSafeOrders {
 		if ( ! is_wp_error( $response ) ) {
 			$order->update_status( 'processing', sprintf( __( 'Extended Delivery Time.', 'woocommerce-tradesafe-gateway' ) ) );
 
-			wp_redirect( '/my-account/orders/' );
+			$redirect = home_url( '/my-account/orders/' );
+			wp_redirect( $redirect );
 		} else {
 			wp_die(
 				$response,
@@ -120,7 +123,8 @@ class TradeSafeOrders {
 		if ( ! is_wp_error( $response ) ) {
 			$order->update_status( 'canceled', sprintf( __( 'Canceled Order.', 'woocommerce-tradesafe-gateway' ) ) );
 
-			wp_redirect( '/my-account/orders/' );
+			$redirect = home_url( '/my-account/orders/' );
+			wp_redirect( $redirect );
 		} else {
 			wp_die(
 				$response,
@@ -149,7 +153,8 @@ class TradeSafeOrders {
 		if ( ! is_wp_error( $response ) ) {
 			$order->update_status( 'on-hold', sprintf( __( 'Order is disputed.', 'woocommerce-tradesafe-gateway' ) ) );
 
-			wp_redirect( '/my-account/orders/' );
+			$redirect = home_url( '/my-account/orders/' );
+			wp_redirect( $redirect );
 		} else {
 			wp_die(
 				$response,
