@@ -160,7 +160,7 @@ class TradeSafe {
 				default:
 					status_header( 404 );
 					include get_query_template( '404' );
-					die();
+					exit;
 			}
 		}
 	}

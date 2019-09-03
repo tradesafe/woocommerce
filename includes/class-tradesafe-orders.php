@@ -226,7 +226,7 @@ class TradeSafeOrders {
 							if ( is_wp_error( $response ) ) {
 								$order->update_status( 'on-hold', sprintf( __( 'Reset to on On Hold because of error.', 'woocommerce-tradesafe-gateway' ) ) );
 								status_header( 400 );
-								die();
+								exit;
 							}
 							break;
 						case 'DECLINED':
@@ -234,17 +234,17 @@ class TradeSafeOrders {
 							break;
 						default:
 							status_header( 400 );
-							die();
+							exit;
 					}
 
 					status_header( 200 );
-					die();
+					exit;
 				}
 			}
 		}
 
 		status_header( 404 );
-		die();
+		exit;
 	}
 
 	/**

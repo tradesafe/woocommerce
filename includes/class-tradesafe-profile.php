@@ -137,7 +137,7 @@ class TradeSafeProfile {
 			print json_encode( $data );
 		}
 
-		die();
+		exit;
 	}
 
 	/**
@@ -155,7 +155,7 @@ class TradeSafeProfile {
 			include get_query_template( '404' );
 		}
 
-		die();
+		exit;
 	}
 
 	/**
@@ -170,7 +170,7 @@ class TradeSafeProfile {
 		} else {
 			status_header( 404 );
 			include get_query_template( '404' );
-			die();
+			exit;
 		}
 	}
 
