@@ -33,11 +33,13 @@ define( 'TRADESAFE_API_DEBUG_CA_PATH', $debug_ca_path );
 // Load classes
 require_once TRADESAFE_PLUGIN_DIR . '/includes/class-tradesafe.php';
 require_once TRADESAFE_PLUGIN_DIR . '/includes/class-tradesafe-api-wrapper.php';
+require_once TRADESAFE_PLUGIN_DIR . '/includes/class-tradesafe-email.php';
 require_once TRADESAFE_PLUGIN_DIR . '/includes/class-tradesafe-profile.php';
 require_once TRADESAFE_PLUGIN_DIR . '/includes/class-tradesafe-orders.php';
 
 // Init Plugin
 add_action( 'init', [ 'TradeSafe', 'init' ] );
-add_action( 'init', [ 'TradeSafeProfile', 'init' ] );
-add_action( 'init', [ 'TradeSafeOrders', 'init' ] );
+add_action( 'init', [ 'TradeSafe_Profile', 'init' ] );
+add_action( 'init', [ 'TradeSafe_Orders', 'init' ] );
+add_action( 'init', [ 'TradeSafe_Email', 'init' ] );
 

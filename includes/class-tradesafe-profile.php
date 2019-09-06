@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Class TradeSafeProfile
+ * Class TradeSafe_Profile
  */
-class TradeSafeProfile {
+class TradeSafe_Profile {
 	private static $initiated = false;
 
 	public static function init() {
@@ -21,19 +21,19 @@ class TradeSafeProfile {
 		self::$initiated = true;
 
 		// Actions
-		add_action( 'show_user_profile', [ 'TradeSafeProfile', 'view' ] );
-		add_action( 'edit_user_profile', [ 'TradeSafeProfile', 'view' ] );
-		add_action( 'woocommerce_account_tradesafe_endpoint', [ 'TradeSafeProfile', 'view' ] );
-		add_action( 'register_form', [ 'TradeSafeProfile', 'registration_form' ] );
-		add_action( 'woocommerce_register_form_start', [ 'TradeSafeProfile', 'registration_form' ] );
-		add_action( 'woocommerce_register_post', [ 'TradeSafeProfile', 'my_account_registration_errors' ], 10, 3 );
-		add_action( 'user_register', [ 'TradeSafeProfile', 'user_register' ] );
-		add_action( 'woocommerce_created_customer', [ 'TradeSafeProfile', 'user_register' ] );
-		add_action( 'wp_ajax_nopriv_woocommerce_tradesafe_ajax_login', [ 'TradeSafeProfile', 'ajax_login' ] );
+		add_action( 'show_user_profile', [ 'TradeSafe_Profile', 'view' ] );
+		add_action( 'edit_user_profile', [ 'TradeSafe_Profile', 'view' ] );
+		add_action( 'woocommerce_account_tradesafe_endpoint', [ 'TradeSafe_Profile', 'view' ] );
+		add_action( 'register_form', [ 'TradeSafe_Profile', 'registration_form' ] );
+		add_action( 'woocommerce_register_form_start', [ 'TradeSafe_Profile', 'registration_form' ] );
+		add_action( 'woocommerce_register_post', [ 'TradeSafe_Profile', 'my_account_registration_errors' ], 10, 3 );
+		add_action( 'user_register', [ 'TradeSafe_Profile', 'user_register' ] );
+		add_action( 'woocommerce_created_customer', [ 'TradeSafe_Profile', 'user_register' ] );
+		add_action( 'wp_ajax_nopriv_woocommerce_tradesafe_ajax_login', [ 'TradeSafe_Profile', 'ajax_login' ] );
 
 		// Filters
-		add_filter( 'woocommerce_account_menu_items', [ 'TradeSafeProfile', 'menu_link' ], 40 );
-		add_filter( 'registration_errors', [ 'TradeSafeProfile', 'registration_errors' ], 10, 3 );
+		add_filter( 'woocommerce_account_menu_items', [ 'TradeSafe_Profile', 'menu_link' ], 40 );
+		add_filter( 'registration_errors', [ 'TradeSafe_Profile', 'registration_errors' ], 10, 3 );
 	}
 
 	/**
@@ -44,7 +44,7 @@ class TradeSafeProfile {
 			$user = wp_get_current_user();
 		}
 
-		$tradesafe           = new TradeSafeAPIWrapper();
+		$tradesafe           = new TradeSafe_API_Wrapper();
 		$tradesafe_id        = get_user_meta( $user->ID, 'tradesafe_user_id', true );
 		$tradesafe_user_data = $tradesafe->get_user( $tradesafe_id );
 
@@ -122,7 +122,7 @@ class TradeSafeProfile {
 	 * Ajax Login
 	 */
 	public static function ajax_login() {
-		$tradesafe     = new TradeSafeAPIWrapper();
+		$tradesafe     = new TradeSafe_API_Wrapper();
 		$request_token = $tradesafe->auth_token();
 		$request_owner = $tradesafe->owner();
 		$data          = array(
@@ -178,7 +178,7 @@ class TradeSafeProfile {
 	 * Registration Form
 	 */
 	public static function registration_form() {
-		$tradesafe = new TradeSafeAPIWrapper();
+		$tradesafe = new TradeSafe_API_Wrapper();
 		wp_enqueue_script( 'jquery' );
 		wp_enqueue_script( 'woocommerce-tradesafe-register-js', plugins_url( '/assets/js/register.js', 'woocommerce-tradesafe-gateway' ) );
 
@@ -267,7 +267,7 @@ class TradeSafeProfile {
 				],
 			);
 
-			$tradesafe = new TradeSafeAPIWrapper();
+			$tradesafe = new TradeSafe_API_Wrapper();
 			$request   = $tradesafe->verify_user( $user );
 			$logger    = new WC_Logger();
 
@@ -294,7 +294,7 @@ class TradeSafeProfile {
 	 * @param $user_id
 	 */
 	public static function user_register( $user_id ) {
-		$tradesafe = new TradeSafeAPIWrapper();
+		$tradesafe = new TradeSafe_API_Wrapper();
 		$user      = get_user_by( 'ID', $user_id );
 
 		if ( isset( $_GET['auth_key'] ) && isset( $_GET['verify'] ) ) {
