@@ -52,7 +52,7 @@ class WC_Gateway_TradeSafe_Base extends WC_Payment_Gateway {
 	 */
 	public function process_payment( $order_id ) {
 		$order     = new WC_Order( $order_id );
-		$tradesafe = new TradeSafeAPIWrapper();
+		$tradesafe = new TradeSafe_API_Wrapper();
 
 		if ( $order->meta_exists( 'tradesafe_id' ) ) {
 			// Get contract
@@ -89,7 +89,7 @@ class WC_Gateway_TradeSafe_Base extends WC_Payment_Gateway {
 				'failure_url'       => $order_url,
 				'industry'          => get_option( 'tradesafe_site_industry', 'GENERAL_GOODS_SERVICES' ),
 				'description'       => sprintf( __( 'New order from %1$s. Order ID: %2$s', 'woocommerce-tradesafe-gateway' ), get_bloginfo( 'name' ), $order->get_order_number() ),
-				'value'             => number_format( filter_var( $base_value, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION ), 2, '.', '' ),
+				'value'             => (float) number_format( filter_var( $base_value, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION ), 2, '.', '' ),
 				'completion_days'   => 30,
 				'completion_months' => 0,
 				'completion_years'  => 0,
