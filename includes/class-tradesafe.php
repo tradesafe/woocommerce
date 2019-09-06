@@ -137,25 +137,25 @@ class TradeSafe {
 			switch ( $wp->query_vars['action'] ) {
 				case 'auth':
 					// run auth check
-					TradeSafeProfile::callback_auth();
+					TradeSafe_Profile::callback_auth();
 					break;
 				case 'callback':
-					TradeSafeOrders::callback();
+					TradeSafe_Orders::callback();
 					break;
 				case 'update-order-payment-method':
-					TradeSafeOrders::update_order_payment_method( $wp->query_vars['action_id'] );
+					TradeSafe_Orders::update_order_payment_method( $wp->query_vars['action_id'] );
 					break;
 				case 'unlink':
-					TradeSafeProfile::unlink();
+					TradeSafe_Profile::unlink();
 					break;
 				case 'accept':
-					TradeSafeOrders::accept( $wp->query_vars['action_id'] );
+					TradeSafe_Orders::accept( $wp->query_vars['action_id'] );
 					break;
 				case 'extend':
-					TradeSafeOrders::extend( $wp->query_vars['action_id'] );
+					TradeSafe_Orders::extend( $wp->query_vars['action_id'] );
 					break;
 				case 'decline':
-					TradeSafeOrders::decline( $wp->query_vars['action_id'] );
+					TradeSafe_Orders::decline( $wp->query_vars['action_id'] );
 					break;
 				default:
 					status_header( 404 );
@@ -191,7 +191,7 @@ class TradeSafe {
 
 		$fee = self::calculate_tradesafe_fee( $base_value );
 
-		if ( 'marketplace' === get_option( 'tradesafe_site_role' ) ) {
+		if ( 'marketplace' === get_option( 'tradesafe_site_role', 'seller' ) ) {
 			$marketplace_fee = self::calculate_marketplace_fee( $base_value );
 			$fee            += $marketplace_fee;
 		}
@@ -320,7 +320,7 @@ class TradeSafe {
 		$owner_data = '';
 
 		if ( '' !== get_option( 'tradesafe_api_token', '' ) ) {
-			$tradesafe     = new TradeSafeAPIWrapper();
+			$tradesafe     = new TradeSafe_API_Wrapper();
 			$owner_details = $tradesafe->owner();
 			$industries    = [];
 

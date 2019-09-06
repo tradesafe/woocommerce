@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Class TradeSafeAPIWrapper
+ * Class TradeSafe_API_Wrapper
  */
-class TradeSafeAPIWrapper {
+class TradeSafe_API_Wrapper {
 	// Variables
 	private $token      = '';
 	public $endpoint    = '';
@@ -11,7 +11,7 @@ class TradeSafeAPIWrapper {
 	private $debugging  = false;
 
 	/**
-	 * TradeSafeAPIWrapper constructor.
+	 * TradeSafe_API_Wrapper constructor.
 	 */
 	public function __construct() {
 		$this->debugging  = get_option( 'tradesafe_api_debugging', false );
