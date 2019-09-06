@@ -263,6 +263,7 @@ class TradeSafe_Orders {
 
 							if ( is_wp_error( $response ) ) {
 								$order->update_status( 'on-hold', sprintf( __( 'Reset to on On Hold because of error.', 'woocommerce-tradesafe-gateway' ) ) );
+								print json_encode( __( 'Could not update contract.', 'woocommerce-tradesafe-gateway' ) );
 								status_header( 400 );
 								exit;
 							}
@@ -279,6 +280,7 @@ class TradeSafe_Orders {
 					exit;
 				} else {
 					status_header( 400 );
+					print json_encode( __( 'No contract associated with order.', 'woocommerce-tradesafe-gateway' ) );
 					exit;
 				}
 			} else {
