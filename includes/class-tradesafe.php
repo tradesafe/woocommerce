@@ -129,6 +129,8 @@ class TradeSafe {
 	 * Parse requests
 	 *
 	 * @param $wp
+	 *
+	 * @throws WC_Data_Exception
 	 */
 	public static function callback_parse_request( $wp ) {
 		if ( array_key_exists( 'tradesafe', $wp->query_vars )
@@ -156,6 +158,9 @@ class TradeSafe {
 					break;
 				case 'decline':
 					TradeSafe_Orders::decline( $wp->query_vars['action_id'] );
+					break;
+				case 'cancel':
+					TradeSafe_Orders::cancel( $wp->query_vars['action_id'] );
 					break;
 				default:
 					status_header( 404 );

@@ -183,17 +183,24 @@ class TradeSafe_Orders {
 			);
 
 			// Set the action button
-			$actions['extend'] = array(
-				'url'    => site_url( '/tradesafe/extend/' . $order->get_id() . '/' ),
-				'name'   => __( 'Extend', 'woocommerce-tradesafe-gateway' ),
-				'action' => 'extend',
-			);
+			// $actions['extend'] = array(
+			// 'url'    => site_url( '/tradesafe/extend/' . $order->get_id() . '/' ),
+			// 'name'   => __( 'Extend', 'woocommerce-tradesafe-gateway' ),
+			// 'action' => 'extend',
+			// );
 
 			// Set the action button
-			$actions['decline'] = array(
-				'url'    => site_url( '/tradesafe/decline/' . $order->get_id() . '/' ),
-				'name'   => __( 'Decline', 'woocommerce-tradesafe-gateway' ),
-				'action' => 'decline',
+			// $actions['decline'] = array(
+			// 'url'    => site_url( '/tradesafe/decline/' . $order->get_id() . '/' ),
+			// 'name'   => __( 'Decline', 'woocommerce-tradesafe-gateway' ),
+			// 'action' => 'decline',
+			// );
+
+			// Set the action button
+			$actions['cancel'] = array(
+				'url'    => site_url( '/tradesafe/cancel/' . $order->get_id() . '/' ),
+				'name'   => __( 'Cancel', 'woocommerce-tradesafe-gateway' ),
+				'action' => 'cancel',
 			);
 		}
 
