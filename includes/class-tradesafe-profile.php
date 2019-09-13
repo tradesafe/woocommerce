@@ -180,7 +180,7 @@ class TradeSafe_Profile {
 	public static function registration_form() {
 		$tradesafe = new TradeSafe_API_Wrapper();
 		wp_enqueue_script( 'jquery' );
-		wp_enqueue_script( 'woocommerce-tradesafe-register-js', plugins_url( '/assets/js/register.js', 'woocommerce-tradesafe-gateway' ) );
+		wp_enqueue_script( 'woocommerce-tradesafe-register-js', plugins_url( 'assets/js/register.js', TRADESAFE_PLUGIN_FILE_PATH ) );
 
 		wp_register_script( 'tradesafe-settings', false );
 		wp_localize_script( 'tradesafe-settings', 'tradesafe_params', array( 'api_url' => $tradesafe->endpoint ) );
@@ -191,7 +191,7 @@ class TradeSafe_Profile {
 
 			if ( ! is_wp_error( $request ) ) {
 				$_POST['email'] = esc_html( $_GET['email'] );
-				require_once TRADESAFE_PLUGIN_DIR . '/tamplates/register-token.php';
+				require_once TRADESAFE_PLUGIN_DIR . '/templates/register-token.php';
 			}
 		} else {
 			$bank_account_types = $tradesafe->constant( 'bank-account-types' );
