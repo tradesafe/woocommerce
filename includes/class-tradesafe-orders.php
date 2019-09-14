@@ -45,11 +45,13 @@ class TradeSafe_Orders {
 		);
 
 		$response = $tradesafe->update_contract( $tradesafe_id, $data );
+
 		if ( ! is_wp_error( $response ) ) {
 			$order->update_status( 'completed', sprintf( __( 'Accepted Goods or Services.', 'woocommerce-tradesafe-gateway' ) ) );
 
 			$redirect = home_url( '/my-account/orders/' );
 			wp_redirect( $redirect );
+			exit;
 		} else {
 			wp_die(
 				$response,
@@ -74,6 +76,7 @@ class TradeSafe_Orders {
 		if ( is_wp_error( $response ) ) {
 			$redirect = home_url( '/my-account/orders/' );
 			wp_redirect( $redirect );
+			exit;
 		}
 
 		if ( '' !== $response['Contract']['completion_days_renegotiated'] ) {
@@ -95,6 +98,7 @@ class TradeSafe_Orders {
 
 			$redirect = home_url( '/my-account/orders/' );
 			wp_redirect( $redirect );
+			exit;
 		} else {
 			wp_die(
 				$response,
@@ -125,6 +129,7 @@ class TradeSafe_Orders {
 
 			$redirect = home_url( '/my-account/orders/' );
 			wp_redirect( $redirect );
+			exit;
 		} else {
 			wp_die(
 				$response,
@@ -155,6 +160,7 @@ class TradeSafe_Orders {
 
 			$redirect = home_url( '/my-account/orders/' );
 			wp_redirect( $redirect );
+			exit;
 		} else {
 			wp_die(
 				$response,

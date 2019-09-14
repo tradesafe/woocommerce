@@ -167,6 +167,7 @@ class TradeSafe_Profile {
 			delete_user_meta( $user->ID, 'tradesafe_user_id' );
 			$edit_account_url = wc_get_endpoint_url( 'tradesafe', '', wc_get_page_permalink( 'myaccount' ) );
 			wp_redirect( $edit_account_url );
+			exit;
 		} else {
 			status_header( 404 );
 			include get_query_template( '404' );
