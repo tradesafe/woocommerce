@@ -39,6 +39,12 @@ class TradeSafe_Orders {
 		$order        = wc_get_order( $order_id );
 		$tradesafe_id = $order->get_meta( 'tradesafe_id' );
 		$tradesafe    = new TradeSafe_API_Wrapper();
+		$redirect     = home_url( '/my-account/orders/' );
+
+		if ( ! $order->has_status( array( 'processing' ) ) ) {
+			wp_redirect( $redirect );
+			exit;
+		}
 
 		$data = array(
 			'step' => 'GOODS_ACCEPTED',
@@ -49,7 +55,6 @@ class TradeSafe_Orders {
 		if ( ! is_wp_error( $response ) ) {
 			$order->update_status( 'completed', sprintf( __( 'Accepted Goods or Services.', 'woocommerce-tradesafe-gateway' ) ) );
 
-			$redirect = home_url( '/my-account/orders/' );
 			wp_redirect( $redirect );
 			exit;
 		} else {
@@ -72,9 +77,14 @@ class TradeSafe_Orders {
 		$tradesafe_id = $order->get_meta( 'tradesafe_id' );
 		$tradesafe    = new TradeSafe_API_Wrapper();
 		$response     = $tradesafe->get_contract( $tradesafe_id );
+		$redirect     = home_url( '/my-account/orders/' );
+
+		if ( ! $order->has_status( array( 'processing' ) ) ) {
+			wp_redirect( $redirect );
+			exit;
+		}
 
 		if ( is_wp_error( $response ) ) {
-			$redirect = home_url( '/my-account/orders/' );
 			wp_redirect( $redirect );
 			exit;
 		}
@@ -96,7 +106,6 @@ class TradeSafe_Orders {
 		if ( ! is_wp_error( $response ) ) {
 			$order->update_status( 'processing', sprintf( __( 'Extended Delivery Time.', 'woocommerce-tradesafe-gateway' ) ) );
 
-			$redirect = home_url( '/my-account/orders/' );
 			wp_redirect( $redirect );
 			exit;
 		} else {
@@ -118,6 +127,12 @@ class TradeSafe_Orders {
 		$order        = wc_get_order( $order_id );
 		$tradesafe_id = $order->get_meta( 'tradesafe_id' );
 		$tradesafe    = new TradeSafe_API_Wrapper();
+		$redirect     = home_url( '/my-account/orders/' );
+
+		if ( ! $order->has_status( array( 'processing' ) ) ) {
+			wp_redirect( $redirect );
+			exit;
+		}
 
 		$data = array(
 			'step' => 'DECLINED',
@@ -127,7 +142,6 @@ class TradeSafe_Orders {
 		if ( ! is_wp_error( $response ) ) {
 			$order->update_status( 'canceled', sprintf( __( 'Canceled Order.', 'woocommerce-tradesafe-gateway' ) ) );
 
-			$redirect = home_url( '/my-account/orders/' );
 			wp_redirect( $redirect );
 			exit;
 		} else {
@@ -149,6 +163,12 @@ class TradeSafe_Orders {
 		$order        = wc_get_order( $order_id );
 		$tradesafe_id = $order->get_meta( 'tradesafe_id' );
 		$tradesafe    = new TradeSafe_API_Wrapper();
+		$redirect     = home_url( '/my-account/orders/' );
+
+		if ( ! $order->has_status( array( 'processing' ) ) ) {
+			wp_redirect( $redirect );
+			exit;
+		}
 
 		$data = array(
 			'step' => 'DISPUTED',
@@ -158,7 +178,6 @@ class TradeSafe_Orders {
 		if ( ! is_wp_error( $response ) ) {
 			$order->update_status( 'on-hold', sprintf( __( 'Order is disputed.', 'woocommerce-tradesafe-gateway' ) ) );
 
-			$redirect = home_url( '/my-account/orders/' );
 			wp_redirect( $redirect );
 			exit;
 		} else {
