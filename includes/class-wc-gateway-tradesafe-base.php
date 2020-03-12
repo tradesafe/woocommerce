@@ -97,6 +97,8 @@ class WC_Gateway_TradeSafe_Base extends WC_Payment_Gateway {
 				'delivery_required' => false,
 			];
 
+                        $data['fee_allocation'] = (int) get_option( 'tradesafe_escrow_fee_allocation', '0' );
+
 			$data['buyer'] = $buyer;
 
 			if ( 'marketplace' === get_option( 'tradesafe_site_role' ) ) {
