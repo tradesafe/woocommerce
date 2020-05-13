@@ -201,7 +201,7 @@ class TradeSafe {
 			case 'tradesafe_eftsecure':
 				break;
 			case 'tradesafe_ecentric':
-				$fee += $base_value * 0.015;
+				$fee += floor( ( $base_value * 0.015 ) * 100 ) / 100;
 				break;
 		}
 
@@ -668,11 +668,13 @@ class TradeSafe {
 				$option = get_option( $args['id'] );
 				$field .= sprintf( '<select name="%1$s" id="%1$s" cols="60" rows="5"><option value="">' . __( '-- SELECT --', 'woocommerce-tradesafe-gateway' ) . '</option>', $args['id'] );
 
-				foreach ( $args['options'] as $value => $name ) {
-					if ( $option === (string) $value ) {
-						$field .= sprintf( '<option value="%s" selected="selected">%s</option>', $value, $name );
-					} else {
-						$field .= sprintf( '<option value="%s">%s</option>', $value, $name );
+				if ( isset( $args['options'] ) ) {
+					foreach ( $args['options'] as $value => $name ) {
+						if ( $option === (string) $value ) {
+							$field .= sprintf( '<option value="%s" selected="selected">%s</option>', $value, $name );
+						} else {
+							$field .= sprintf( '<option value="%s">%s</option>', $value, $name );
+						}
 					}
 				}
 

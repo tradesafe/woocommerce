@@ -9,7 +9,7 @@ $sections = [
 <div style="border: 1px solid #FFD700; background-color: #fffbe5; padding: 10px;"><strong>Please Note:</strong> This
 	following information is not stored on <strong><?php esc_html_e( get_bloginfo( 'name' ) ); ?></strong> and is
 	provided for confirmation purposes only. If you would like update your information please <a
-		href="https://www.tradesafe.co.za/login" target="_blank">login to your account</a> on the TradeSafe Website.
+		href="https://<?php echo $tradesafe->domain; ?>/login" target="_blank">login to your account</a> on the TradeSafe Website.
 </div>
 
 <br/>

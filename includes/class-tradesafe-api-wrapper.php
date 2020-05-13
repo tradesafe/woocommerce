@@ -7,6 +7,7 @@ class TradeSafe_API_Wrapper {
 	// Variables
 	private $token      = '';
 	public $endpoint    = '';
+	public $domain      = '';
 	private $production = false;
 	private $debugging  = false;
 
@@ -29,6 +30,7 @@ class TradeSafe_API_Wrapper {
 
 		$this->token    = get_option( 'tradesafe_api_token' );
 		$this->endpoint = sprintf( 'https://%s/api', $domain );
+		$this->domain   = $domain;
 	}
 
 	private function request( $route, $data = null, $method = 'GET' ) {
