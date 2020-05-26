@@ -306,7 +306,8 @@ class TradeSafe_Orders {
 		$order            = new WC_Order( $order_id );
 		$payment_gateways = WC()->payment_gateways()->payment_gateways();
 		$payment_method   = $_POST['payment_method'];
-		$base_value       = (float) $order->get_subtotal() + (float) $order->get_shipping_total() + (float) $order->get_total_tax();
+		//$base_value       = (float) $order->get_subtotal() + (float) $order->get_shipping_total() + (float) $order->get_total_tax();
+		$base_value = (float) $order->get_total();
 
 		if ( isset( $payment_gateways[ $payment_method ]->enabled ) && 'yes' === $payment_gateways[ $payment_method ]->enabled ) {
 			$fee = TradeSafe::calculate_fee( $base_value, $payment_method );
