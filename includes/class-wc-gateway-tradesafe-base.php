@@ -80,8 +80,7 @@ class WC_Gateway_TradeSafe_Base extends WC_Payment_Gateway {
 
 			$checkout_url = $order->get_checkout_payment_url();
 			$order_url    = $order->get_view_order_url();
-			//$base_value   = (float) $order->get_subtotal() + (float) $order->get_shipping_total() + (float) $order->get_total_tax();
-			$base_value   = (float) $order->get_total();
+			$base_value   = (float) $order->get_subtotal() + (float) $order->get_shipping_total() + (float) $order->get_total_tax();
 
 			$data = [
 				'name'              => get_bloginfo( 'name' ) . ' - Order ' . $order->get_order_number(),
