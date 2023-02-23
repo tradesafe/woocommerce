@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.11.2](https://github.com/tradesafe/tradesafe-payment-gateway/compare/v2.11.1...v2.11.2) (2023-02-23)
+
+### Bug Fixes
+
+* Removed profile check from is valid check to lower api requests ([e7b520](https://github.com/tradesafe/tradesafe-payment-gateway/commit/e7b5204e1d230697fb62d0cd7011b32967563b2c))
+
+
+---
+
 ## [2.11.1](https://github.com/tradesafe/tradesafe-payment-gateway/compare/v2.11.0...v2.11.1) (2023-01-20)
 
 ### Bug Fixes
