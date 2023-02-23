@@ -118,12 +118,6 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 			return false;
 		}
 
-		$profile = $this->client->profile();
-
-		if ( isset( $profile['error'] ) ) {
-			return false;
-		}
-
 		if ( 'no' === $this->get_option( 'enabled' ) || null === $this->get_option( 'enabled' ) ) {
 			return false;
 		}
