@@ -35,7 +35,7 @@ class TradeSafeProfile {
 		add_action( 'woocommerce_checkout_update_customer', array( 'TradeSafeProfile', 'woocommerce_checkout_update_customer' ) );
 
 		// Withdrawal Page
-		if ( tradesafe_is_marketplace() && ! tradesafe_has_dokan() ) {
+		if ( ! tradesafe_has_dokan() ) {
 			// Actions.
 			add_action( 'woocommerce_account_tradesafe-withdrawal_endpoint', array( 'TradeSafeProfile', 'withdrawal_endpoint' ) );
 
@@ -247,7 +247,7 @@ class TradeSafeProfile {
 
 		// New items to add to menu.
 		$new_items = array(
-			'tradesafe-withdrawal' => __( 'Withdrawals', 'tradesafe-payment-gateway' ),
+			'tradesafe-withdrawal' => __( 'TradeSafe Wallet', 'tradesafe-payment-gateway' ),
 		);
 
 		// Insert the new item.
@@ -271,7 +271,7 @@ class TradeSafeProfile {
 
 		if ( $is_endpoint && ! is_admin() && is_main_query() && in_the_loop() && is_account_page() ) {
 			// New page title.
-			$title = __( 'Withdrawals', 'tradesafe-payment-gateway' );
+			$title = __( 'TradeSafe Wallet', 'tradesafe-payment-gateway' );
 
 			remove_filter( 'the_title', array( 'TradeSafeProfile', 'withdrawal_endpoint_title' ) );
 		}
