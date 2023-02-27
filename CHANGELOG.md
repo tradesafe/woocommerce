@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.11.3](https://github.com/tradesafe/tradesafe-payment-gateway/compare/v2.11.2...v2.11.3) (2023-02-27)
+
+### Bug Fixes
+
+* Changed requirements for wallet page to be shown ([a413c2](https://github.com/tradesafe/tradesafe-payment-gateway/commit/a413c268eee8e35ff87afcb137d3f0564ec66b01))
+
+
+---
+
 ## [2.11.2](https://github.com/tradesafe/tradesafe-payment-gateway/compare/v2.11.1...v2.11.2) (2023-02-23)
 
 ### Bug Fixes
