@@ -367,8 +367,15 @@ class TradeSafeProfile {
 							);
 						}
 
+						$payout_interval = 'WEEKLY';
+						$settings        = get_option( 'woocommerce_tradesafe_settings', array() );
+
+						if ( isset( $settings['payout_method'] ) ) {
+							$payout_interval = $settings['payout_method'];
+						}
+
 						try {
-							$token = $client->updateToken( $tokenId, $user, $organization, $bank_account );
+							$token = $client->updateToken( $tokenId, $user, $organization, $bank_account, $payout_interval );
 						} catch ( \GraphQL\Exception\QueryError $e ) {
 							$error_message = $e->getMessage();
 
