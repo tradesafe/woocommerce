@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.11.4](https://github.com/tradesafe/tradesafe-payment-gateway/compare/v2.11.3...v2.11.4) (2023-03-01)
+
+### Bug Fixes
+
+* Ensure correct payout interval is set when updating user tokens ([a4f226](https://github.com/tradesafe/tradesafe-payment-gateway/commit/a4f2269dc92293847911a8bfea4e4d471a77cc93))
+
+
+---
+
 ## [2.11.3](https://github.com/tradesafe/tradesafe-payment-gateway/compare/v2.11.2...v2.11.3) (2023-02-27)
 
 ### Bug Fixes
