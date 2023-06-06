@@ -4,7 +4,7 @@ Tags: tradesafe, woocommerce, dokan, payment gateway, escrow, credit card, insta
 Requires at least: 5.6
 Tested up to: 6.1
 Requires PHP: 7.4
-Stable tag: 2.11.4
+Stable tag: 2.12.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -76,37 +76,8 @@ Please do not hesitate to email [support@tradesafe.co.za](mailto:support@tradesa
 
 == Changelog ==
 
-= 2.11.4 2023-03-01 =
-
-### Bug Fixes
- 
-* Ensure correct payout interval is set when updating user tokens
-
-= 2.11.3 2023-02-27 =
-
-### Bug Fixes
-
-* Changed requirements for wallet page to be shown
-
-= 2.11.2 2023-02-23 =
-
-### Bug Fixes
-
-* Removed profile check from is valid check to lower api request
-
-= 2.11.1 2023-01-20 =
-
-### Bug Fixes
-
-* Changed error handeling for mark as delivered button
-* Reduce the delivery days from 7 days to 5
-
-= 2.11.0 2023-01-06 =
+= 2.12.0 2023-06-06 =
 
 ### Features
 
-* Added button to mark in transit orders as delivered
-
-### Bug Fixes
-
-* Do not load transaction on order page if notification delay is not enabled
+* Added verification page for payments

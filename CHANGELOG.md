@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.12.0](https://github.com/tradesafe/tradesafe-payment-gateway/compare/v2.11.4...v2.12.0) (2023-06-06)
+
+### Features
+
+* Added verification page for payments ([325c3c](https://github.com/tradesafe/tradesafe-payment-gateway/commit/325c3c9256d1619ed3d1cb0b5c32c45e2f652936))
+
+
+---
+
 ## [2.11.4](https://github.com/tradesafe/tradesafe-payment-gateway/compare/v2.11.3...v2.11.4) (2023-03-01)
 
 ### Bug Fixes
