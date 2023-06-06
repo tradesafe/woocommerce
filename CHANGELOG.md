@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.12.1](https://github.com/tradesafe/tradesafe-payment-gateway/compare/v2.12.0...v2.12.1) (2023-06-06)
+
+### Bug Fixes
+
+* Set order status if payment has been made ([016219](https://github.com/tradesafe/tradesafe-payment-gateway/commit/016219e3d8c43653392f29f11449fb40d86e65ba))
+
+
+---
+
 ## [2.12.0](https://github.com/tradesafe/tradesafe-payment-gateway/compare/v2.11.4...v2.12.0) (2023-06-06)
 
 ### Features
