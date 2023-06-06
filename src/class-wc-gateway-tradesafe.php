@@ -518,8 +518,8 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 		$urls = array(
 			'oauth_callback' => site_url( '/tradesafe/oauth/callback/' ),
 			'callback'       => site_url( '/tradesafe/callback/' ),
-			'success'        => wc_get_endpoint_url( 'orders', '', get_permalink( get_option( 'woocommerce_myaccount_page_id' ) ) ),
-			'failure'        => wc_get_endpoint_url( 'orders', '', get_permalink( get_option( 'woocommerce_myaccount_page_id' ) ) ),
+			'success'        => site_url( 'tradesafe/verify-payment/' ),
+			'failure'        => site_url( 'tradesafe/verify-payment/' ),
 		);
 
 		ob_start();

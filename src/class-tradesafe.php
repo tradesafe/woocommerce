@@ -43,8 +43,8 @@ class TradeSafe {
 		add_filter( 'wc_order_statuses', array( 'TradeSafe', 'order_statuses' ), 20 );
 		add_filter( 'bulk_actions-edit-shop_order', array( 'TradeSafe', 'bulk_actions' ), 20 );
 
-		add_rewrite_rule( '^tradesafe/eft-details/([0-9]+)[/]?$', 'index.php?tradesafe=eft-details&order-id=$matches[1]', 'top' );
 		add_rewrite_rule( '^tradesafe/callback$', 'index.php?tradesafe=callback', 'top' );
+		add_rewrite_rule( '^tradesafe/verify-payment', 'index.php?tradesafe=verify-payment', 'top' );
 		add_rewrite_rule( '^tradesafe/unlink?$', 'index.php?tradesafe=unlink', 'top' );
 		add_action( 'parse_request', array( 'TradeSafe', 'parse_request' ) );
 
@@ -59,6 +59,10 @@ class TradeSafe {
 			'query_vars',
 			function ( $query_vars ) {
 				$query_vars[] = 'tradesafe';
+				$query_vars[] = 'status';
+				$query_vars[] = 'method';
+				$query_vars[] = 'transactionId';
+				$query_vars[] = 'reference';
 				$query_vars[] = 'order-id';
 
 				return $query_vars;
@@ -232,9 +236,53 @@ class TradeSafe {
 						);
 					}
 					// Either exit is called or error is thrown.
-				case 'eft-details':
-					self::eft_details_page( $wp->query_vars['order-id'] );
-					break;
+				case 'verify-payment':
+					if ( empty( $wp->query_vars['reference'] ) || empty( $wp->query_vars['transactionId'] ) ) {
+						wp_safe_redirect( '/' );
+						exit;
+					}
+
+					preg_match( '/^(.*)-[0-9]{10}$/', $wp->query_vars['reference'], $matches );
+					$order_id = wc_get_order_id_by_order_key( $matches[1] );
+					$order    = wc_get_order( $order_id );
+
+					if ( in_array( $wp->query_vars['status'], array( 'failure', 'error', 'canceled' ) ) ) {
+						$pay_url = wc_get_endpoint_url( 'order-pay', $order_id, wc_get_checkout_url() );
+						$pay_url = add_query_arg(
+							array(
+								'pay_for_order' => 'true',
+								'key'           => $order->get_order_key(),
+							),
+							$pay_url
+						);
+						wp_safe_redirect( $pay_url );
+						exit;
+					}
+
+					if ( empty( $order ) || $order->get_meta( 'tradesafe_transaction_id', true ) !== $wp->query_vars['transactionId'] ) {
+						wp_safe_redirect( '/' );
+						exit;
+					}
+
+					$view_order_url = wc_get_endpoint_url( 'view-order', $order_id, get_permalink( get_option( 'woocommerce_myaccount_page_id' ) ) );
+
+					if ( $order->get_status() === 'processing' ) {
+						wp_safe_redirect( $view_order_url );
+						exit;
+					}
+
+					$client      = new \TradeSafe\Helpers\TradeSafeApiClient();
+					$transaction = $client->getTransaction( $order->get_meta( 'tradesafe_transaction_id', true ) );
+
+					if ( in_array( $transaction['state'], array( 'FUNDS_DEPOSITED', 'FUNDS_RECEIVED', 'INITIATED' ) ) ) {
+						wp_safe_redirect( $view_order_url );
+						exit;
+					}
+
+					$view_orders_url = wc_get_endpoint_url( 'orders', '', get_permalink( get_option( 'woocommerce_myaccount_page_id' ) ) );
+
+					wp_safe_redirect( $view_orders_url );
+					exit;
 				case 'unlink':
 					$user = wp_get_current_user();
 
