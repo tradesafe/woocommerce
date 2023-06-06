@@ -275,6 +275,8 @@ class TradeSafe {
 					$transaction = $client->getTransaction( $order->get_meta( 'tradesafe_transaction_id', true ) );
 
 					if ( in_array( $transaction['state'], array( 'FUNDS_DEPOSITED', 'FUNDS_RECEIVED', 'INITIATED' ) ) ) {
+						$order->update_status( 'processing', 'Funds have been received by TradeSafe.' );
+
 						wp_safe_redirect( $view_order_url );
 						exit;
 					}
