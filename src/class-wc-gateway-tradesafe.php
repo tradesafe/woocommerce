@@ -941,11 +941,11 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 					break;
 				}
 
-				if ( empty( $party['token_id'] ) && is_string( $party['token_id'] ) ) {
+				if ( empty( $party['token_id'] ) && is_string( $party['token_id'] ) && $party['token_id'] != '' ) {
 					break;
 				}
 
-				if ( empty( $party['fee'] ) && is_float( $party['fee'] ) ) {
+				if ( empty( $party['fee'] ) && is_float( $party['fee'] ) && $party['token_id'] != '' ) {
 					break;
 				}
 
