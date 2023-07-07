@@ -2,7 +2,7 @@
 Contributors: richardnbanks, tradesafeops
 Tags: tradesafe, woocommerce, dokan, payment gateway, escrow, credit card, instant eft, bnpl
 Requires at least: 5.6
-Tested up to: 6.1
+Tested up to: 6.2
 Requires PHP: 7.4
 Stable tag: 2.12.2
 License: GPLv3
@@ -25,34 +25,34 @@ The plugin also includes support for paying multiple vendors when using the Doka
 - The customer will be directed to a payment page, where they choose their payment option namely EFT, Instant EFT (Ozow), Card, SnapScan, and Buy Now Pay Later (PayJustNow).
 - Once payment is successful, the order is marked as PROCESSING and delivery is kicked off.
 - When delivery has been completed, a new state called DELIVERED is reached. This triggers an email and sms which TradeSafe will send to the customer, asking them if they received what they ordered.
-- If yes, TradeSafe releases the funds to you, and/or your vendors if trading in a multi-vendor setup. 
+- If yes, TradeSafe releases the funds to you, and/or your vendors if trading in a multi-vendor setup.
 - The customer has 24 hours in which to make their decision. If we do not hear from the customer within that time, TradeSafe will deem this as acceptance on the buyer's part and automatically release the funds to you.
-- If the customer is unhappy with the order, then the customer can submit a comment. The transaction will then be placed on hold in WooCommerce. This will give you the opportunity to enact your own return policies until a successful resolution has been achieved. 
-- No refund will be processed without your consent. TradeSafe performs all refunds on your behalf. We take away this admin burden. 
+- If the customer is unhappy with the order, then the customer can submit a comment. The transaction will then be placed on hold in WooCommerce. This will give you the opportunity to enact your own return policies until a successful resolution has been achieved.
+- No refund will be processed without your consent. TradeSafe performs all refunds on your behalf. We take away this admin burden.
 - The buyer must have a material complaint and provide evidence. We will release the funds to you in the event the complaint/issue is non-material or frivolous.
- 
+
 == Frequently Asked Questions ==
 
 = How does TradeSafe benefit me as a merchant? =
 
 - Boosts sales conversions. TradeSafe gives new uninitiated customers the peace of mind to make that upfront purchase.
 - We enable split payments for each transaction which allows your digital store to earn a commission for each transaction. No longer do you have to do this manually.
-- Refunds. Just hit that button, and we will refund the customer on your behalf. 
+- Refunds. Just hit that button, and we will refund the customer on your behalf.
 - Wallet functionality. TradeSafe provides two settlement options whereby we either pay to the beneficiary's bank account, or we credit their escrow wallet where they can manually withdraw the funds in WooCommerce.
 - We augment your store's credibility and reputational cred
 
 = How does TradeSafe benefit my customers? =
 
 - Removes uncertainty and stress. An escrow holding account, together with Standard Bank’s logo, gives buyers the confidence to make that upfront payment.
-- We provide multiple payment options for their convenience. 
+- We provide multiple payment options for their convenience.
 - Customers are never redirected to another site, and they never need to register on a separate platform. We ensure a seamless user journey.
 
 = How and when do I get paid? =
 
 We provide you two options how the funds are to be disbursed to you and/or your vendors.
 
-1. Automatically. TradeSafe will make payment to your bank account. There is an additional small charge per transaction should you choose this option.    
-2. Wallet withdraw. You can choose to withdrawal your funds from your WooCommerce dashboard. 
+1. Automatically. TradeSafe will make payment to your bank account. There is an additional small charge per transaction should you choose this option.
+2. Wallet withdraw. You can choose to withdrawal your funds from your WooCommerce dashboard.
 
 The payment frequencies can be set at your discretion. We will pay the funds to you either on a daily, weekly, bi-monthly, or monthly basis. Some merchants preferred to be paid at the end of the month, and some immediately. Just tell us what would suit you.
 
