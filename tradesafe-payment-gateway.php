@@ -312,6 +312,12 @@ function tradesafe_get_token_id( int $user_id ): ?string {
 	} catch ( \GraphQL\Exception\QueryError $e ) {
 		$logger = wc_get_logger();
 		$logger->error( $e->getMessage() . ': ' . $e->getErrorDetails()['message'] ?? null, array( 'source' => 'tradesafe-payment-gateway' ) );
+	} catch ( \Exception $e ) {
+		$logger = wc_get_logger();
+		$logger->error( $e->getMessage() ?? null, array( 'source' => 'tradesafe-payment-gateway' ) );
+	} catch ( \Throwable $e ) {
+		$logger = wc_get_logger();
+		$logger->error( $e->getMessage() ?? null, array( 'source' => 'tradesafe-payment-gateway' ) );
 	}
 
 	return null;
@@ -334,6 +340,12 @@ function tradesafe_get_token( int $user_id ): ?array {
 	} catch ( \GraphQL\Exception\QueryError $e ) {
 		$logger = wc_get_logger();
 		$logger->error( $e->getMessage() . ': ' . $e->getErrorDetails()['message'] ?? null, array( 'source' => 'tradesafe-payment-gateway' ) );
+	} catch ( \Exception $e ) {
+		$logger = wc_get_logger();
+		$logger->error( $e->getMessage() ?? null, array( 'source' => 'tradesafe-payment-gateway' ) );
+	} catch ( \Throwable $e ) {
+		$logger = wc_get_logger();
+		$logger->error( $e->getMessage() ?? null, array( 'source' => 'tradesafe-payment-gateway' ) );
 	}
 
 	return null;

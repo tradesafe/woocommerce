@@ -102,6 +102,8 @@ class TradeSafeApiClient {
 			}
 		} catch ( \Exception $e ) {
 			$api_status_reason = $e->getMessage();
+		} catch ( \Throwable $e ) {
+			$api_status_reason = $e->getMessage();
 		}
 
 		try {
@@ -125,6 +127,8 @@ class TradeSafeApiClient {
 			}
 		} catch ( \Exception $e ) {
 			$auth_status_reason = $e->getMessage();
+		} catch ( \Throwable $e ) {
+			$auth_status_reason = 'Authentication Failed';
 		}
 
 		return array(
@@ -151,6 +155,8 @@ class TradeSafeApiClient {
 
 			return false;
 		} catch ( \Exception $e ) {
+			return false;
+		} catch ( \Throwable $e ) {
 			return false;
 		}
 	}
@@ -200,6 +206,14 @@ class TradeSafeApiClient {
 			return $access_token->getToken();
 		} catch ( \Exception $e ) {
 			$this->error = $e->getMessage();
+
+			error_log( $e->getMessage() );
+
+			return null;
+		} catch ( \Throwable $e ) {
+			$this->error = $e->getMessage();
+
+			error_log( $e->getMessage() );
 
 			return null;
 		}
@@ -257,6 +271,10 @@ class TradeSafeApiClient {
 			return array(
 				'error' => $e->getMessage(),
 			);
+		} catch ( \Throwable $e ) {
+			return array(
+				'error' => $e->getMessage(),
+			);
 		}
 	}
 
@@ -285,6 +303,10 @@ class TradeSafeApiClient {
 
 			return $result['clientInfo'];
 		} catch ( \Exception $e ) {
+			error_log( $e->getMessage() );
+			return array();
+		} catch ( \Throwable $e ) {
+			error_log( $e->getMessage() );
 			return array();
 		}
 	}
@@ -356,6 +378,10 @@ class TradeSafeApiClient {
 
 			return $result['token'];
 		} catch ( \Exception $e ) {
+			error_log( $e->getMessage() );
+			return null;
+		} catch ( \Throwable $e ) {
+			error_log( $e->getMessage() );
 			return null;
 		}
 	}

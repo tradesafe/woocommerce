@@ -131,7 +131,13 @@ class TradeSafe {
 						break;
 				}
 			} catch ( \Exception $e ) {
-				$valid = false;
+				error_log( $e->getMessage() );
+
+				return false;
+			} catch ( \Throwable $e ) {
+				error_log( $e->getMessage() );
+
+				return false;
 			}
 		}
 
