@@ -4,6 +4,16 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.12.2](https://github.com/tradesafe/tradesafe-payment-gateway/compare/v2.12.1...v2.12.2) (2023-07-07)
+
+### Bug Fixes
+
+* Don't add custom party if token is empty ([c3cdf0](https://github.com/tradesafe/tradesafe-payment-gateway/commit/c3cdf0ad5289355735811a385f11c6e98fdfe3a2))
+* Extended error handeling for try catch statements ([02570b](https://github.com/tradesafe/tradesafe-payment-gateway/commit/02570b625aed080f17f790ba1732e57983f69f1a))
+
+
+---
+
 ## [2.12.1](https://github.com/tradesafe/tradesafe-payment-gateway/compare/v2.12.0...v2.12.1) (2023-06-06)
 
 ### Bug Fixes
