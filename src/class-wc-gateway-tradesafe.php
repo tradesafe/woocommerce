@@ -256,34 +256,16 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 			'desc_tip'    => true,
 		);
 
-		if ( $this->client->production() ) {
-			$form['environment'] = array(
-				'title'    => __( 'Environment', 'tradesafe-payment-gateway' ),
-				'type'     => 'select',
-				'default'  => 'SIT',
-				'options'  => array(
-					'SIT'  => 'Sandbox',
-					'PROD' => 'Live',
-				),
-				'desc_tip' => false,
-			);
-		} else {
-			$form['environment'] = array(
-				'title'       => __( 'Environment', 'tradesafe-payment-gateway' ),
-				'type'        => 'row',
-				'description' => __( 'To access the live environment, you will need to complete the go-live process for your application', 'tradesafe-payment-gateway' ),
-				'value'       => 'Sandbox',
-			);
-
-			if ( isset( $settings['client_id'] ) && '' !== $settings['client_id'] ) {
-				$form['go_live'] = array(
-					'title'       => __( 'Go Live', 'tradesafe-payment-gateway' ),
-					'description' => __( 'Take your store live to start processing transactions with real world currency.', 'tradesafe-payment-gateway' ),
-					'type'        => 'go_live',
-					'value'       => $settings['client_id'],
-				);
-			}
-		}
+		$form['environment'] = array(
+			'title'    => __( 'Environment', 'tradesafe-payment-gateway' ),
+			'type'     => 'select',
+			'default'  => 'SIT',
+			'options'  => array(
+				'SIT'  => 'Sandbox',
+				'PROD' => 'Live',
+			),
+			'desc_tip' => false,
+		);
 
 		$form['delivery_section_title'] = array(
 			'title'       => __( 'Delivery Settings', 'tradesafe-payment-gateway' ),
@@ -654,7 +636,7 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 			$body .= "<tr><th scope='row'>Email:</th><td>" . esc_attr( $profile['user']['email'] ) . '</td></tr>';
 			$body .= "<tr><th scope='row'>Mobile:</th><td>" . esc_attr( $profile['user']['mobile'] ) . '</td></tr>';
 
-			$body .= "<tr><th scope='row'>Go-Live Completed:</th><td>" . esc_attr( $production ? 'Yes' : 'No' ) . '</td></tr>';
+			$body .= "<tr><th scope='row'>Production:</th><td>" . esc_attr( $production ? 'Yes' : 'No' ) . '</td></tr>';
 		}
 
 		ob_start();

@@ -146,19 +146,7 @@ class TradeSafeApiClient {
 	}
 
 	public function production() {
-		try {
-			$info = $this->clientInfo();
-
-			if ( isset( $info['production'] ) ) {
-				return $info['production'];
-			}
-
-			return false;
-		} catch ( \Exception $e ) {
-			return false;
-		} catch ( \Throwable $e ) {
-			return false;
-		}
+		return tradesafe_is_prod();
 	}
 
 	public function generateToken() {
