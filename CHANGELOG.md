@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.12.3](https://github.com/tradesafe/tradesafe-payment-gateway/compare/v2.12.2...v2.12.3) (2023-07-21)
+
+### Bug Fixes
+
+* Removed dynamic environment check ([b12746](https://github.com/tradesafe/tradesafe-payment-gateway/commit/b1274697b4cb380b8e6fd32caad2474b7ad9b6ca))
+
+
+---
+
 ## [2.12.2](https://github.com/tradesafe/tradesafe-payment-gateway/compare/v2.12.1...v2.12.2) (2023-07-07)
 
 ### Bug Fixes
