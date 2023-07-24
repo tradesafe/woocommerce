@@ -11,8 +11,6 @@ defined( 'ABSPATH' ) || exit;
  * Class TradeSafe Dokan.
  */
 class TradeSafeDokan {
-
-
 	/**
 	 * Initialize the plugin and load the actions and filters.
 	 */
@@ -33,6 +31,17 @@ class TradeSafeDokan {
 			// Add scripts
 			wp_enqueue_script( 'tradesafe-payment-gateway-withdrawal', TRADESAFE_PAYMENT_GATEWAY_BASE_DIR . '/assets/js/withdrawal.js', array( 'jquery' ), WC_GATEWAY_TRADESAFE_VERSION, true );
 			wp_enqueue_script( 'wc-setup', TRADESAFE_PAYMENT_GATEWAY_BASE_DIR . '/assets/js/withdrawal.js', array( 'jquery' ), WC_GATEWAY_TRADESAFE_VERSION, true );
+
+			// WORK AROUND: Ensure dokan pro hooks are loaded
+			if ( dokan()->is_pro_exists() ) {
+				try {
+					new WeDevs\DokanPro\Hooks();
+				} catch ( \Exception $e ) {
+					error_log( $e->getMessage() );
+				} catch ( \Throwable $e ) {
+					error_log( $e->getMessage() );
+				}
+			}
 		}
 	}
 
