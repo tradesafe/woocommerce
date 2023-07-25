@@ -15,6 +15,8 @@ class TradeSafeDokan {
 	 * Initialize the plugin and load the actions and filters.
 	 */
 	public static function init() {
+		global $wp_filter;
+
 		// Actions
 		add_action( 'dokan_store_profile_saved', array( 'TradeSafeDokan', 'save_withdraw_method' ), 10, 2 );
 		add_action( 'dokan_seller_wizard_payment_field_save', array( 'TradeSafeDokan', 'dokan_seller_wizard_payment_field_save' ), 10, 2 );
@@ -35,7 +37,9 @@ class TradeSafeDokan {
 			// WORK AROUND: Ensure dokan pro hooks are loaded
 			if ( dokan()->is_pro_exists() ) {
 				try {
-					new WeDevs\DokanPro\Hooks();
+					if ( ! array_key_exists( 'dokan_prepare_for_calculation', $wp_filter ) ) {
+						new WeDevs\DokanPro\Hooks();
+					}
 				} catch ( \Exception $e ) {
 					error_log( $e->getMessage() );
 				} catch ( \Throwable $e ) {
