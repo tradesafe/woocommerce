@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.12.5](https://github.com/tradesafe/tradesafe-payment-gateway/compare/v2.12.4...v2.12.5) (2023-07-25)
+
+### Bug Fixes
+
+* Ensure dokan pro hooks are not loaded twice ([4f7d10](https://github.com/tradesafe/tradesafe-payment-gateway/commit/4f7d10229ba335182a941e033083fae617024707))
+
+
+---
+
 ## [2.12.4](https://github.com/tradesafe/tradesafe-payment-gateway/compare/v2.12.3...v2.12.4) (2023-07-24)
 
 ### Bug Fixes
