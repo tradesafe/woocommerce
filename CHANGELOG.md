@@ -4,6 +4,14 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.12.6](https://github.com/tradesafe/tradesafe-payment-gateway/compare/v2.12.5...v2.12.6) (2023-07-25)
+
+### Reverts
+
+* Removed workaround for DokanPro commission bug ([08c990](https://github.com/tradesafe/plugin-woocommerce/commit/08c990fbbff08a46cd7c6b5341b0af370dff102c))
+
+---
+
 ## [2.12.5](https://github.com/tradesafe/tradesafe-payment-gateway/compare/v2.12.4...v2.12.5) (2023-07-25)
 
 ### Bug Fixes
