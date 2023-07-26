@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.12.7](https://github.com/tradesafe/tradesafe-payment-gateway/compare/v2.12.6...v2.12.7) (2023-07-26)
+
+### Bug Fixes
+
+* Delete access token when saving settings page ([a0f51f](https://github.com/tradesafe/tradesafe-payment-gateway/commit/a0f51fe84bec9171a28d6b520c4d324d1e74ad17))
+
+
+---
+
 ## [2.12.6](https://github.com/tradesafe/tradesafe-payment-gateway/compare/v2.12.5...v2.12.6) (2023-07-25)
 
 ### Reverts
