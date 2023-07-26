@@ -474,6 +474,7 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 	 */
 	public function process_admin_options() {
 		delete_transient( 'tradesafe_client_token' );
+		delete_option( 'tradesafe_api_access' );
 
 		return parent::process_admin_options();
 	}
