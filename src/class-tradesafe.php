@@ -193,7 +193,6 @@ class TradeSafe {
 					$signature_check = hash_hmac( 'sha256', $request, get_option( 'tradesafe_client_id' ) );
 
 					// TODO: Change how signature check works.
-					if ( true ) {
 						$query = wc_get_orders(
 							array(
 								'meta_key'     => 'tradesafe_transaction_id',
@@ -202,46 +201,36 @@ class TradeSafe {
 							)
 						);
 
-						if ( ! isset( $query[0] ) ) {
-							wp_die(
-								'Invalid Transaction ID',
-								'An Error Occurred While Processing Callback',
-								array(
-									'code' => 400,
-								)
-							);
-						}
-
-						$order = $query[0];
-
-						if ( 'FUNDS_DEPOSITED' === $data['state'] ) {
-							$order->update_status( 'on-hold', __( 'Awaiting Manual EFT payment.', 'tradesafe-payment-gateway' ) );
-						}
-
-						if ( ( $order->has_status( 'on-hold' ) || $order->has_status( 'pending' ) || $order->has_status( 'failed' ) || $order->has_status( 'cancelled' ) ) && 'FUNDS_RECEIVED' === $data['state'] ) {
-							$client = new \TradeSafe\Helpers\TradeSafeApiClient();
-
-							$transaction = $client->getTransaction( $order->get_meta( 'tradesafe_transaction_id', true ) );
-							$client->allocationStartDelivery( $transaction['allocations'][0]['id'] );
-
-							$order->update_status( 'processing', 'Funds have been received by TradeSafe.' );
-						}
-
-						if ( 'FUNDS_RELEASED' === $data['state'] ) {
-							$order->update_status( 'completed', 'Transaction Completed. Paying out funds to parties.' );
-						}
-
-						exit;
-					} else {
+					if ( ! isset( $query[0] ) ) {
 						wp_die(
-							'Invalid Signature',
+							'Invalid Transaction ID',
 							'An Error Occurred While Processing Callback',
 							array(
 								'code' => 400,
 							)
 						);
 					}
-					// Either exit is called or error is thrown.
+
+					$order = $query[0];
+
+					if ( 'FUNDS_DEPOSITED' === $data['state'] ) {
+						$order->update_status( 'on-hold', __( 'Awaiting Manual EFT payment.', 'tradesafe-payment-gateway' ) );
+					}
+
+					if ( 'FUNDS_RECEIVED' === $data['state'] ) {
+						$client = new \TradeSafe\Helpers\TradeSafeApiClient();
+
+						$transaction = $client->getTransaction( $order->get_meta( 'tradesafe_transaction_id', true ) );
+						$client->allocationStartDelivery( $transaction['allocations'][0]['id'] );
+
+						$order->update_status( 'processing', 'Funds have been received by TradeSafe.' );
+					}
+
+					if ( 'FUNDS_RELEASED' === $data['state'] ) {
+						$order->update_status( 'completed', 'Transaction Completed. Paying out funds to parties.' );
+					}
+
+					exit;
 				case 'verify-payment':
 					if ( empty( $wp->query_vars['reference'] ) || empty( $wp->query_vars['transactionId'] ) ) {
 						wp_safe_redirect( '/' );
