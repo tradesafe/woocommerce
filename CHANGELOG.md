@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.12.8](https://github.com/tradesafe/tradesafe-payment-gateway/compare/v2.12.7...v2.12.8) (2023-07-27)
+
+### Bug Fixes
+
+* Removed order status check from callback ([2fb5a5](https://github.com/tradesafe/tradesafe-payment-gateway/commit/2fb5a56e36ff19ba985e665a95065ccf8b12e9b6))
+
+
+---
+
 ## [2.12.7](https://github.com/tradesafe/tradesafe-payment-gateway/compare/v2.12.6...v2.12.7) (2023-07-26)
 
 ### Bug Fixes
