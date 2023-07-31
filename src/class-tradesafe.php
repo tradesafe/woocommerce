@@ -193,13 +193,13 @@ class TradeSafe {
 					$signature_check = hash_hmac( 'sha256', $request, get_option( 'tradesafe_client_id' ) );
 
 					// TODO: Change how signature check works.
-						$query = wc_get_orders(
-							array(
-								'meta_key'     => 'tradesafe_transaction_id',
-								'meta_value'   => $data['id'],
-								'meta_compare' => '=',
-							)
-						);
+					$query = wc_get_orders(
+						array(
+							'meta_key'     => 'tradesafe_transaction_id',
+							'meta_value'   => $data['id'],
+							'meta_compare' => '=',
+						)
+					);
 
 					if ( ! isset( $query[0] ) ) {
 						wp_die(
@@ -215,6 +215,8 @@ class TradeSafe {
 
 					if ( 'FUNDS_DEPOSITED' === $data['state'] ) {
 						$order->update_status( 'on-hold', __( 'Awaiting Manual EFT payment.', 'tradesafe-payment-gateway' ) );
+
+						exit;
 					}
 
 					if ( 'FUNDS_RECEIVED' === $data['state'] ) {
@@ -224,10 +226,22 @@ class TradeSafe {
 						$client->allocationStartDelivery( $transaction['allocations'][0]['id'] );
 
 						$order->update_status( 'processing', 'Funds have been received by TradeSafe.' );
+
+						exit;
+					}
+
+					if ( 'INITIATED' === $data['state'] ) {
+
+						if ( $order->get_status() !== 'processing' ) {
+							$order->update_status( 'processing', 'Delivery of the goods or service has started.' );
+						}
+
+						exit;
 					}
 
 					if ( 'FUNDS_RELEASED' === $data['state'] ) {
 						$order->update_status( 'completed', 'Transaction Completed. Paying out funds to parties.' );
+						exit;
 					}
 
 					exit;
