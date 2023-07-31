@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.12.9](https://github.com/tradesafe/tradesafe-payment-gateway/compare/v2.12.8...v2.12.9) (2023-07-31)
+
+### Bug Fixes
+
+* Added additional option to callback to handle the initiated transaction state ([62b17a](https://github.com/tradesafe/tradesafe-payment-gateway/commit/62b17a06eb153ff3ae5a5cca5fdc1ebc955b506f))
+
+
+---
+
 ## [2.12.8](https://github.com/tradesafe/tradesafe-payment-gateway/compare/v2.12.7...v2.12.8) (2023-07-27)
 
 ### Bug Fixes
