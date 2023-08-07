@@ -4,7 +4,7 @@ Tags: tradesafe, woocommerce, dokan, payment gateway, escrow, credit card, insta
 Requires at least: 5.6
 Tested up to: 6.2
 Requires PHP: 7.4
-Stable tag: 2.12.9
+Stable tag: 2.13.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -76,63 +76,8 @@ Please do not hesitate to email [support@tradesafe.co.za](mailto:support@tradesa
 
 == Changelog ==
 
-= 2.12.9 2023-07-31 =
-
-### Bug Fixes
-
-* Added additional option to callback to handle the initiated transaction state
-
-= 2.12.8 2023-07-27 =
-
-### Bug Fixes
-
-* Removed order status check from callback
-
-= 2.12.7 2023-07-26 =
-
-### Bug Fixes
-
-* Delete access token when saving settings page
-
-= 2.12.6 2023-07-25 =
-
-### Reverts
-
-* Removed workaround for DokanPro commission bug
-
-= 2.12.5 2023-07-25 =
-
-### Bug Fixes
-
-* Ensure dokan pro hooks are not loaded twice
-
-= 2.12.4 2023-07-24 =
-
-### Bug Fixes
-
-* Added work around for dokan pro not loading hooks
-
-= 2.12.3 2023-07-21 =
-
-### Bug Fixes
-
-* Removed dynamic environment check
-
-= 2.12.2 2023-07-07 =
-
-### Bug Fixes
-
-* Don't add custom party if token is empty
-* Extended error handeling for try catch statements
-
-= 2.12.1 2023-06-06 =
-
-### Bug Fixes
-
-* Set order status if payment has been made
-
-= 2.12.0 2023-06-06 =
+= 2.13.0 2023-08-07 =
 
 ### Features
 
-* Added verification page for payments
+* Added propper support for the refunded order status

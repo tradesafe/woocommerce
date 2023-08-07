@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.13.0](https://github.com/tradesafe/tradesafe-payment-gateway/compare/v2.12.9...v2.13.0) (2023-08-07)
+
+### Features
+
+* Added propper support for the refunded order status ([0642ad](https://github.com/tradesafe/tradesafe-payment-gateway/commit/0642ad51ec465402b2b99008f2deaec26d2bbb62))
+
+
+---
+
 ## [2.12.9](https://github.com/tradesafe/tradesafe-payment-gateway/compare/v2.12.8...v2.12.9) (2023-07-31)
 
 ### Bug Fixes
