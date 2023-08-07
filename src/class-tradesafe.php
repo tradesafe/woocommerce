@@ -239,6 +239,12 @@ class TradeSafe {
 						exit;
 					}
 
+					if ( 'REFUNDED' === $data['state'] || 'ADMIN_REFUNDED' === $data['state'] ) {
+						$order->update_status( 'refunded', 'Transaction canceled and refunded to buyer' );
+
+						exit;
+					}
+
 					if ( 'FUNDS_RELEASED' === $data['state'] ) {
 						$order->update_status( 'completed', 'Transaction Completed. Paying out funds to parties.' );
 						exit;
@@ -436,7 +442,13 @@ class TradeSafe {
 		}
 
 		try {
-			$client->cancelTransaction( $order->get_meta( 'tradesafe_transaction_id', true ), 'Transaction canceled my store owner' );
+			$transaction_id = $order->get_meta( 'tradesafe_transaction_id', true );
+
+			$transaction = $client->getTransaction( $transaction_id );
+
+			if ( ! in_array( $transaction['state'], array( 'CANCELED', 'REFUNDED', 'DECLINED', 'DISPUTED', 'LEGAL', 'ADMIN_SUSPENDED', 'ADMIN_CANCELED', 'ADMIN_REFUNDED' ) ) ) {
+				$client->cancelTransaction( $transaction_id, 'Transaction canceled my store owner' );
+			}
 		} catch ( Exception $e ) {
 			$order->set_status( 'failed', null, false );
 			$order->save();
