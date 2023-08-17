@@ -232,7 +232,7 @@ class TradeSafe {
 
 					if ( 'INITIATED' === $data['state'] ) {
 
-						if ( $order->get_status() !== 'processing' ) {
+						if ( in_array( $order->get_status(), array( 'pending', 'on-hold', 'completed', 'cancelled', 'refunded', 'failed', 'draft' ) ) ) {
 							$order->update_status( 'processing', 'Delivery of the goods or service has started.' );
 						}
 
