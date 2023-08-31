@@ -20,8 +20,9 @@ class TradeSafe {
 		// Actions.
 
 		// add_action( 'woocommerce_cart_calculate_fees', array( 'TradeSafe', 'add_gateway_fee' ), PHP_INT_MAX );
-		add_action( 'woocommerce_order_status_completed', array( 'TradeSafe', 'complete_transaction' ), PHP_INT_MAX, 2 );
-		add_action( 'woocommerce_order_status_delivered', array( 'TradeSafe', 'complete_delivery' ), PHP_INT_MAX, 2 );
+		add_action( 'woocommerce_order_status_processing_to_completed', array( 'TradeSafe', 'complete_transaction' ), PHP_INT_MAX, 2 );
+		add_action( 'woocommerce_order_status_completed_to_delivered', array( 'TradeSafe', 'complete_delivery' ), PHP_INT_MAX, 2 );
+		add_action( 'woocommerce_order_status_processing_to_delivered', array( 'TradeSafe', 'complete_delivery' ), PHP_INT_MAX, 2 );
 		add_action( 'woocommerce_order_status_refunded', array( 'TradeSafe', 'cancel_transaction' ), PHP_INT_MAX, 2 );
 		add_action( 'woocommerce_order_status_cancelled', array( 'TradeSafe', 'cancel_transaction' ), PHP_INT_MAX, 2 );
 		add_action( 'woocommerce_review_order_before_payment', array( 'TradeSafe', 'refresh_checkout' ) );
@@ -214,7 +215,7 @@ class TradeSafe {
 					$order = $query[0];
 
 					if ( 'FUNDS_DEPOSITED' === $data['state'] ) {
-						$order->update_status( 'on-hold', __( 'Awaiting Manual EFT payment.', 'tradesafe-payment-gateway' ) );
+						$order->update_status( 'on-hold', __( 'TradeSafe is awaiting for manual EFT payment.', 'tradesafe-payment-gateway' ) );
 
 						exit;
 					}
@@ -225,28 +226,33 @@ class TradeSafe {
 						$transaction = $client->getTransaction( $order->get_meta( 'tradesafe_transaction_id', true ) );
 						$client->allocationStartDelivery( $transaction['allocations'][0]['id'] );
 
-						$order->update_status( 'processing', 'Funds have been received by TradeSafe.' );
+						$order->update_status( 'processing', 'TradeSafe has received the funds in full. You may begin delivery. For manual delivery - Select the state \'DELIVERED\' once delivery has been completed. If integrated with courier company - order status will be updated automatically (ensure a delay notification is configured in TradeSafe plugin settings).' );
 
 						exit;
 					}
 
 					if ( 'INITIATED' === $data['state'] ) {
 
-						if ( in_array( $order->get_status(), array( 'pending', 'on-hold', 'completed', 'cancelled', 'refunded', 'failed', 'draft' ) ) ) {
-							$order->update_status( 'processing', 'Delivery of the goods or service has started.' );
+						if ( in_array( $order->get_status(), array( 'pending', 'on-hold', 'cancelled', 'refunded', 'failed', 'draft' ) ) ) {
+							$order->update_status( 'processing', 'TradeSafe has received the funds in full. You may begin delivery. For manual delivery - Select the state \'DELIVERED\' once delivery has been completed. If integrated with courier company - order status will be updated automatically (ensure a delay notification is configured in TradeSafe plugin settings).' );
 						}
 
 						exit;
 					}
 
 					if ( 'REFUNDED' === $data['state'] || 'ADMIN_REFUNDED' === $data['state'] ) {
-						$order->update_status( 'refunded', 'Transaction canceled and refunded to buyer' );
+						$order->update_status( 'refunded', 'Transaction has been canceled and TradeSafe has refunded to buyer.' );
 
 						exit;
 					}
 
+					if ( 'DELIVERED' === $data['state'] ) {
+						$order->update_status( 'completed', 'Hooray! Your customer has accepted the goods or services. TradeSafe will release the funds.' );
+						exit;
+					}
+
 					if ( 'FUNDS_RELEASED' === $data['state'] ) {
-						$order->update_status( 'completed', 'Transaction Completed. Paying out funds to parties.' );
+						$order->add_order_note( __( 'Transaction is Complete. TradeSafe has released the funds to you (and other parties if applicable).', 'tradesafe-payment-gateway' ) );
 						exit;
 					}
 
@@ -290,7 +296,7 @@ class TradeSafe {
 					$transaction = $client->getTransaction( $order->get_meta( 'tradesafe_transaction_id', true ) );
 
 					if ( in_array( $transaction['state'], array( 'FUNDS_DEPOSITED', 'FUNDS_RECEIVED', 'INITIATED' ) ) ) {
-						$order->update_status( 'processing', 'Funds have been received by TradeSafe.' );
+						$order->update_status( 'processing', 'TradeSafe has received the funds in full. You may begin delivery. For manual delivery - Select the state \'DELIVERED\' once delivery has been completed. If integrated with courier company - order status will be updated automatically (ensure a delay notification is configured in TradeSafe plugin settings).' );
 
 						wp_safe_redirect( $view_order_url );
 						exit;
@@ -405,31 +411,8 @@ class TradeSafe {
 			return;
 		}
 
-		try {
-			$settings    = get_option( 'woocommerce_tradesafe_settings', array() );
-			$transaction = $client->getTransaction( $order->get_meta( 'tradesafe_transaction_id', true ) );
-
-			if ( 'INITIATED' === $transaction['allocations'][0]['state'] ) {
-				if ( isset( $settings['delivery_delay_notification'] ) && 'yes' === $settings['delivery_delay_notification'] ) {
-					$client->allocationInTransit( $transaction['allocations'][0]['id'] );
-				} else {
-					$client->allocationCompleteDelivery( $transaction['allocations'][0]['id'] );
-				}
-
-				$order->set_status( 'delivered', null, false );
-			} elseif ( 'DELIVERED' === $transaction['allocations'][0]['state']
-				|| 'FUNDS_RELEASED' === $transaction['allocations'][0]['state']
-				|| 'PENDING_ACCEPTANCE' === $transaction['allocations'][0]['state'] ) {
-				return;
-			} else {
-				throw new Exception( 'There was a problem updating this transaction' );
-			}
-		} catch ( \Exception $e ) {
-			$order->set_status( 'failed', null, false );
-			$order->save();
-
-			throw new Exception( $e->getMessage() );
-		}
+		$order->set_status( 'delivered' );
+		$order->save();
 	}
 
 	public static function cancel_transaction( int $order_id, WC_Order $order ) {
@@ -450,7 +433,7 @@ class TradeSafe {
 				$client->cancelTransaction( $transaction_id, 'Transaction canceled my store owner' );
 			}
 		} catch ( Exception $e ) {
-			$order->set_status( 'failed', null, false );
+			$order->set_status( 'failed', $e->getMessage(), false );
 			$order->save();
 
 			throw new Exception( $e->getMessage() );
@@ -477,11 +460,15 @@ class TradeSafe {
 			if ( isset( $settings['delivery_delay_notification'] )
 					 && 'yes' === $settings['delivery_delay_notification'] ) {
 				$client->allocationInTransit( $transaction['allocations'][0]['id'] );
+
+				$order->add_order_note( __( 'Good acceptance notification will be sent to the customer in ' . $settings['delivery_days'] . ' business days.', 'tradesafe-payment-gateway' ) );
 			} else {
 				$client->allocationCompleteDelivery( $transaction['allocations'][0]['id'] );
+
+				$order->add_order_note( __( 'TradeSafe has asked the customer if they received what was ordered. 24 hour timer started.', 'tradesafe-payment-gateway' ) );
 			}
 		} catch ( Exception $e ) {
-			$order->set_status( 'failed', null, false );
+			$order->set_status( 'failed', $e->getMessage(), false );
 			$order->save();
 
 			throw new Exception( $e->getMessage() );

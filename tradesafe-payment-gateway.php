@@ -9,7 +9,7 @@
  * Text Domain: tradesafe-payment-gateway
  * Requires at least: 5.5
  * Requires PHP: 7.4
- * Tested up to: 6.1
+ * Tested up to: 6.3
  * WC tested up to: 7.1
  * WC requires at least: 4.6
  *

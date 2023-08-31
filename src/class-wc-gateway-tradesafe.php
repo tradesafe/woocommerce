@@ -962,7 +962,7 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 		}
 
 		// Mark as pending.
-		$order->update_status( 'pending', __( 'Awaiting payment.', 'tradesafe-payment-gateway' ) );
+		$order->update_status( 'pending', __( 'TradeSafe is waiting awaiting payment from buyer.', 'tradesafe-payment-gateway' ) );
 
 		// Remove cart.
 		$woocommerce->cart->empty_cart();
