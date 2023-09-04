@@ -20,7 +20,7 @@ class TradeSafe {
 		// Actions.
 
 		// add_action( 'woocommerce_cart_calculate_fees', array( 'TradeSafe', 'add_gateway_fee' ), PHP_INT_MAX );
-		add_action( 'woocommerce_order_status_processing_to_completed', array( 'TradeSafe', 'complete_transaction' ), PHP_INT_MAX, 2 );
+		add_action( 'woocommerce_order_status_completed', array( 'TradeSafe', 'complete_transaction' ), PHP_INT_MAX, 2 );
 		add_action( 'woocommerce_order_status_completed_to_delivered', array( 'TradeSafe', 'complete_delivery' ), PHP_INT_MAX, 2 );
 		add_action( 'woocommerce_order_status_processing_to_delivered', array( 'TradeSafe', 'complete_delivery' ), PHP_INT_MAX, 2 );
 		add_action( 'woocommerce_order_status_refunded', array( 'TradeSafe', 'cancel_transaction' ), PHP_INT_MAX, 2 );
