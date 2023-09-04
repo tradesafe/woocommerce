@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.13.3](https://github.com/tradesafe/tradesafe-payment-gateway/compare/v2.13.2...v2.13.3) (2023-09-04)
+
+### Bug Fixes
+
+* Changed how completed hook is triggured ([ff004a](https://github.com/tradesafe/tradesafe-payment-gateway/commit/ff004a6b3e90766cede15f02a9742f7159b440b4))
+
+
+---
+
 ## [2.13.2](https://github.com/tradesafe/tradesafe-payment-gateway/compare/v2.13.1...v2.13.2) (2023-08-31)
 
 ### Bug Fixes
