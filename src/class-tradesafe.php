@@ -224,9 +224,12 @@ class TradeSafe {
 						$client = new \TradeSafe\Helpers\TradeSafeApiClient();
 
 						$transaction = $client->getTransaction( $order->get_meta( 'tradesafe_transaction_id', true ) );
-						$client->allocationStartDelivery( $transaction['allocations'][0]['id'] );
 
-						$order->update_status( 'processing', 'TradeSafe has received the funds in full. You may begin delivery. For manual delivery - Select the state \'DELIVERED\' once delivery has been completed. If integrated with courier company - order status will be updated automatically (ensure a delay notification is configured in TradeSafe plugin settings).' );
+						if ( 'CREATED' === $transaction['allocations'][0]['state'] ) {
+							$client->allocationStartDelivery( $transaction['allocations'][0]['id'] );
+
+							$order->update_status( 'processing', 'TradeSafe has received the funds in full. You may begin delivery. For manual delivery - Select the state \'DELIVERED\' once delivery has been completed. If integrated with courier company - order status will be updated automatically (ensure a delay notification is configured in TradeSafe plugin settings).' );
+						}
 
 						exit;
 					}
