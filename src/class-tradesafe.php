@@ -255,7 +255,11 @@ class TradeSafe {
 					}
 
 					if ( 'FUNDS_RELEASED' === $data['state'] ) {
-						$order->add_order_note( __( 'Transaction is Complete. TradeSafe has released the funds to you (and other parties if applicable).', 'tradesafe-payment-gateway' ) );
+						if ( $order->get_status() !== 'completed' ) {
+							$order->update_status( 'completed', __( 'Transaction is Complete. TradeSafe has released the funds to you (and other parties if applicable).', 'tradesafe-payment-gateway' ) );
+						} else {
+							$order->add_order_note( __( 'Transaction is Complete. TradeSafe has released the funds to you (and other parties if applicable).', 'tradesafe-payment-gateway' ) );
+						}
 						exit;
 					}
 
@@ -414,8 +418,21 @@ class TradeSafe {
 			return;
 		}
 
-		$order->set_status( 'delivered' );
-		$order->save();
+		try {
+			$transaction_id = $order->get_meta( 'tradesafe_transaction_id', true );
+
+			$transaction = $client->getTransaction( $transaction_id );
+
+			if ( ! in_array( $transaction['state'], array( 'DELIVERED', 'FUNDS_RELEASED' ) ) ) {
+				$order->set_status( 'delivered' );
+				$order->save();
+			}
+		} catch ( Exception $e ) {
+			$order->set_status( 'failed', $e->getMessage(), false );
+			$order->save();
+
+			throw new Exception( $e->getMessage() );
+		}
 	}
 
 	public static function cancel_transaction( int $order_id, WC_Order $order ) {
