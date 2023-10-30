@@ -4,6 +4,16 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.13.4](https://github.com/tradesafe/plugin-woocommerce/compare/v2.13.3...v2.13.4) (2023-10-30)
+
+### Bug Fixes
+
+* Changed how an order is updated when marked as completed ([f5bf43](https://github.com/tradesafe/plugin-woocommerce/commit/f5bf43d9bb420d6364b8b310717c18ab536a5668))
+* Only start delivery for allocation if in a created state ([3b37a9](https://github.com/tradesafe/plugin-woocommerce/commit/3b37a9a34c3f481c4a388b33fb52e7a20e494e7c))
+
+
+---
+
 ## [2.13.3](https://github.com/tradesafe/tradesafe-payment-gateway/compare/v2.13.2...v2.13.3) (2023-09-04)
 
 ### Bug Fixes
