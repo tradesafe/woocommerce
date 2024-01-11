@@ -10,7 +10,7 @@
  * Requires at least: 5.5
  * Requires PHP: 7.4
  * Tested up to: 6.4
- * WC tested up to: 7.1
+ * WC tested up to: 8.4
  * WC requires at least: 4.6
  *
  * @package TradeSafe Payment Gateway
@@ -30,6 +30,7 @@ function tradesafe_payment_gateway_init() {
 
 	define( 'WC_GATEWAY_TRADESAFE_VERSION', '2.13.4' );
 	define( 'TRADESAFE_PAYMENT_GATEWAY_BASE_DIR', untrailingslashit( plugin_dir_url( __FILE__ ) ) );
+	define( 'TRADESAFE_PAYMENT_GATEWAY_PATH', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 
 	$autoloader = dirname( __DIR__ ) . DIRECTORY_SEPARATOR . plugin_basename( __DIR__ ) . '/vendor/autoload.php';
 
@@ -76,6 +77,8 @@ function tradesafe_payment_gateway_init() {
 
 add_action( 'plugins_loaded', 'tradesafe_payment_gateway_init', 10 );
 add_action( 'plugins_loaded', 'tradesafe_payment_gateway_update_db_check', 15 );
+add_action( 'before_woocommerce_init', 'tradesafe_payment_gateway_declare_feature_compatibility' );
+add_action( 'woocommerce_blocks_loaded', 'tradesafe_payment_gateway_woocommerce_blocks_support' );
 
 /**
  * Add action links to the entry on the plugin page.
@@ -364,5 +367,39 @@ function tradesafe_payment_gateway_update_db_check() {
 
 		update_option( 'woocommerce_tradesafe_settings', apply_filters( 'woocommerce_settings_api_sanitized_fields_tradesafe', $settings ), 'yes' );
 		update_option( 'tradesafe_payment_gateway_version', WC_GATEWAY_TRADESAFE_VERSION );
+	}
+}
+
+/**
+ * Custom function to register a payment method type
+ */
+function tradesafe_payment_gateway_woocommerce_blocks_support() {
+	if ( class_exists( 'Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType' ) ) {
+		require_once TRADESAFE_PAYMENT_GATEWAY_PATH . '/src/class-wc-gateway-tradesafe-blocks-support.php';
+
+		add_action(
+			'woocommerce_blocks_payment_method_type_registration',
+			function ( Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry $payment_method_registry ) {
+				$payment_method_registry->register( new WC_Gateway_TradeSafe_Blocks_Support() );
+			}
+		);
+	}
+}
+
+/**
+ * Declares compatibility with Woocommerce features.
+ *
+ * List of features:
+ * - custom_order_tables
+ *
+ * @return void
+ */
+function tradesafe_payment_gateway_declare_feature_compatibility() {
+	if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
+		\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility(
+			'custom_order_tables',
+			__FILE__,
+			true
+		);
 	}
 }

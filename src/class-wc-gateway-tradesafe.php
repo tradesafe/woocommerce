@@ -43,7 +43,8 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 		// Supported functionality.
 		$this->supports = array(
 			'products',
-			'pre-orders',
+			'refunds',
+			'tokenization',
 		);
 
 		// Setup default merchant data.
