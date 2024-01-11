@@ -4,7 +4,7 @@ Tags: tradesafe, woocommerce, dokan, payment gateway, escrow, credit card, insta
 Requires at least: 5.6
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 2.13.4
+Stable tag: 2.14.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -76,32 +76,7 @@ Please do not hesitate to email [support@tradesafe.co.za](mailto:support@tradesa
 
 == Changelog ==
 
-= 2.13.4 2023-10-30 =
-
-### Bug Fixes
-
-* Changed how an order is updated when marked as completed
-* Only start delivery for allocation if in a created state
-
-= 2.13.3 2023-09-04 =
-
-### Bug Fixes
-
-* Changed how completed hook is triggured
-
-= 2.13.2 2023-08-31 =
-
-### Bug Fixes
-
-* Updated order notes to include more information
-
-= 2.13.1 2023-08-17 =
-
-### Bug Fixes
-
-* Changed how order states are checked for initiated transactions
-
-= 2.13.0 2023-08-07 =
+= 2.14.0 2024-01-11 =
 
 ### Features
 
