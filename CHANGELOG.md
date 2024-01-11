@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.14.0](https://github.com/tradesafe/plugin-woocommerce/compare/v2.13.4...v2.14.0) (2024-01-11)
+
+### Features
+
+* Added support for WooCommerce blocks ([3bdf8e](https://github.com/tradesafe/plugin-woocommerce/commit/3bdf8e75c589d304e92854edbcfc84c0e2aa8c87))
+
+
+---
+
 ## [2.13.4](https://github.com/tradesafe/plugin-woocommerce/compare/v2.13.3...v2.13.4) (2023-10-30)
 
 ### Bug Fixes
