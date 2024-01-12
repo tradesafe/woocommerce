@@ -17,6 +17,9 @@
  */
 
 defined( 'ABSPATH' ) || exit;
+define( 'WC_GATEWAY_TRADESAFE_VERSION', '2.14.0' );
+define( 'TRADESAFE_PAYMENT_GATEWAY_BASE_DIR', untrailingslashit( plugin_dir_url( __FILE__ ) ) );
+define( 'TRADESAFE_PAYMENT_GATEWAY_PATH', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 
 /**
  * Initialize the gateway.
@@ -27,10 +30,6 @@ function tradesafe_payment_gateway_init() {
 	if ( ! class_exists( 'WC_Payment_Gateway' ) ) {
 		return;
 	}
-
-	define( 'WC_GATEWAY_TRADESAFE_VERSION', '2.14.0' );
-	define( 'TRADESAFE_PAYMENT_GATEWAY_BASE_DIR', untrailingslashit( plugin_dir_url( __FILE__ ) ) );
-	define( 'TRADESAFE_PAYMENT_GATEWAY_PATH', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 
 	$autoloader = dirname( __DIR__ ) . DIRECTORY_SEPARATOR . plugin_basename( __DIR__ ) . '/vendor/autoload.php';
 
