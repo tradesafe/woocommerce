@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.14.1](https://github.com/tradesafe/plugin-woocommerce/compare/v2.14.0...v2.14.1) (2024-01-12)
+
+### Bug Fixes
+
+* Moved constants outside init function ([b69bcd](https://github.com/tradesafe/plugin-woocommerce/commit/b69bcdd5e0f19a1eaf2341802a33e441302a8427))
+
+
+---
+
 ## [2.14.0](https://github.com/tradesafe/plugin-woocommerce/compare/v2.13.4...v2.14.0) (2024-01-11)
 
 ### Features
