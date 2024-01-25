@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.14.2](https://github.com/tradesafe/plugin-woocommerce/compare/v2.14.1...v2.14.2) (2024-01-25)
+
+### Bug Fixes
+
+* Don't try update user profile when the user is using a diffrent payment gateway ([472e20](https://github.com/tradesafe/plugin-woocommerce/commit/472e20cba9642b19248e9c62b67a84476d4c83df))
+
+
+---
+
 ## [2.14.1](https://github.com/tradesafe/plugin-woocommerce/compare/v2.14.0...v2.14.1) (2024-01-12)
 
 ### Bug Fixes
