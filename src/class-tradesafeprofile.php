@@ -32,7 +32,7 @@ class TradeSafeProfile {
 		// add_action( 'woocommerce_edit_account_form', array( 'TradeSafeProfile', 'edit_account_form' ) );
 		// add_action( 'woocommerce_save_account_details', array( 'TradeSafeProfile', 'save_account_details' ) );
 		// add_action( 'woocommerce_save_account_details_errors', array( 'TradeSafeProfile', 'save_account_details_errors' ), 10, 1 );
-		add_action( 'woocommerce_checkout_update_customer', array( 'TradeSafeProfile', 'woocommerce_checkout_update_customer' ) );
+		add_action( 'woocommerce_checkout_update_customer', array( 'TradeSafeProfile', 'woocommerce_checkout_update_customer' ), 10, 2 );
 
 		// Withdrawal Page
 		if ( ! tradesafe_has_dokan() ) {
@@ -216,7 +216,15 @@ class TradeSafeProfile {
 	 *
 	 * @param WC_Customer $customer User account details.
 	 */
-	public static function woocommerce_checkout_update_customer( WC_Customer $customer ) {
+	public static function woocommerce_checkout_update_customer( WC_Customer $customer, $data = null ) {
+		if ( empty( $data ) ) {
+			return;
+		}
+
+		if ( 'tradesafe' !== $data['payment_method'] ) {
+			return;
+		}
+
 		$client = new \TradeSafe\Helpers\TradeSafeApiClient();
 
 		if ( '' === $customer->get_meta( tradesafe_token_meta_key(), true ) ) {
