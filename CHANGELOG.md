@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.15.0](https://github.com/tradesafe/plugin-woocommerce/compare/v2.14.2...v2.15.0) (2024-01-26)
+
+### Features
+
+* Added option to set a custom redirect page ([a71a24](https://github.com/tradesafe/plugin-woocommerce/commit/a71a2441b490a73d7935c4e0d4f38360ffb7aaf3))
+
+
+---
+
 ## [2.14.2](https://github.com/tradesafe/plugin-woocommerce/compare/v2.14.1...v2.14.2) (2024-01-25)
 
 ### Bug Fixes

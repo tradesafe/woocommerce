@@ -4,7 +4,7 @@ Tags: tradesafe, woocommerce, dokan, payment gateway, escrow, credit card, insta
 Requires at least: 5.6
 Tested up to: 6.4
 Requires PHP: 7.4
-Stable tag: 2.14.2
+Stable tag: 2.15.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -78,20 +78,8 @@ Please do not hesitate to email [support@tradesafe.co.za](mailto:support@tradesa
 
 ==
 
-= 2.14.2 2024-01-25 =
-
-### Bug Fixes
-
-* Don't try update user profile when the a is using a diffrent payment gateway
-
-= 2.14.1 2024-01-12 =
-
-### Bug Fixes
-
-* Moved constants outside init function
-
-= 2.14.0 2024-01-11 =
+= 2.15.0 2024-01-26 =
 
 ### Features
 
-* Added support for WooCommerce blocks
+* Added option to set a custom redirect page
