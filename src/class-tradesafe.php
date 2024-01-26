@@ -294,6 +294,11 @@ class TradeSafe {
 
 					$view_order_url = wc_get_endpoint_url( 'view-order', $order_id, get_permalink( get_option( 'woocommerce_myaccount_page_id' ) ) );
 
+					$settings = get_option( 'woocommerce_tradesafe_settings' );
+					if ( ! empty( $settings['success_redirect'] ) ) {
+						$view_order_url = get_site_url( null, str_replace( array( ':orderId', ':orderKey' ), array( $order_id, $order->get_order_key() ), $settings['success_redirect'] ) );
+					}
+
 					if ( $order->get_status() === 'processing' ) {
 						wp_safe_redirect( $view_order_url );
 						exit;

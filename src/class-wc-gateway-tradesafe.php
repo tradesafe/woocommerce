@@ -190,7 +190,12 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 	 * Define Gateway settings fields.
 	 */
 	public function init_form_fields() {
-		$settings = get_option( 'woocommerce_tradesafe_settings', array() );
+		$settings       = get_option( 'woocommerce_tradesafe_settings', array() );
+		$view_order_url = wc_get_endpoint_url( 'view-order', 1234, get_permalink( get_option( 'woocommerce_myaccount_page_id' ) ) );
+
+		if ( ! empty( $settings['success_redirect'] ) ) {
+			$view_order_url = get_site_url( null, str_replace( array( ':orderId', ':orderKey' ), array( '1234', 'wc_order_abc123xyz' ), $settings['success_redirect'] ) );
+		}
 
 		$form = array(
 			'enabled'     => array(
@@ -266,6 +271,20 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 				'PROD' => 'Live',
 			),
 			'desc_tip' => false,
+		);
+
+		$form['redirect_section_title'] = array(
+			'title'       => __( 'Redirect Settings', 'tradesafe-payment-gateway' ),
+			'type'        => 'title',
+			'description' => __( 'Additional settings for redirects', 'tradesafe-payment-gateway' ),
+		);
+
+		$form['success_redirect'] = array(
+			'title'       => __( 'Success Page', 'tradesafe-payment-gateway' ),
+			'type'        => 'text',
+			'description' => sprintf( __( 'The page to redirect to upon successful payment (leave blank to use the default WooCommerce order page). Custom variables are supported in the url and will be replaced when the user is redirected.<br/><br/><strong>Example Url:</strong> /custom/payment/page/:orderId/?key=:orderKey<br/><strong>Current Url:</strong> %1$s <br/><br/><strong>Available Variables:</strong><br/><strong>:orderId</strong> - Order reference number [1234]<br/><strong>:orderKey</strong> - Internal order ID [wc_order_abc123xyz]', 'tradesafe-payment-gateway' ), $view_order_url ),
+			'default'     => null,
+			'desc_tip'    => false,
 		);
 
 		$form['delivery_section_title'] = array(
