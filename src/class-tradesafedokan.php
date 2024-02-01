@@ -85,7 +85,7 @@ class TradeSafeDokan {
 			$account_type   = $token_data['bankAccount']['accountType'] ?? '';
 			$bank_code      = $token_data['bankAccount']['bank'] ?? '';
 
-			$interval = $token_data['settings']['payout']['interval'];
+			$interval = $settings['payout_method'];
 		} else {
 			$given_name  = '';
 			$family_name = '';
