@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.15.1](https://github.com/tradesafe/plugin-woocommerce/compare/v2.15.0...v2.15.1) (2024-02-01)
+
+### Bug Fixes
+
+* Force dokan to use default payout frequency when updating wethdrawal settings ([281206](https://github.com/tradesafe/plugin-woocommerce/commit/281206aef62ffc42357eeb91281c2bb89a5f5325))
+
+
+---
+
 ## [2.15.0](https://github.com/tradesafe/plugin-woocommerce/compare/v2.14.2...v2.15.0) (2024-01-26)
 
 ### Features
