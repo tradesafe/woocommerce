@@ -26,9 +26,7 @@ return [
   'packageBump' => true,
   'packageBumps' => [
     'ConventionalChangelog\PackageBump\ComposerJson',
-    'ConventionalChangelog\PackageBump\PackageJson',
-    'readme.txt',
-    'tradesafe-payment-gateway.php',
+    'ConventionalChangelog\PackageBump\PackageJson'
   ],
   'packageLockCommit' => true,
   'ignoreTypes' => ['build', 'chore', 'ci', 'docs', 'perf', 'refactor', 'revert', 'style', 'test'],
