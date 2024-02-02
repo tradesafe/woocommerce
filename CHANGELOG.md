@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.15.2](https://github.com/tradesafe/plugin-woocommerce/compare/v2.15.1...v2.15.2) (2024-02-02)
+
+### Bug Fixes
+
+* Updated dokan withdraw settings page to display registred banking details ([6fde04](https://github.com/tradesafe/plugin-woocommerce/commit/6fde0460c3167aa1b81dde74966b50c6af9c1d58))
+
+
+---
+
 ## [2.15.1](https://github.com/tradesafe/plugin-woocommerce/compare/v2.15.0...v2.15.1) (2024-02-01)
 
 ### Bug Fixes
