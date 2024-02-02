@@ -19,7 +19,15 @@ class TradeSafeDokan {
 
 		// Actions
 		add_action( 'dokan_store_profile_saved', array( 'TradeSafeDokan', 'save_withdraw_method' ), 10, 2 );
-		add_action( 'dokan_seller_wizard_payment_field_save', array( 'TradeSafeDokan', 'dokan_seller_wizard_payment_field_save' ), 10, 2 );
+		add_action(
+			'dokan_seller_wizard_payment_field_save',
+			array(
+				'TradeSafeDokan',
+				'dokan_seller_wizard_payment_field_save',
+			),
+			10,
+			2
+		);
 		add_action( 'dokan_after_withdraw_request', array( 'TradeSafeDokan', 'after_withdraw_request' ), 10, 3 );
 		add_action( 'dokan_withdraw_content', array( 'TradeSafeDokan', 'show_tradesafe_balance' ), 5 );
 		add_action( 'dokan_dashboard_left_widgets', array( 'TradeSafeDokan', 'balance_widget' ), 11 );
@@ -54,6 +62,7 @@ class TradeSafeDokan {
 	 * Callback for TradeSafe in store settings
 	 *
 	 * @param array $store_settings
+	 *
 	 * @global WP_User $current_user
 	 */
 	public static function dokan_withdraw_method( $store_settings ) {
@@ -85,7 +94,7 @@ class TradeSafeDokan {
 			$account_type   = $token_data['bankAccount']['accountType'] ?? '';
 			$bank_code      = $token_data['bankAccount']['bank'] ?? '';
 
-			$interval = $settings['payout_method'];
+			$interval = $token_data['settings']['payout']['interval'];
 		} else {
 			$given_name  = '';
 			$family_name = '';
@@ -119,9 +128,10 @@ class TradeSafeDokan {
 				<div class="checkbox">
 					<input name="settings[tradesafe][is_organization]" value="no" type="hidden">
 					<input id="is_organization" name="settings[tradesafe][is_organization]" value="yes"
-						   type="checkbox" class="switch-input" <?php echo $organization_name !== '' ? 'checked' : ''; ?>>
+						   type="checkbox"
+						   class="switch-input" <?php echo $organization_name !== '' ? 'checked' : ''; ?>>
 					<label for="is_organization">
-						 Is this account for an organisation?
+						Is this account for a business?
 					</label>
 				</div>
 			</div>
@@ -225,19 +235,40 @@ class TradeSafeDokan {
 			</div>
 		</div>
 
-		<?php if ( ! is_null( $account_number ) ) : ?>
-		<div id="change_details_form" class="dokan-form-group">
-			<div class="dokan-w12 dokan-text-left">
-				<div class="checkbox">
-					<input name="settings[tradesafe][update_banking_details]" value="no" type="hidden">
-					<input id="change_details" name="settings[tradesafe][update_banking_details]" value="yes"
-						   type="checkbox">
-					<label for="change_details">
-						I would like to change my banking details
-					</label>
+		<?php if ( ! empty( $account_number ) ) : ?>
+			<div id="change_details_form" class="dokan-form-group">
+				<div class="dokan-w12 dokan-text-left">
+					<div class="checkbox">
+						<input name="settings[tradesafe][update_banking_details]" value="no" type="hidden">
+						<input id="change_details" name="settings[tradesafe][update_banking_details]" value="yes"
+							   type="checkbox">
+						<label for="change_details">
+							I would like to change my banking details
+						</label>
+					</div>
 				</div>
 			</div>
-		</div>
+
+			<div class="dokan-form-group dokan-text-left" id="current-banking-details">
+				<label>Registered Banking Details</label>
+				<div class="dokan-form-group">
+					<div class="dokan-w12">
+						<strong>Account Number:</strong> <?php print $account_number; ?>
+					</div>
+				</div>
+
+				<div class="dokan-form-group">
+					<div class="dokan-w12">
+						<strong>Bank:</strong> <?php print $bank_code; ?>
+					</div>
+				</div>
+
+				<div class="dokan-form-group">
+					<div class="dokan-w12">
+						<strong>Account Type:</strong> <?php print $account_type; ?>
+					</div>
+				</div>
+			</div>
 		<?php endif; ?>
 
 		<div class="dokan-form-group dokan-text-left" id="banking-details">
@@ -350,17 +381,17 @@ class TradeSafeDokan {
 
 					// Banking Details
 					if ( ! empty( $post_data['settings']['tradesafe']['account_number'] )
-						&& ! is_numeric( $post_data['settings']['tradesafe']['account_number'] ) ) {
+						 && ! is_numeric( $post_data['settings']['tradesafe']['account_number'] ) ) {
 						wp_send_json_error( 'Invalid Account Number' );
 					}
 
 					if ( ! empty( $post_data['settings']['tradesafe']['account_number'] )
-						&& empty( $post_data['settings']['tradesafe']['bank_name'] ) ) {
+						 && empty( $post_data['settings']['tradesafe']['bank_name'] ) ) {
 						wp_send_json_error( 'Invalid Bank' );
 					}
 
 					if ( ! empty( $post_data['settings']['tradesafe']['account_number'] )
-						&& empty( $post_data['settings']['tradesafe']['account_type'] ) ) {
+						 && empty( $post_data['settings']['tradesafe']['account_type'] ) ) {
 						wp_send_json_error( 'Invalid Account Type' );
 					}
 
@@ -474,17 +505,17 @@ class TradeSafeDokan {
 
 				// Banking Details
 				if ( ! empty( $post_data['settings']['tradesafe']['account_number'] )
-					&& ! is_numeric( $post_data['settings']['tradesafe']['account_number'] ) ) {
+					 && ! is_numeric( $post_data['settings']['tradesafe']['account_number'] ) ) {
 					throw new Exception( 'Invalid Account Number' );
 				}
 
 				if ( ! empty( $post_data['settings']['tradesafe']['account_number'] )
-					&& empty( $post_data['settings']['tradesafe']['bank_name'] ) ) {
+					 && empty( $post_data['settings']['tradesafe']['bank_name'] ) ) {
 					throw new Exception( 'Invalid Bank' );
 				}
 
 				if ( ! empty( $post_data['settings']['tradesafe']['account_number'] )
-					&& empty( $post_data['settings']['tradesafe']['account_type'] ) ) {
+					 && empty( $post_data['settings']['tradesafe']['account_type'] ) ) {
 					throw new Exception( 'Invalid Account Type' );
 				}
 
@@ -582,6 +613,7 @@ class TradeSafeDokan {
 	 *
 	 * @param $valid
 	 * @param $args
+	 *
 	 * @return void|WP_Error
 	 */
 	public static function withdraw_is_valid_request( $valid, $args ) {
@@ -603,6 +635,7 @@ class TradeSafeDokan {
 	 * @param $user_id
 	 * @param $amount
 	 * @param $method
+	 *
 	 * @return void
 	 */
 	public static function after_withdraw_request( $user_id, $amount, $method ) {

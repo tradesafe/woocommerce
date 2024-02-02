@@ -27,8 +27,10 @@ jQuery(document).ready(function ($) {
         function change_details(element) {
             if (element.is(':checked')) {
                 $('form #banking-details').show()
+                $('form #current-banking-details').hide()
             } else {
                 $('form #banking-details').hide()
+                $('form #current-banking-details').show()
             }
         }
 
