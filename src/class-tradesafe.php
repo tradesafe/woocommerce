@@ -250,7 +250,11 @@ class TradeSafe {
 					}
 
 					if ( 'DELIVERED' === $data['state'] ) {
-						$order->update_status( 'completed', 'Hooray! Your customer has accepted the goods or services. TradeSafe will release the funds.' );
+						if ( $order->get_status() !== 'completed' ) {
+							$order->update_status( 'completed', 'Hooray! Your customer has accepted the goods or services. TradeSafe will release the funds.' );
+						} else {
+							$order->add_order_note( __( 'Hooray! Your customer has accepted the goods or services. TradeSafe will release the funds.', 'tradesafe-payment-gateway' ) );
+						}
 						exit;
 					}
 
@@ -428,7 +432,14 @@ class TradeSafe {
 
 			$transaction = $client->getTransaction( $transaction_id );
 
-			if ( ! in_array( $transaction['state'], array( 'DELIVERED', 'FUNDS_RELEASED' ) ) ) {
+			$settings = get_option( 'woocommerce_tradesafe_settings' );
+
+			$update_order_status = true;
+			if ( 'no' === $settings['allow_update_order_status'] ) {
+				$update_order_status = false;
+			}
+
+			if ( ! in_array( $transaction['state'], array( 'DELIVERED', 'FUNDS_RELEASED' ) ) && $update_order_status ) {
 				$order->set_status( 'delivered' );
 				$order->save();
 			}

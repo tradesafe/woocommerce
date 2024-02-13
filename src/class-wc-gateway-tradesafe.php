@@ -302,6 +302,15 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 			'desc_tip'    => false,
 		);
 
+		$form['allow_update_order_status'] = array(
+			'title'       => __( 'Update Order Status', 'tradesafe-payment-gateway' ),
+			'label'       => 'Allow TradeSafe to update order status after it has been marked as complete',
+			'type'        => 'checkbox',
+			'description' => __( 'During the delivery phase there are additional steps in the TradeSafe process before a delivery can be marked as complete. The TradeSafe plugin will update the order status to reflect this, in some cases other plugins will mark an order as complete which can result in duplicate notifications.<br/><br/>Disabling this option prevents the TradeSafe plugin from changing the order status if the order is already marked as complete by another plugin.', 'tradesafe-payment-gateway' ),
+			'default'     => true,
+			'desc_tip'    => false,
+		);
+
 		$form['delivery_days'] = array(
 			'title'       => __( 'Days to Delay', 'tradesafe-payment-gateway' ),
 			'type'        => 'select',
@@ -483,6 +492,10 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 
 		if ( empty( $this->settings['commission_allocation'] ) ) {
 			$this->settings['commission_allocation'] = 'VENDOR';
+		}
+
+		if ( empty( $this->settings['allow_update_order_status'] ) ) {
+			$this->settings['allow_update_order_status'] = 'yes';
 		}
 	}
 
