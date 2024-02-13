@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.16.0](https://github.com/tradesafe/plugin-woocommerce/compare/v2.15.2...v2.16.0) (2024-02-13)
+
+### Features
+
+* Added option to prevent the order status from been updated after its been maked as complete ([979b1e](https://github.com/tradesafe/plugin-woocommerce/commit/979b1e46c0cbfd1f228c17f6124da69062d0adb2))
+
+
+---
+
 ## [2.15.2](https://github.com/tradesafe/plugin-woocommerce/compare/v2.15.1...v2.15.2) (2024-02-02)
 
 ### Bug Fixes
