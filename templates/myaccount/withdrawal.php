@@ -13,7 +13,7 @@ defined( 'ABSPATH' ) || exit;
 		<form method="post" id="withdrawal-request">
 			<h3>Available Balance: <?php echo wc_price( esc_html( $token['balance'] ) ); ?></h3>
 
-			<p>Please note: All withdrawals incur a R5 withdrawal fee.</p>
+			<p>Please note: All withdrawals incur a R5 (excl.) withdrawal fee.</p>
 
 			<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-first">
 				<label for="tradesafe_withdrawal_request"><?php esc_html_e( 'Amount', 'woocommerce-tradesafe-gateway' ); ?></label>

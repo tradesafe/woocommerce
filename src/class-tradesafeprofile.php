@@ -307,7 +307,13 @@ class TradeSafeProfile {
 
 			if ( wp_verify_nonce( $nonce_value, 'tradesafe_update_token' ) ) {
 				if ( ! empty( $_POST['withdrawal_submit'] ) && ! empty( $_POST['tradesafe_withdrawal_request'] ) ) {
-					self::process_withdrawal_request( $client, $tokenId );
+					$rtc = false;
+
+					if ( ! empty( $_POST['rtc'] ) && is_bool( $_POST['rtc'] ) ) {
+						$rtc = $_POST['rtc'];
+					}
+
+					self::process_withdrawal_request( $client, $tokenId, $rtc );
 				}
 
 				if ( ! empty( $_POST['update_token_submit'] ) ) {
@@ -462,9 +468,9 @@ class TradeSafeProfile {
 		return $error;
 	}
 
-	public static function process_withdrawal_request( \TradeSafe\Helpers\TradeSafeApiClient $client, $tokenId ) {
+	public static function process_withdrawal_request( \TradeSafe\Helpers\TradeSafeApiClient $client, $tokenId, $rtc = false ) {
 		try {
-			$client->tokenAccountWithdraw( $tokenId, (float) sanitize_text_field( $_POST['tradesafe_withdrawal_request'] ) );
+			$client->tokenAccountWithdraw( $tokenId, (float) sanitize_text_field( $_POST['tradesafe_withdrawal_request'] ), $rtc );
 		} catch ( \GraphQL\Exception\QueryError $e ) {
 			$error = $e->getErrorDetails();
 

@@ -926,13 +926,14 @@ class TradeSafeApiClient {
 		return $result['allocationAcceptDelivery'];
 	}
 
-	public function tokenAccountWithdraw( $id, $value ) {
+	public function tokenAccountWithdraw( $id, $value, $rtc = false ) {
 		$gql = ( new Mutation( 'tokenAccountWithdraw' ) );
 
 		$gql->setArguments(
 			array(
 				'id'    => $id,
 				'value' => $value,
+				'rtc'   => $rtc,
 			)
 		);
 
