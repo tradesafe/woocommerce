@@ -39,7 +39,9 @@ final class WC_Gateway_TradeSafe_Blocks_Support extends AbstractPaymentMethodTyp
 				'wp-i18n',
 			),
 			WC_GATEWAY_TRADESAFE_VERSION,
-			true
+			array(
+				'in_footer' => true,
+			)
 		);
 
 		if ( function_exists( 'wp_set_script_translations' ) ) {

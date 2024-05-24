@@ -7,9 +7,10 @@
  * Author: TradeSafe Escrow
  * Author URI: https://www.tradesafe.co.za
  * Text Domain: tradesafe-payment-gateway
+ * Requires Plugins: woocommerce
  * Requires at least: 5.5
  * Requires PHP: 7.4
- * Tested up to: 6.4
+ * Tested up to: 6.5
  * WC tested up to: 8.4
  * WC requires at least: 4.6
  *
