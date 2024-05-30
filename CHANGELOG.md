@@ -4,6 +4,19 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.17.0](https://github.com/tradesafe/plugin-woocommerce/compare/v2.16.0...v2.17.0) (2024-05-30)
+
+### Features
+
+* Added code to enable support for real time clearance payments ([a410c5](https://github.com/tradesafe/plugin-woocommerce/commit/a410c57511443e350c5c0161e336079074c8c013))
+
+### Bug Fixes
+
+* Refactored block js ([73bcca](https://github.com/tradesafe/plugin-woocommerce/commit/73bcca4a7126dd26d9f4af7d7f888ed491864c9f))
+
+
+---
+
 ## [2.16.0](https://github.com/tradesafe/plugin-woocommerce/compare/v2.15.2...v2.16.0) (2024-02-13)
 
 ### Features

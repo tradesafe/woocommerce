@@ -2,9 +2,9 @@
 Contributors: richardnbanks, tradesafeops
 Tags: tradesafe, woocommerce, dokan, payment gateway, escrow, credit card, instant eft, bnpl
 Requires at least: 5.6
-Tested up to: 6.4
+Tested up to: 6.5
 Requires PHP: 7.4
-Stable tag: 2.16.0
+Stable tag: 2.17.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -78,8 +78,12 @@ Please do not hesitate to email [support@tradesafe.co.za](mailto:support@tradesa
 
 ==
 
-= 2.16.0 2024-02-13 =
+= 2.17.0 2024-02-13 =
 
 ### Features
 
-* Added option to prevent the order status from been updated after its been maked as complete
+* Added code to enable support for real time clearance payments
+
+### Bug Fixes
+
+* Refactored block js
