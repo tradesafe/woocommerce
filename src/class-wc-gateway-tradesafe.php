@@ -295,24 +295,15 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 
 		$form['delivery_delay_notification'] = array(
 			'title'       => __( 'Delivery Notification', 'tradesafe-payment-gateway' ),
-			'label'       => 'Delay Notification',
+			'label'       => 'Enable Delay',
 			'type'        => 'checkbox',
 			'description' => __( 'TradeSafe sends an email and a SMS to the customer asking if they received what was ordered once the order has been marked as DELIVERED. Some courier companies, such as uAfrica, marks the order as COMPLETED (TradeSafe then marks as DELIVERED) once the order has been fulfilled and not when it has been delivered. This means that a customer might receive an email and a SMS before the goods were delivered. To prevent this, please specify the number of business days you would like to initiate the goods acceptance process after the order has been marked as DELIVERED.', 'tradesafe-payment-gateway' ),
 			'default'     => false,
 			'desc_tip'    => false,
 		);
 
-		$form['allow_update_order_status'] = array(
-			'title'       => __( 'Update Order Status', 'tradesafe-payment-gateway' ),
-			'label'       => 'Allow TradeSafe to update order status after it has been marked as complete',
-			'type'        => 'checkbox',
-			'description' => __( 'During the delivery phase there are additional steps in the TradeSafe process before a delivery can be marked as complete. The TradeSafe plugin will update the order status to reflect this, in some cases other plugins will mark an order as complete which can result in duplicate notifications.<br/><br/>Disabling this option prevents the TradeSafe plugin from changing the order status if the order is already marked as complete by another plugin.', 'tradesafe-payment-gateway' ),
-			'default'     => true,
-			'desc_tip'    => false,
-		);
-
 		$form['delivery_days'] = array(
-			'title'       => __( 'Days to Delay', 'tradesafe-payment-gateway' ),
+			'title'       => __( 'Days In Transit', 'tradesafe-payment-gateway' ),
 			'type'        => 'select',
 			'description' => __( 'Number of days it takes to deliver the goods or service.', 'tradesafe-payment-gateway' ),
 			'default'     => '5',
@@ -328,152 +319,161 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 				'14' => '2 Weeks',
 				'21' => '3 Weeks',
 			),
-			'desc_tip'    => true,
+			'desc_tip'    => false,
 		);
 
-		// $form['inspection_days'] = array(
-		// 'title'       => __( 'Days to Inspect', 'tradesafe-payment-gateway' ),
-		// 'type'        => 'select',
-		// 'description' => __( 'Number of days for the buyer to inspect the goods or service.', 'tradesafe-payment-gateway' ),
-		// 'default'     => '1',
-		// 'options'     => array(
-		// '1' => '1 Day',
-		// '2' => '2 Days',
-		// '3' => '3 Days',
-		// '4' => '4 Days',
-		// '5' => '5 Days',
-		// '6' => '6 Days',
-		// '7' => '1 Week',
-		// ),
-		// 'desc_tip'    => true,
-		// );
-
-		$form['marketplace_section_title'] = array(
-			'title'       => __( 'Marketplace Settings', 'tradesafe-payment-gateway' ),
-			'type'        => 'title',
-			'description' => __( 'Additional settings for creating a marketplace', 'tradesafe-payment-gateway' ),
+		$form['inspection_days'] = array(
+			'title'       => __( 'Days to Inspect', 'tradesafe-payment-gateway' ),
+			'type'        => 'select',
+			'description' => __( 'Number of days for the buyer to inspect the goods or service. This will also set the number of days to wait time before automatically accepting the transaction if the buyer does not respond to the acceptance email.', 'tradesafe-payment-gateway' ),
+			'default'     => '1',
+			'options'     => array(
+				'1' => '1 Day',
+				'2' => '2 Days',
+				'3' => '3 Days',
+				'4' => '4 Days',
+				'5' => '5 Days',
+				'6' => '6 Days',
+				'7' => '1 Week',
+			),
+			'desc_tip'    => false,
 		);
 
-		$form['is_marketplace'] = array(
-			'title'       => __( 'Is this website a Marketplace?', 'tradesafe-payment-gateway' ),
-			'label'       => 'Enable Marketplace Support',
+		$form['allow_update_order_status'] = array(
+			'title'       => __( 'Update Order Status', 'tradesafe-payment-gateway' ),
+			'label'       => 'Allow TradeSafe to update order status after it has been marked as complete',
 			'type'        => 'checkbox',
-			'description' => __( 'You are a marketplace owner who is paid a commission and has multiple vendors onboarded onto your store', 'tradesafe-payment-gateway' ),
-			'default'     => false,
-			'desc_tip'    => false,
-			'class'       => 'test',
-		);
-
-		$form['marketplace_section_open_box'] = array(
-			'type'  => 'open_box',
-			'class' => 'is-marketplace',
-		);
-
-		$form['commission'] = array(
-			'title'             => __( 'Marketplace Commission Fee', 'tradesafe-payment-gateway' ),
-			'type'              => 'number',
-			'description'       => __( 'What is the amount that is payable to you the marketplace owner for every transaction', 'tradesafe-payment-gateway' ),
-			'default'           => 10,
-			'desc_tip'          => false,
-			'custom_attributes' => array(
-				'min'  => 1,
-				'step' => 0.01,
-			),
-		);
-
-		$form['commission_type'] = array(
-			'title'    => __( 'Marketplace Commission Type', 'tradesafe-payment-gateway' ),
-			'type'     => 'select',
-			'default'  => 'PERCENT',
-			'options'  => array(
-				'PERCENT' => 'Percentage',
-				'FIXED'   => 'Fixed Value',
-			),
-			'desc_tip' => false,
-		);
-
-		$form['commission_allocation'] = array(
-			'title'    => __( 'Marketplace Commission Fee Allocation', 'tradesafe-payment-gateway' ),
-			'type'     => 'select',
-			'default'  => 'VENDOR',
-			'options'  => array(
-				'BUYER'  => 'Buyer',
-				'VENDOR' => 'Vendor',
-			),
-			'desc_tip' => false,
-		);
-
-		if ( tradesafe_has_dokan() ) {
-			$form['commission'] = array(
-				'title'       => __( 'Marketplace Commission Fee', 'tradesafe-payment-gateway' ),
-				'description' => __( 'What is the amount that is payable to you the marketplace owner for every transaction.', 'tradesafe-payment-gateway' ),
-				'type'        => 'row',
-				'value'       => dokan_get_option( 'admin_percentage', 'dokan_selling', 0 ),
-			);
-
-			$form['commission_type'] = array(
-				'title'       => __( 'Marketplace Commission Type', 'tradesafe-payment-gateway' ),
-				'description' => __( 'What type of commission been changed.', 'tradesafe-payment-gateway' ),
-				'type'        => 'row',
-				'value'       => ucwords( dokan_get_option( 'commission_type', 'dokan_selling', 'percentage' ) ),
-			);
-
-			$form['commission_allocation'] = array(
-				'title'       => __( 'Marketplace Commission Fee Allocation', 'tradesafe-payment-gateway' ),
-				'description' => __( 'Who will pay the commission.' ),
-				'type'        => 'row',
-				'value'       => 'Vendor',
-			);
-		}
-
-		$form['payout_method'] = array(
-			'title'       => __( 'When should Vendors be Paid Out?', 'tradesafe-payment-gateway' ),
-			'description' => 'A R5 fee (excl.) is incurred for payouts. If "Once a month" is selected this fee is waived.',
-			'type'        => 'select',
-			'default'     => 'IMMEDIATE',
-			'options'     => array(
-				'ACCOUNT'   => 'Manual Withdrawal',
-				'IMMEDIATE' => 'Immediate',
-				'DAILY'     => 'Once a Day',
-				'WEEKLY'    => 'Once a week',
-				'BIMONTHLY' => 'Twice a month',
-				'MONTHLY'   => 'Once a month',
-			),
-		);
-
-		$form['marketplace_section_close_box'] = array(
-			'type' => 'close_box',
-		);
-
-		$form['transaction_section_title'] = array(
-			'title'       => __( 'Transaction Settings', 'tradesafe-payment-gateway' ),
-			'type'        => 'title',
-			'description' => __( 'Default settings for new transactions', 'tradesafe-payment-gateway' ),
-		);
-
-		$form['industry'] = array(
-			'title'       => __( 'Industry', 'tradesafe-payment-gateway' ),
-			'type'        => 'select',
-			'description' => __( 'Which industry will your transactions be classified as?', 'tradesafe-payment-gateway' ),
-			'default'     => 'GENERAL_GOODS_SERVICES',
-			'options'     => $this->client->getEnum( 'Industry' ),
+			'description' => __( 'During the delivery phase there are additional steps in the TradeSafe process before a delivery can be marked as complete. The TradeSafe plugin will update the order status to reflect this, in some cases other plugins will mark an order as complete which can result in duplicate notifications.<br/><br/>Disabling this option prevents the TradeSafe plugin from changing the order status if the order is already marked as complete by another plugin.', 'tradesafe-payment-gateway' ),
+			'default'     => true,
 			'desc_tip'    => false,
 		);
 
-		$form['processing_fee'] = array(
-			'title'       => __( 'Processing Fee', 'tradesafe-payment-gateway' ),
-			'type'        => 'select',
-			'description' => __( 'Who absorbs TradeSafe’s fee?', 'tradesafe-payment-gateway' ),
-			'default'     => 'SELLER',
-			'options'     => array(
-				'BUYER'        => 'Buyer',
-				'SELLER'       => 'Seller',
-				'BUYER_SELLER' => 'Buyer / Seller',
-			),
-			'desc_tip'    => false,
-		);
+		 $form['marketplace_section_title'] = array(
+			 'title'       => __( 'Marketplace Settings', 'tradesafe-payment-gateway' ),
+			 'type'        => 'title',
+			 'description' => __( 'Additional settings for creating a marketplace', 'tradesafe-payment-gateway' ),
+		 );
 
-		$this->form_fields = $form;
+		 $form['is_marketplace'] = array(
+			 'title'       => __( 'Is this website a Marketplace?', 'tradesafe-payment-gateway' ),
+			 'label'       => 'Enable Marketplace Support',
+			 'type'        => 'checkbox',
+			 'description' => __( 'You are a marketplace owner who is paid a commission and has multiple vendors onboarded onto your store', 'tradesafe-payment-gateway' ),
+			 'default'     => false,
+			 'desc_tip'    => false,
+			 'class'       => 'test',
+		 );
+
+		 $form['marketplace_section_open_box'] = array(
+			 'type'  => 'open_box',
+			 'class' => 'is-marketplace',
+		 );
+
+		 $form['commission'] = array(
+			 'title'             => __( 'Marketplace Commission Fee', 'tradesafe-payment-gateway' ),
+			 'type'              => 'number',
+			 'description'       => __( 'What is the amount that is payable to you the marketplace owner for every transaction', 'tradesafe-payment-gateway' ),
+			 'default'           => 10,
+			 'desc_tip'          => false,
+			 'custom_attributes' => array(
+				 'min'  => 1,
+				 'step' => 0.01,
+			 ),
+		 );
+
+		 $form['commission_type'] = array(
+			 'title'    => __( 'Marketplace Commission Type', 'tradesafe-payment-gateway' ),
+			 'type'     => 'select',
+			 'default'  => 'PERCENT',
+			 'options'  => array(
+				 'PERCENT' => 'Percentage',
+				 'FIXED'   => 'Fixed Value',
+			 ),
+			 'desc_tip' => false,
+		 );
+
+		 $form['commission_allocation'] = array(
+			 'title'    => __( 'Marketplace Commission Fee Allocation', 'tradesafe-payment-gateway' ),
+			 'type'     => 'select',
+			 'default'  => 'VENDOR',
+			 'options'  => array(
+				 'BUYER'  => 'Buyer',
+				 'VENDOR' => 'Vendor',
+			 ),
+			 'desc_tip' => false,
+		 );
+
+		 if ( tradesafe_has_dokan() ) {
+			 $form['commission'] = array(
+				 'title'       => __( 'Marketplace Commission Fee', 'tradesafe-payment-gateway' ),
+				 'description' => __( 'What is the amount that is payable to you the marketplace owner for every transaction.', 'tradesafe-payment-gateway' ),
+				 'type'        => 'row',
+				 'value'       => dokan_get_option( 'admin_percentage', 'dokan_selling', 0 ),
+			 );
+
+			 $form['commission_type'] = array(
+				 'title'       => __( 'Marketplace Commission Type', 'tradesafe-payment-gateway' ),
+				 'description' => __( 'What type of commission been changed.', 'tradesafe-payment-gateway' ),
+				 'type'        => 'row',
+				 'value'       => ucwords( dokan_get_option( 'commission_type', 'dokan_selling', 'percentage' ) ),
+			 );
+
+			 $form['commission_allocation'] = array(
+				 'title'       => __( 'Marketplace Commission Fee Allocation', 'tradesafe-payment-gateway' ),
+				 'description' => __( 'Who will pay the commission.' ),
+				 'type'        => 'row',
+				 'value'       => 'Vendor',
+			 );
+		 }
+
+		 $form['payout_method'] = array(
+			 'title'       => __( 'When should Vendors be Paid Out?', 'tradesafe-payment-gateway' ),
+			 'description' => 'A R5 fee (excl.) is incurred for payouts. If "Once a month" is selected this fee is waived.',
+			 'type'        => 'select',
+			 'default'     => 'IMMEDIATE',
+			 'options'     => array(
+				 'ACCOUNT'   => 'Manual Withdrawal',
+				 'IMMEDIATE' => 'Immediate',
+				 'DAILY'     => 'Once a Day',
+				 'WEEKLY'    => 'Once a week',
+				 'BIMONTHLY' => 'Twice a month',
+				 'MONTHLY'   => 'Once a month',
+			 ),
+		 );
+
+		 $form['marketplace_section_close_box'] = array(
+			 'type' => 'close_box',
+		 );
+
+		 $form['transaction_section_title'] = array(
+			 'title'       => __( 'Transaction Settings', 'tradesafe-payment-gateway' ),
+			 'type'        => 'title',
+			 'description' => __( 'Default settings for new transactions', 'tradesafe-payment-gateway' ),
+		 );
+
+		 $form['industry'] = array(
+			 'title'       => __( 'Industry', 'tradesafe-payment-gateway' ),
+			 'type'        => 'select',
+			 'description' => __( 'Which industry will your transactions be classified as?', 'tradesafe-payment-gateway' ),
+			 'default'     => 'GENERAL_GOODS_SERVICES',
+			 'options'     => $this->client->getEnum( 'Industry' ),
+			 'desc_tip'    => false,
+		 );
+
+		 $form['processing_fee'] = array(
+			 'title'       => __( 'Processing Fee', 'tradesafe-payment-gateway' ),
+			 'type'        => 'select',
+			 'description' => __( 'Who absorbs TradeSafe’s fee?', 'tradesafe-payment-gateway' ),
+			 'default'     => 'SELLER',
+			 'options'     => array(
+				 'BUYER'        => 'Buyer',
+				 'SELLER'       => 'Seller',
+				 'BUYER_SELLER' => 'Buyer / Seller',
+			 ),
+			 'desc_tip'    => false,
+		 );
+
+		 $this->form_fields = $form;
 	}
 
 	/**
