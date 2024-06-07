@@ -4,7 +4,7 @@ Tags: tradesafe, woocommerce, dokan, payment gateway, escrow, credit card, insta
 Requires at least: 5.6
 Tested up to: 6.5
 Requires PHP: 7.4
-Stable tag: 2.17.0
+Stable tag: 2.18.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -78,12 +78,8 @@ Please do not hesitate to email [support@tradesafe.co.za](mailto:support@tradesa
 
 ==
 
-= 2.17.0 2024-02-13 =
+= 2.18.0 2024-06-07 =
 
 ### Features
 
-* Added code to enable support for real time clearance payments
-
-### Bug Fixes
-
-* Refactored block js
+* Added custom inspection period

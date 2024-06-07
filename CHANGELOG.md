@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.18.0](https://github.com/tradesafe/plugin-woocommerce/compare/v2.17.0...v2.18.0) (2024-06-07)
+
+### Features
+
+* Added custom inspection period ([55ce6b](https://github.com/tradesafe/plugin-woocommerce/commit/55ce6b9b61f272def5ed9f4e0b0737a8d8f04684))
+
+
+---
+
 ## [2.17.0](https://github.com/tradesafe/plugin-woocommerce/compare/v2.16.0...v2.17.0) (2024-05-30)
 
 ### Features
