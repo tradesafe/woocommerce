@@ -4,7 +4,7 @@ Tags: tradesafe, woocommerce, dokan, payment gateway, escrow, credit card, insta
 Requires at least: 5.6
 Tested up to: 6.5
 Requires PHP: 7.4
-Stable tag: 2.18.0
+Stable tag: 2.18.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -77,6 +77,13 @@ Please do not hesitate to email [support@tradesafe.co.za](mailto:support@tradesa
 == Changelog ==
 
 ==
+
+= 2.18.1 2024-06-12 =
+
+### Bug Fixes
+
+* Added check for required fields for withdrawals in Dokan
+* Allow suborders to be marked as complete
 
 = 2.18.0 2024-06-07 =
 

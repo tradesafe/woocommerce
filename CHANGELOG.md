@@ -4,6 +4,16 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.18.1](https://github.com/tradesafe/plugin-woocommerce/compare/v2.18.0...v2.18.1) (2024-06-12)
+
+### Bug Fixes
+
+* Added check for required fields for withdrawals in Dokan ([8f9e40](https://github.com/tradesafe/plugin-woocommerce/commit/8f9e40c8955ee0547a3087bcc4b3cb7a8144b86c))
+* Allow suborders to be marked as complete ([6fd137](https://github.com/tradesafe/plugin-woocommerce/commit/6fd13746a3955d42687887a9fde90cc3691d92be))
+
+
+---
+
 ## [2.18.0](https://github.com/tradesafe/plugin-woocommerce/compare/v2.17.0...v2.18.0) (2024-06-07)
 
 ### Features
