@@ -154,8 +154,8 @@ class TradeSafe {
 			$options = get_option( 'dokan_selling', array() );
 
 			if ( 'on' === $options['order_status_change'] ) {
-				$options['order_status_change'] = 'off';
-				update_option( 'dokan_selling', $options );
+				// $options['order_status_change'] = 'off';
+				// update_option( 'dokan_selling', $options );
 			}
 		}
 
@@ -427,6 +427,11 @@ class TradeSafe {
 			return;
 		}
 
+		// If suborder do not update transaction
+		if ( $order->get_parent_id() > 0 ) {
+			return;
+		}
+
 		try {
 			$transaction_id = $order->get_meta( 'tradesafe_transaction_id', true );
 
@@ -626,7 +631,7 @@ class TradeSafe {
 	 * @return array
 	 */
 	public static function override_dokan_selling( array $value ): array {
-		$value['order_status_change'] = 'off';
+		// $value['order_status_change'] = 'off';
 
 		return $value;
 	}
