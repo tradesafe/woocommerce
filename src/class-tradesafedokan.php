@@ -34,7 +34,8 @@ class TradeSafeDokan {
 
 		// Filters
 		add_filter( 'dokan_withdraw_methods', array( 'TradeSafeDokan', 'add_custom_withdraw_methods' ) );
-		add_filter( 'dokan_get_seller_active_withdraw_methods', array( 'TradeSafeDokan', 'active_payment_methods' ) );
+		add_filter( 'dokan_get_seller_active_withdraw_methods', array( 'TradeSafeDokan', 'active_payment_methods' ), 10, 2 );
+		add_filter( 'dokan_payment_settings_required_fields', array( 'TradeSafeDokan', 'required_fields' ), 10, 3 );
 		add_filter( 'dokan_withdraw_is_valid_request', array( 'TradeSafeDokan', 'withdraw_is_valid_request' ), 10, 2 );
 
 		if ( tradesafe_has_dokan() ) {
@@ -51,8 +52,9 @@ class TradeSafeDokan {
 	 */
 	public static function add_custom_withdraw_methods( $methods ) {
 		$methods['tradesafe'] = array(
-			'title'    => __( 'TradeSafe Escrow', 'tradesafe-payment-gateway' ),
-			'callback' => array( 'TradeSafeDokan', 'dokan_withdraw_method' ),
+			'title'        => __( 'TradeSafe Escrow', 'tradesafe-payment-gateway' ),
+			'callback'     => array( 'TradeSafeDokan', 'dokan_withdraw_method' ),
+			'apply_charge' => false,
 		);
 
 		return $methods;
@@ -596,7 +598,7 @@ class TradeSafeDokan {
 	 *
 	 * @return array
 	 */
-	public static function active_payment_methods( $active_payment_methods ) {
+	public static function active_payment_methods( $active_payment_methods, $vendor_id ) {
 		$client     = new \TradeSafe\Helpers\TradeSafeApiClient();
 		$token_id   = tradesafe_get_token_id( dokan_get_current_user_id() );
 		$token_data = $client->getToken( $token_id );
@@ -606,6 +608,19 @@ class TradeSafeDokan {
 		}
 
 		return $active_payment_methods;
+	}
+
+	/**
+	 * Add the required fields for the TradeSafe withdraw method.
+	 *
+	 * return array
+	 */
+	public static function required_fields( $required_fields, $payment_method_id, $seller_id ) {
+		if ( $payment_method_id === 'tradesafe' ) {
+			array_push( $required_fields, 'user' );
+		}
+
+		return $required_fields;
 	}
 
 	/**
