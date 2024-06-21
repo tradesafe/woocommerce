@@ -67,7 +67,7 @@ defined( 'ABSPATH' ) || exit;
 		</p>
 
 		<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row">
-			<label for="tradesafe_token_payout_interval"><?php esc_html_e( 'Automatic Payout Interval', 'woocommerce-tradesafe-gateway' ); ?></label>
+			<label for="tradesafe_token_payout_interval"><?php esc_html_e( 'Payment Release Frequency', 'woocommerce-tradesafe-gateway' ); ?></label>
 			<?php
 			foreach ( $payout_interval as $interval_name => $interval_description ) {
 				if ( $interval_name === $token['settings']['payout']['interval'] ) {

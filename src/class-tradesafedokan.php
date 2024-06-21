@@ -311,7 +311,7 @@ class TradeSafeDokan {
 		</div>
 
 		<div class="dokan-form-group dokan-text-left" id="payout-interval">
-			<label>Automatic Payout Interval</label>
+			<label>Payment Release Frequency</label>
 
 			<div class="dokan-form-group">
 				<div class="dokan-w12">

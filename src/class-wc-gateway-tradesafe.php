@@ -432,12 +432,10 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 			 'type'        => 'select',
 			 'default'     => 'IMMEDIATE',
 			 'options'     => array(
-				 'ACCOUNT'   => 'Manual Withdrawal',
-				 'IMMEDIATE' => 'Immediate',
-				 'DAILY'     => 'Once a Day',
-				 'WEEKLY'    => 'Once a week',
-				 'BIMONTHLY' => 'Twice a month',
-				 'MONTHLY'   => 'Once a month',
+				 'WALLET'    => 'Wallet - Manual Withdrawal',
+				 'IMMEDIATE' => 'Bank Account - Immediate',
+				 'WEEKLY'    => 'Bank Account - Once a Week',
+				 'MONTHLY'   => 'Bank Account - Once a Month',
 			 ),
 		 );
 
