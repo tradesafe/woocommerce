@@ -1,6 +1,6 @@
 === TradeSafe Payment Gateway for WooCommerce ===
 Contributors: richardnbanks, tradesafeops
-Tags: tradesafe, woocommerce, dokan, payment gateway, escrow, credit card, instant eft, bnpl
+Tags: woocommerce, dokan, payment gateway, escrow, credit card
 Requires at least: 5.6
 Tested up to: 6.5
 Requires PHP: 7.4
