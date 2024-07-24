@@ -326,6 +326,10 @@ class TradeSafeDokan {
 						}
 						?>
 					</select>
+					<?php if ( ! empty( $account_number ) ) : ?>
+					<br />
+					<p class="description">Go to Withdraw on the left sidebar to make a withdraw from the escrow wallet [<a href="../../withdraw/">Make a Withdrawal</a>]</p>
+					<?php endif; ?>
 				</div>
 			</div>
 		</div>
@@ -636,10 +640,11 @@ class TradeSafeDokan {
 			$client     = new \TradeSafe\Helpers\TradeSafeApiClient();
 			$token_id   = tradesafe_get_token_id( dokan_get_current_user_id() );
 			$token_data = $client->getToken( $token_id );
-			$amount     = (float) sanitize_text_field( $args['amount'] );
+			$amount     = (float) wc_format_decimal( sanitize_text_field( $args['amount'] ), 2 );
 
 			if ( $amount > $token_data['balance'] ) {
-				return new WP_Error( 'tradesafe-invalid-withdraw', 'Not enough funds available' );
+				$errorMessage = sprintf( __( 'Not enough funds available.<br />Available: R %1$s<br />Requested: R %2$s', 'tradesafe-payment-gateway' ), number_format( round( $token_data['balance'], 2 ), 2 ), number_format( round( $amount, 2 ), 2 ) );
+				return new WP_Error( 'tradesafe-invalid-withdraw', $errorMessage );
 			}
 		}
 	}
@@ -691,7 +696,7 @@ class TradeSafeDokan {
 
 		$message = sprintf( __( 'TradeSafe Escrow Balance: %s ', 'tradesafe-payment-gateway' ), wc_price( $token_data['balance'] ) );
 
-		$message .= '<br/><small>' . sprintf( __( 'A R5 fee (excl.) is incurred for withdrawals from TradeSafe.', 'tradesafe-payment-gateway' ) ) . '</small>';
+		$message .= '<br/><small>' . sprintf( __( 'A R5 fee (excl. VAT) is incurred for all withdrawals from the TradeSafe escrow account to your bank account', 'tradesafe-payment-gateway' ) ) . '</small>';
 
 		dokan_get_template_part(
 			'global/dokan',
