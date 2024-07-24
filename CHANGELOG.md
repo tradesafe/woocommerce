@@ -4,6 +4,16 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.18.2](https://github.com/tradesafe/plugin-woocommerce/compare/v2.18.1...v2.18.2) (2024-07-24)
+
+### Bug Fixes
+
+* Added additional infomation to dokan error message ([e551f3](https://github.com/tradesafe/plugin-woocommerce/commit/e551f3413176d22399bf78d080566b99a2b6de62))
+* Updated label for payment frequency ([5d8af6](https://github.com/tradesafe/plugin-woocommerce/commit/5d8af6936dc3935a49c112f8db9ed4859f7347e1))
+
+
+---
+
 ## [2.18.1](https://github.com/tradesafe/plugin-woocommerce/compare/v2.18.0...v2.18.1) (2024-06-12)
 
 ### Bug Fixes
