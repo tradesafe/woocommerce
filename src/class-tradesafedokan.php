@@ -638,7 +638,7 @@ class TradeSafeDokan {
 	public static function withdraw_is_valid_request( $valid, $args ) {
 		if ( 'tradesafe' === $args['method'] ) {
 			$client     = new \TradeSafe\Helpers\TradeSafeApiClient();
-			$token_id   = tradesafe_get_token_id( dokan_get_current_user_id() );
+			$token_id   = tradesafe_get_token_id( $args['user_id'] );
 			$token_data = $client->getToken( $token_id );
 			$amount     = (float) wc_format_decimal( sanitize_text_field( $args['amount'] ), 2 );
 
