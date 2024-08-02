@@ -4,6 +4,16 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.18.3](https://github.com/tradesafe/plugin-woocommerce/compare/v2.18.2...v2.18.3) (2024-08-02)
+
+### Bug Fixes
+
+* Change how user id is loaded when verifing withdrawals ([54394f](https://github.com/tradesafe/plugin-woocommerce/commit/54394f1d8de3deab90ee0af2b2704da7c8bfe909))
+* Mark orders status as on-hold when a dispute is raised ([fccb7d](https://github.com/tradesafe/plugin-woocommerce/commit/fccb7d1bf6c6aa3155d22ab13e3248edfa3a1b9d))
+
+
+---
+
 ## [2.18.2](https://github.com/tradesafe/plugin-woocommerce/compare/v2.18.1...v2.18.2) (2024-07-24)
 
 ### Bug Fixes
