@@ -235,9 +235,20 @@ class TradeSafe {
 					}
 
 					if ( 'INITIATED' === $data['state'] ) {
+						$client = new \TradeSafe\Helpers\TradeSafeApiClient();
 
-						if ( in_array( $order->get_status(), array( 'pending', 'on-hold', 'cancelled', 'refunded', 'failed', 'draft' ) ) ) {
-							$order->update_status( 'processing', 'TradeSafe has received the funds in full. You may begin delivery. For manual delivery - Select the state \'DELIVERED\' once delivery has been completed. If integrated with courier company - order status will be updated automatically (ensure a delay notification is configured in TradeSafe plugin settings).' );
+						$transaction = $client->getTransaction( $order->get_meta( 'tradesafe_transaction_id', true ) );
+
+						if ( 'INITIATED' === $transaction['allocations'][0]['state'] ) {
+							if ( in_array( $order->get_status(), array( 'pending', 'on-hold', 'cancelled', 'refunded', 'failed', 'draft' ) ) ) {
+								$order->update_status( 'processing', 'TradeSafe has received the funds in full. You may begin delivery. For manual delivery - Select the state \'DELIVERED\' once delivery has been completed. If integrated with courier company - order status will be updated automatically (ensure a delay notification is configured in TradeSafe plugin settings).' );
+							}
+						}
+
+						if ( 'DISPUTED' === $transaction['allocations'][0]['state'] ) {
+							if ( in_array( $order->get_status(), array( 'pending', 'processing', 'cancelled', 'refunded', 'failed', 'draft' ) ) ) {
+								$order->update_status( 'on-hold', 'Buyer has disputed the transacction. Order placed on hold' );
+							}
 						}
 
 						exit;
