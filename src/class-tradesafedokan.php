@@ -661,7 +661,7 @@ class TradeSafeDokan {
 	public static function after_withdraw_request( $user_id, $amount, $method ) {
 		if ( 'tradesafe' === $method ) {
 			$client   = new \TradeSafe\Helpers\TradeSafeApiClient();
-			$token_id = tradesafe_get_token_id( dokan_get_current_user_id() );
+			$token_id = tradesafe_get_token_id( $user_id );
 
 			$withdraw_requests = dokan()->withdraw->get_withdraw_requests( sanitize_key( $user_id ) );
 
