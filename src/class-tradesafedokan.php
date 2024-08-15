@@ -604,7 +604,7 @@ class TradeSafeDokan {
 	 */
 	public static function active_payment_methods( $active_payment_methods, $vendor_id ) {
 		$client     = new \TradeSafe\Helpers\TradeSafeApiClient();
-		$token_id   = tradesafe_get_token_id( dokan_get_current_user_id() );
+		$token_id   = tradesafe_get_token_id( $vendor_id );
 		$token_data = $client->getToken( $token_id );
 
 		if ( $token_data['valid'] ) {
