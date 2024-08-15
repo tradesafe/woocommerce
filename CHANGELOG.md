@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.18.5](https://github.com/tradesafe/plugin-woocommerce/compare/v2.18.4...v2.18.5) (2024-08-15)
+
+### Bug Fixes
+
+* Changed how user id is loaded when checking if a withdraw method is valid ([729902](https://github.com/tradesafe/plugin-woocommerce/commit/729902b69525fd4a7cc32c94f601d23f05c374be))
+
+
+---
+
 ## [2.18.4](https://github.com/tradesafe/plugin-woocommerce/compare/v2.18.3...v2.18.4) (2024-08-14)
 
 ### Bug Fixes
