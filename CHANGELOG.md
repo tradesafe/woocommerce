@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.18.6](https://github.com/tradesafe/plugin-woocommerce/compare/v2.18.5...v2.18.6) (2024-08-16)
+
+### Bug Fixes
+
+* Removed option to set fee allocation ([7eedfc](https://github.com/tradesafe/plugin-woocommerce/commit/7eedfcbb3268f45201bd69f5e1f49f1a408ed0cc))
+
+
+---
+
 ## [2.18.5](https://github.com/tradesafe/plugin-woocommerce/compare/v2.18.4...v2.18.5) (2024-08-15)
 
 ### Bug Fixes
