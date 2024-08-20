@@ -20,9 +20,33 @@ class TradeSafe {
 		// Actions.
 
 		// add_action( 'woocommerce_cart_calculate_fees', array( 'TradeSafe', 'add_gateway_fee' ), PHP_INT_MAX );
-		add_action( 'woocommerce_order_status_completed', array( 'TradeSafe', 'complete_transaction' ), PHP_INT_MAX, 2 );
-		add_action( 'woocommerce_order_status_completed_to_delivered', array( 'TradeSafe', 'complete_delivery' ), PHP_INT_MAX, 2 );
-		add_action( 'woocommerce_order_status_processing_to_delivered', array( 'TradeSafe', 'complete_delivery' ), PHP_INT_MAX, 2 );
+		add_action(
+			'woocommerce_order_status_completed',
+			array(
+				'TradeSafe',
+				'complete_transaction',
+			),
+			PHP_INT_MAX,
+			2
+		);
+		add_action(
+			'woocommerce_order_status_completed_to_delivered',
+			array(
+				'TradeSafe',
+				'complete_delivery',
+			),
+			PHP_INT_MAX,
+			2
+		);
+		add_action(
+			'woocommerce_order_status_processing_to_delivered',
+			array(
+				'TradeSafe',
+				'complete_delivery',
+			),
+			PHP_INT_MAX,
+			2
+		);
 		add_action( 'woocommerce_order_status_refunded', array( 'TradeSafe', 'cancel_transaction' ), PHP_INT_MAX, 2 );
 		add_action( 'woocommerce_order_status_cancelled', array( 'TradeSafe', 'cancel_transaction' ), PHP_INT_MAX, 2 );
 		add_action( 'woocommerce_review_order_before_payment', array( 'TradeSafe', 'refresh_checkout' ) );
@@ -87,6 +111,7 @@ class TradeSafe {
 	 * Set empty value to zero.
 	 *
 	 * @param mixed $value Option value.
+	 *
 	 * @return int|mixed
 	 */
 	public static function sanitize_boolean( $value ) {
@@ -101,6 +126,7 @@ class TradeSafe {
 	 * Check if a token is correcctly configured based on the users role.
 	 *
 	 * @param string $role the role to check.
+	 *
 	 * @return bool
 	 * @throws Exception
 	 */
@@ -240,13 +266,33 @@ class TradeSafe {
 						$transaction = $client->getTransaction( $order->get_meta( 'tradesafe_transaction_id', true ) );
 
 						if ( 'INITIATED' === $transaction['allocations'][0]['state'] ) {
-							if ( in_array( $order->get_status(), array( 'pending', 'on-hold', 'cancelled', 'refunded', 'failed', 'draft' ) ) ) {
+							if ( in_array(
+								$order->get_status(),
+								array(
+									'pending',
+									'on-hold',
+									'cancelled',
+									'refunded',
+									'failed',
+									'draft',
+								)
+							) ) {
 								$order->update_status( 'processing', 'TradeSafe has received the funds in full. You may begin delivery. For manual delivery - Select the state \'DELIVERED\' once delivery has been completed. If integrated with courier company - order status will be updated automatically (ensure a delay notification is configured in TradeSafe plugin settings).' );
 							}
 						}
 
 						if ( 'DISPUTED' === $transaction['allocations'][0]['state'] ) {
-							if ( in_array( $order->get_status(), array( 'pending', 'processing', 'cancelled', 'refunded', 'failed', 'draft' ) ) ) {
+							if ( in_array(
+								$order->get_status(),
+								array(
+									'pending',
+									'processing',
+									'cancelled',
+									'refunded',
+									'failed',
+									'draft',
+								)
+							) ) {
 								$order->update_status( 'on-hold', 'Buyer has disputed the transacction. Order placed on hold' );
 							}
 						}
@@ -311,7 +357,17 @@ class TradeSafe {
 
 					$settings = get_option( 'woocommerce_tradesafe_settings' );
 					if ( ! empty( $settings['success_redirect'] ) ) {
-						$view_order_url = get_site_url( null, str_replace( array( ':orderId', ':orderKey' ), array( $order_id, $order->get_order_key() ), $settings['success_redirect'] ) );
+						$view_order_url = get_site_url(
+							null,
+							str_replace(
+								array(
+									':orderId',
+									':orderKey',
+								),
+								array( $order_id, $order->get_order_key() ),
+								$settings['success_redirect']
+							)
+						);
 					}
 
 					if ( $order->get_status() === 'processing' ) {
@@ -322,7 +378,14 @@ class TradeSafe {
 					$client      = new \TradeSafe\Helpers\TradeSafeApiClient();
 					$transaction = $client->getTransaction( $order->get_meta( 'tradesafe_transaction_id', true ) );
 
-					if ( in_array( $transaction['state'], array( 'FUNDS_DEPOSITED', 'FUNDS_RECEIVED', 'INITIATED' ) ) ) {
+					if ( in_array(
+						$transaction['state'],
+						array(
+							'FUNDS_DEPOSITED',
+							'FUNDS_RECEIVED',
+							'INITIATED',
+						)
+					) ) {
 						$order->update_status( 'processing', 'TradeSafe has received the funds in full. You may begin delivery. For manual delivery - Select the state \'DELIVERED\' once delivery has been completed. If integrated with courier company - order status will be updated automatically (ensure a delay notification is configured in TradeSafe plugin settings).' );
 
 						wp_safe_redirect( $view_order_url );
@@ -360,9 +423,9 @@ class TradeSafe {
 		$totals = WC()->cart->get_totals();
 
 		$base_value = $totals['subtotal']
-			+ $totals['shipping_total']
-			- $totals['discount_total']
-			+ $totals['fee_total'];
+					  + $totals['shipping_total']
+					  - $totals['discount_total']
+					  + $totals['fee_total'];
 
 		foreach ( WC()->cart->get_taxes() as $tax ) {
 			$base_value += $tax;
@@ -393,7 +456,7 @@ class TradeSafe {
 		$chosen_payment_method = false;
 		$available_gateways    = WC()->payment_gateways->get_available_payment_gateways();
 		$default_gateway       = get_option( 'woocommerce_default_gateway' );
-        // phpcs:disable WordPress.Security.NonceVerification.Recommended
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
 		if ( isset( WC()->session->chosen_payment_method ) ) {
 			$chosen_payment_method = WC()->session->chosen_payment_method;
 		} elseif ( ! empty( $_REQUEST['payment_method'] ) ) {
@@ -406,7 +469,7 @@ class TradeSafe {
 		if ( ! isset( $available_gateways[ $chosen_payment_method ] ) ) {
 			$chosen_payment_method = false;
 		}
-        // phpcs:enable WordPress.Security.NonceVerification.Recommended
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 	}
 
 	/**
@@ -434,7 +497,7 @@ class TradeSafe {
 
 		$payment_gateway = wc_get_payment_gateway_by_order( $order );
 
-		if ( $payment_gateway->id !== 'tradesafe' ) {
+		if ( 'tradesafe' !== $payment_gateway->id ) {
 			return;
 		}
 
@@ -443,27 +506,29 @@ class TradeSafe {
 			return;
 		}
 
-		try {
-			$transaction_id = $order->get_meta( 'tradesafe_transaction_id', true );
+		$transaction_id = $order->get_meta( 'tradesafe_transaction_id', true );
 
-			$transaction = $client->getTransaction( $transaction_id );
+		if ( ! empty( $transaction_id ) ) {
+			try {
+				$transaction = $client->getTransaction( $transaction_id );
 
-			$settings = get_option( 'woocommerce_tradesafe_settings' );
+				$settings = get_option( 'woocommerce_tradesafe_settings' );
 
-			$update_order_status = true;
-			if ( 'no' === $settings['allow_update_order_status'] ) {
-				$update_order_status = false;
-			}
+				$update_order_status = true;
+				if ( 'no' === $settings['allow_update_order_status'] ) {
+					$update_order_status = false;
+				}
 
-			if ( ! in_array( $transaction['state'], array( 'DELIVERED', 'FUNDS_RELEASED' ) ) && $update_order_status ) {
-				$order->set_status( 'delivered' );
+				if ( ! in_array( $transaction['state'], array( 'DELIVERED', 'FUNDS_RELEASED' ) ) && $update_order_status ) {
+					$order->set_status( 'delivered' );
+					$order->save();
+				}
+			} catch ( Exception $e ) {
+				$order->set_status( 'failed', $e->getMessage(), false );
 				$order->save();
-			}
-		} catch ( Exception $e ) {
-			$order->set_status( 'failed', $e->getMessage(), false );
-			$order->save();
 
-			throw new Exception( $e->getMessage() );
+				throw new Exception( $e->getMessage() );
+			}
 		}
 	}
 
@@ -472,23 +537,37 @@ class TradeSafe {
 
 		$payment_gateway = wc_get_payment_gateway_by_order( $order );
 
-		if ( $payment_gateway->id !== 'tradesafe' ) {
+		if ( 'tradesafe' !== $payment_gateway->id ) {
 			return;
 		}
 
-		try {
-			$transaction_id = $order->get_meta( 'tradesafe_transaction_id', true );
+		$transaction_id = $order->get_meta( 'tradesafe_transaction_id', true );
 
-			$transaction = $client->getTransaction( $transaction_id );
+		if ( ! empty( $transaction_id ) ) {
+			try {
+				$transaction = $client->getTransaction( $transaction_id );
 
-			if ( ! in_array( $transaction['state'], array( 'CANCELED', 'REFUNDED', 'DECLINED', 'DISPUTED', 'LEGAL', 'ADMIN_SUSPENDED', 'ADMIN_CANCELED', 'ADMIN_REFUNDED' ) ) ) {
-				$client->cancelTransaction( $transaction_id, 'Transaction canceled my store owner' );
+				if ( ! in_array(
+					$transaction['state'],
+					array(
+						'CANCELED',
+						'REFUNDED',
+						'DECLINED',
+						'DISPUTED',
+						'LEGAL',
+						'ADMIN_SUSPENDED',
+						'ADMIN_CANCELED',
+						'ADMIN_REFUNDED',
+					)
+				) ) {
+					$client->cancelTransaction( $transaction_id, 'Transaction canceled my store owner' );
+				}
+			} catch ( Exception $e ) {
+				$order->set_status( 'failed', $e->getMessage(), false );
+				$order->save();
+
+				throw new Exception( $e->getMessage() );
 			}
-		} catch ( Exception $e ) {
-			$order->set_status( 'failed', $e->getMessage(), false );
-			$order->save();
-
-			throw new Exception( $e->getMessage() );
 		}
 	}
 
@@ -497,33 +576,37 @@ class TradeSafe {
 
 		$payment_gateway = wc_get_payment_gateway_by_order( $order );
 
-		if ( $payment_gateway->id !== 'tradesafe' ) {
+		if ( 'tradesafe' !== $payment_gateway->id ) {
 			return;
 		}
 
-		try {
-			$settings    = get_option( 'woocommerce_tradesafe_settings', array() );
-			$transaction = $client->getTransaction( $order->get_meta( 'tradesafe_transaction_id', true ) );
+		$transaction_id = $order->get_meta( 'tradesafe_transaction_id', true );
 
-			if ( 'INITIATED' !== $transaction['allocations'][0]['state'] ) {
-				return;
-			}
+		if ( ! empty( $transaction_id ) ) {
+			try {
+				$settings    = get_option( 'woocommerce_tradesafe_settings', array() );
+				$transaction = $client->getTransaction( $transaction_id );
 
-			if ( isset( $settings['delivery_delay_notification'] )
+				if ( 'INITIATED' !== $transaction['allocations'][0]['state'] ) {
+					return;
+				}
+
+				if ( isset( $settings['delivery_delay_notification'] )
 					 && 'yes' === $settings['delivery_delay_notification'] ) {
-				$client->allocationInTransit( $transaction['allocations'][0]['id'] );
+					$client->allocationInTransit( $transaction['allocations'][0]['id'] );
 
-				$order->add_order_note( __( 'Good acceptance notification will be sent to the customer in ' . $settings['delivery_days'] . ' business days.', 'tradesafe-payment-gateway' ) );
-			} else {
-				$client->allocationCompleteDelivery( $transaction['allocations'][0]['id'] );
+					$order->add_order_note( __( 'Good acceptance notification will be sent to the customer in ' . $settings['delivery_days'] . ' business days.', 'tradesafe-payment-gateway' ) );
+				} else {
+					$client->allocationCompleteDelivery( $transaction['allocations'][0]['id'] );
 
-				$order->add_order_note( __( 'TradeSafe has asked the customer if they received what was ordered. 24 hour timer started.', 'tradesafe-payment-gateway' ) );
+					$order->add_order_note( __( 'TradeSafe has asked the customer if they received what was ordered. 24 hour timer started.', 'tradesafe-payment-gateway' ) );
+				}
+			} catch ( Exception $e ) {
+				$order->set_status( 'failed', $e->getMessage(), false );
+				$order->save();
+
+				throw new Exception( $e->getMessage() );
 			}
-		} catch ( Exception $e ) {
-			$order->set_status( 'failed', $e->getMessage(), false );
-			$order->save();
-
-			throw new Exception( $e->getMessage() );
 		}
 	}
 
@@ -531,6 +614,7 @@ class TradeSafe {
 	 * Check if an order meets the minimum requirements to process a payment.
 	 *
 	 * @param array $available_gateways Array of allowed payment gateways.
+	 *
 	 * @return array
 	 */
 	public static function availability( array $available_gateways ): array {
@@ -538,7 +622,7 @@ class TradeSafe {
 			return $available_gateways;
 		}
 
-        // phpcs:disable WordPress.Security.NonceVerification.Recommended
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
 		if ( isset( $_GET['key'] ) ) {
 			$key      = wp_unslash( sanitize_key( $_GET['key'] ) );
 			$order_id = wc_get_order_id_by_order_key( $key );
@@ -550,7 +634,7 @@ class TradeSafe {
 
 			return $available_gateways;
 		}
-        // phpcs:enable WordPress.Security.NonceVerification.Recommended
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
 		if ( isset( WC()->cart->total ) && WC()->cart->total !== 0 && WC()->cart->total < 50 ) {
 			unset( $available_gateways['tradesafe'] );
@@ -563,13 +647,14 @@ class TradeSafe {
 	 * If a user has already added their mobile number. Automatically add it to the checkout page.
 	 *
 	 * @param array $fields Array of fields for the checkout form.
+	 *
 	 * @return array
 	 */
 	public static function checkout_field_defaults( array $fields ): array {
 		$client = new \TradeSafe\Helpers\TradeSafeApiClient();
 		$user   = wp_get_current_user();
 
-		if ( $user->ID === 0 ) {
+		if ( 0 === $user->ID ) {
 			return $fields;
 		}
 
@@ -639,6 +724,7 @@ class TradeSafe {
 	 * The function disables the setting if an admin tries to enable it.
 	 *
 	 * @param array $value Array for configuration flags.
+	 *
 	 * @return array
 	 */
 	public static function override_dokan_selling( array $value ): array {
