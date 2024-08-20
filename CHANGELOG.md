@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.18.7](https://github.com/tradesafe/plugin-woocommerce/compare/v2.18.6...v2.18.7) (2024-08-20)
+
+### Bug Fixes
+
+* Added check for missing transaction id meta data ([5f0d53](https://github.com/tradesafe/plugin-woocommerce/commit/5f0d53a6a7fe8a4ee2772cf89c74942426449d20))
+
+
+---
+
 ## [2.18.6](https://github.com/tradesafe/plugin-woocommerce/compare/v2.18.5...v2.18.6) (2024-08-16)
 
 ### Bug Fixes
