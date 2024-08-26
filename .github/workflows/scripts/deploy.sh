@@ -43,4 +43,4 @@ svn update
 echo "Check SVN repo status..."
 svn status
 
-echo "svn commit -m \"chore(release): \" ${VERSION}"
+svn commit -m "chore(release): ${VERSION}" --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
