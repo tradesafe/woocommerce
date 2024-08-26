@@ -25,12 +25,20 @@ if [[ -d "tags/$VERSION" ]]; then
 	exit
 fi
 
+echo "Copy files from Git to SVN..."
 rsync -rc --exclude-from="$GITHUB_WORKSPACE/.exclude" "$GITHUB_WORKSPACE/" trunk/ --delete --delete-excluded
 
+echo "Add files to SVN..."
 svn add . --force > /dev/null
+
+echo "Removed deleted files from SVN..."
 svn status | grep '^\!' | sed 's/! *//' | xargs -I% svn rm %@ > /dev/null
+
+echo "Create tag for version..."
 svn cp "trunk" "tags/$VERSION"
 
+echo "Check that SVN repo is up-to-date..."
 svn update
 
+echo "Check SVN repo status..."
 svn status
