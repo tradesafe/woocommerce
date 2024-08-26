@@ -34,7 +34,7 @@ svn add . --force > /dev/null
 echo "Removed deleted files from SVN..."
 svn status | grep '^\!' | sed 's/! *//' | xargs -I% svn rm %@ > /dev/null
 
-echo "Create tag for version..."
+echo "Create tag for ${VERSION}..."
 svn cp "trunk" "tags/$VERSION"
 
 echo "Check that SVN repo is up-to-date..."
@@ -42,3 +42,5 @@ svn update
 
 echo "Check SVN repo status..."
 svn status
+
+echo "svn commit -m \"chore(release): \" ${VERSION}"

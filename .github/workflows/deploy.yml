@@ -41,4 +41,6 @@ jobs:
         run: .github/workflows/scripts/deploy.sh
         env:
           VERSION: ${{ inputs.version }}
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
 
