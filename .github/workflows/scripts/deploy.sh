@@ -3,10 +3,10 @@
 if [[ -z "$VERSION" ]]; then
   # Get version from tag name
   VERSION="${GITHUB_REF#refs/tags/}"
-
-  # remove the leading v
-  VERSION="${VERSION#v}"
 fi
+
+# remove the leading v
+VERSION="${VERSION#v}"
 
 PLUGIN="tradesafe-payment-gateway"
 SVN_URL="https://plugins.svn.wordpress.org/${PLUGIN}/"

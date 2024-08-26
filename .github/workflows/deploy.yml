@@ -38,7 +38,7 @@ jobs:
         run: composer install --prefer-dist --no-dev
 
       - name: Deploy to wordpress.org
-        run: .github/scripts/deploy.sh
+        run: .github/workflows/scripts/deploy.sh
         env:
           VERSION: ${{ inputs.version }}
 
