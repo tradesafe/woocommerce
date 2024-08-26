@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "76a59ec8f5dff38255f8a5b590c75f60",
+    "content-hash": "27c9a0de77abf8aec86d7031c32a54bb",
     "packages": [
         {
             "name": "gmostafa/php-graphql-client",
@@ -1173,6 +1173,46 @@
         }
     ],
     "packages-dev": [
+        {
+            "name": "codaptive/wordpress-packagebump",
+            "version": "0.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/codaptive/wordpress-packagebump.git",
+                "reference": "2c2e768d8e69d175f47925c394a423d51beb079f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/codaptive/wordpress-packagebump/zipball/2c2e768d8e69d175f47925c394a423d51beb079f",
+                "reference": "2c2e768d8e69d175f47925c394a423d51beb079f",
+                "shasum": ""
+            },
+            "require-dev": {
+                "marcocesarato/php-conventional-changelog": "^1.17"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Codaptive\\WordpressPackageBump\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-3.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Richard Banks",
+                    "email": "richard.banks@codaptive.io"
+                }
+            ],
+            "description": "WordPress Plugin support for PHP Conventional Changelog",
+            "support": {
+                "issues": "https://github.com/codaptive/wordpress-packagebump/issues",
+                "source": "https://github.com/codaptive/wordpress-packagebump/tree/v0.0.1"
+            },
+            "time": "2024-08-26T14:16:31+00:00"
+        },
         {
             "name": "marcocesarato/php-conventional-changelog",
             "version": "1.17.2",
