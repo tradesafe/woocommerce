@@ -31,6 +31,7 @@ class TradeSafeDokan {
 		add_action( 'dokan_after_withdraw_request', array( 'TradeSafeDokan', 'after_withdraw_request' ), 10, 3 );
 		add_action( 'dokan_withdraw_content', array( 'TradeSafeDokan', 'show_tradesafe_balance' ), 5 );
 		add_action( 'dokan_dashboard_left_widgets', array( 'TradeSafeDokan', 'balance_widget' ), 11 );
+		add_action( 'dokan_withdraw_request_approved', array( 'TradeSafeDokan', 'withdraw_request_approved' ), 11 );
 
 		// Filters
 		add_filter( 'dokan_withdraw_methods', array( 'TradeSafeDokan', 'add_custom_withdraw_methods' ) );
@@ -679,6 +680,23 @@ class TradeSafeDokan {
 						$withdraw->save();
 					}
 				}
+			}
+		}
+	}
+
+	/**
+	 * Withdraw request was approved.
+	 *
+	 * @param \WeDevs\Dokan\Withdraw\Withdraw $withdraw .
+	 */
+	public function withdraw_request_approved( $withdraw ) {
+		if ( 'tradesafe' === $withdraw->get_method() ) {
+			$client   = new \TradeSafe\Helpers\TradeSafeApiClient();
+			$token_id = tradesafe_get_token_id( $withdraw->get_user_id() );
+
+			if ( $client->tokenAccountWithdraw( $token_id, (float) $withdraw->get_amount() ) !== true ) {
+				$withdraw->set_status( dokan()->withdraw->get_status_code( 'pending' ) );
+				$withdraw->save();
 			}
 		}
 	}
