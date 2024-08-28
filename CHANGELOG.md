@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.18.8](https://github.com/tradesafe/woocommerce/compare/v2.18.7...v2.18.8) (2024-08-28)
+
+### Bug Fixes
+
+* Changed how withdrawals are executed with dokan ([dbdeee](https://github.com/tradesafe/woocommerce/commit/dbdeee0229045e6000cd941e9382d0fd835141cd))
+
+
+---
+
 ## [2.18.7](https://github.com/tradesafe/plugin-woocommerce/compare/v2.18.6...v2.18.7) (2024-08-20)
 
 ### Bug Fixes
