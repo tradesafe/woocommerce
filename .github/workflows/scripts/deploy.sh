@@ -26,7 +26,8 @@ if [[ -d "tags/$VERSION" ]]; then
 fi
 
 echo "Copy files from Git to SVN..."
-rsync -rc --exclude-from="$GITHUB_WORKSPACE/.exclude" "$GITHUB_WORKSPACE/" trunk/ --delete --delete-excluded
+rsync -rc --exclude-from="$GITHUB_WORKSPACE/.distignore" "$GITHUB_WORKSPACE/" trunk/ --delete --delete-excluded
+rsync -rc --exclude-from="$GITHUB_WORKSPACE/.distignore" "$GITHUB_WORKSPACE/.wordpress.org/assets/" assets/ --delete --delete-excluded
 
 echo "Add files to SVN..."
 svn add . --force > /dev/null
@@ -42,5 +43,9 @@ svn update
 
 echo "Check SVN repo status..."
 svn status
+
+echo "Set the correct mime-type for images..."
+svn propset svn:mime-type image/png *.png
+svn propset svn:mime-type image/jpeg *.jpg
 
 svn commit -m "chore(release): ${VERSION}" --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD"

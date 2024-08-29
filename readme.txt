@@ -74,6 +74,12 @@ For more information on how to install and configure the plugin, please refer to
 
 Please do not hesitate to email [support@tradesafe.co.za](mailto:support@tradesafe.co.za) or phone us on 010 020 3101. We are here to help you every step of the way.
 
+== Screenshots ==
+
+1. Checkout Page
+2. Payment Page
+2. Mobile Payment Page
+
 == Changelog ==
 
 = 2.18.9 2024-08-29 =
