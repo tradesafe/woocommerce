@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.18.9](https://github.com/tradesafe/woocommerce/compare/v2.18.8...v2.18.9) (2024-08-29)
+
+### Bug Fixes
+
+* Added static definition to function ([a1a8ae](https://github.com/tradesafe/woocommerce/commit/a1a8aef40e94e00707bb04cb83a8405df8466ebe))
+
+
+---
+
 ## [2.18.8](https://github.com/tradesafe/woocommerce/compare/v2.18.7...v2.18.8) (2024-08-28)
 
 ### Bug Fixes
