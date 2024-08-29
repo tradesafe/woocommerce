@@ -689,7 +689,7 @@ class TradeSafeDokan {
 	 *
 	 * @param \WeDevs\Dokan\Withdraw\Withdraw $withdraw .
 	 */
-	public function withdraw_request_approved( $withdraw ) {
+	public static function withdraw_request_approved( $withdraw ) {
 		if ( 'tradesafe' === $withdraw->get_method() ) {
 			$client   = new \TradeSafe\Helpers\TradeSafeApiClient();
 			$token_id = tradesafe_get_token_id( $withdraw->get_user_id() );
