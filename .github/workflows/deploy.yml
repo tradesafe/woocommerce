@@ -37,6 +37,11 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-dev
 
+      - name: Convert CHANGELOG.md to changelog.txt
+        uses: docker://pandoc/core:2.9
+        with:
+          args: "-f markdown -t plain CHANGELOG.md -o changelog.txt"
+
       - name: Deploy to wordpress.org
         run: .github/workflows/scripts/deploy.sh
         env:
