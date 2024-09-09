@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.18.10](https://github.com/tradesafe/woocommerce/compare/v2.18.9...v2.18.10) (2024-09-09)
+
+### Bug Fixes
+
+* Added note to order if marked as completed instead of delivered ([938560](https://github.com/tradesafe/woocommerce/commit/9385603842ccbf6ca622a8c2c855ef5a01d0e8b6))
+
+
+---
+
 ## [2.18.9](https://github.com/tradesafe/woocommerce/compare/v2.18.8...v2.18.9) (2024-08-29)
 
 ### Bug Fixes
