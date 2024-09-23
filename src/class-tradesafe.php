@@ -521,8 +521,21 @@ class TradeSafe {
 
 				if ( ! in_array( $transaction['state'], array( 'DELIVERED', 'FUNDS_RELEASED' ) ) && $update_order_status ) {
 					$order->add_order_note( __( 'Order has been marked as completed. The current status of the transaction is ' . $transaction['state'] . '.', 'tradesafe-payment-gateway' ) );
-					// $order->set_status( 'delivered' );
-					// $order->save();
+
+					if ( 'INITIATED' !== $transaction['allocations'][0]['state'] ) {
+						return;
+					}
+
+					if ( isset( $settings['delivery_delay_notification'] )
+						 && 'yes' === $settings['delivery_delay_notification'] ) {
+						$client->allocationInTransit( $transaction['allocations'][0]['id'] );
+
+						$order->add_order_note( __( 'Good acceptance notification will be sent to the customer in ' . $settings['delivery_days'] . ' business days.', 'tradesafe-payment-gateway' ) );
+					} else {
+						$client->allocationCompleteDelivery( $transaction['allocations'][0]['id'] );
+
+						$order->add_order_note( __( 'TradeSafe has asked the customer if they received what was ordered. 24 hour timer started.', 'tradesafe-payment-gateway' ) );
+					}
 				}
 			} catch ( Exception $e ) {
 				$order->set_status( 'failed', $e->getMessage(), false );
