@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.18.11](https://github.com/tradesafe/woocommerce/compare/v2.18.10...v2.18.11) (2024-09-23)
+
+### Bug Fixes
+
+* Changed how main orders are accepted (#41) ([1e97d1](https://github.com/tradesafe/woocommerce/commit/1e97d12c9aa1de3e8fa61ed0cbcb7452d0040d47))
+
+
+---
+
 ## [2.18.10](https://github.com/tradesafe/woocommerce/compare/v2.18.9...v2.18.10) (2024-09-09)
 
 ### Bug Fixes
