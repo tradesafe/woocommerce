@@ -275,6 +275,7 @@ class TradeSafe {
 									'refunded',
 									'failed',
 									'draft',
+									'completed',
 								)
 							) ) {
 								$order->update_status( 'processing', 'TradeSafe has received the funds in full. You may begin delivery. For manual delivery - Select the state \'DELIVERED\' once delivery has been completed. If integrated with courier company - order status will be updated automatically (ensure a delay notification is configured in TradeSafe plugin settings).' );
@@ -291,9 +292,10 @@ class TradeSafe {
 									'refunded',
 									'failed',
 									'draft',
+									'completed',
 								)
 							) ) {
-								$order->update_status( 'on-hold', 'Buyer has disputed the transacction. Order placed on hold' );
+								$order->update_status( 'on-hold', 'Buyer has disputed the transaction. Order placed on hold' );
 							}
 						}
 
