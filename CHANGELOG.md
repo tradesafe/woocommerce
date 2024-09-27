@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.18.12](https://github.com/tradesafe/woocommerce/compare/v2.18.11...v2.18.12) (2024-09-27)
+
+### Bug Fixes
+
+* Allow orders to be updated if order is marked as complete (#42) ([8ab598](https://github.com/tradesafe/woocommerce/commit/8ab598d7ab4578fcd31a107c258c4c78e8807ab6))
+
+
+---
+
 ## [2.18.11](https://github.com/tradesafe/woocommerce/compare/v2.18.10...v2.18.11) (2024-09-23)
 
 ### Bug Fixes
