@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.18.13](https://github.com/tradesafe/woocommerce/compare/v2.18.12...v2.18.13) (2024-12-05)
+
+### Bug Fixes
+
+* Updated supported wordpress version ([171236](https://github.com/tradesafe/woocommerce/commit/171236c502b91f7169fa5d19021a96735da787f7))
+
+
+---
+
 ## [2.18.12](https://github.com/tradesafe/woocommerce/compare/v2.18.11...v2.18.12) (2024-09-27)
 
 ### Bug Fixes
