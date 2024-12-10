@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.19.0](https://github.com/tradesafe/woocommerce/compare/v2.18.13...v2.19.0) (2024-12-10)
+
+### Features
+
+* Log withdraw in doken when a transaction is made as delivered and a user has an automatic payout ([e973d7](https://github.com/tradesafe/woocommerce/commit/e973d7f16e97fd3a9e96f1179e6a345285df2b51))
+
+
+---
+
 ## [2.18.13](https://github.com/tradesafe/woocommerce/compare/v2.18.12...v2.18.13) (2024-12-05)
 
 ### Bug Fixes

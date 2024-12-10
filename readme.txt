@@ -4,7 +4,7 @@ Tags: woocommerce, dokan, payment gateway, escrow, credit card
 Requires at least: 5.6
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 2.18.13
+Stable tag: 2.19.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -82,83 +82,8 @@ Please do not hesitate to email [support@tradesafe.co.za](mailto:support@tradesa
 
 == Changelog ==
 
-= 2.18.12 2024-09-27 =
-
-### Bug Fixes
-
-* Allow orders to be updated if order is marked as complete
-
-= 2.18.11 2024-09-23 =
-
-### Bug Fixes
-
-* Changed how main orders are accepted
-
-= 2.18.10 2024-09-09 =
-
-### Bug Fixes
-
-* Added note to order if marked as completed instead of delivered
-
-= 2.18.9 2024-08-29 =
-
-### Bug Fixes
-
-* Added static definition to function
-
-= 2.18.8 2024-08-28 =
-
-### Bug Fixes
-
-* Changed how withdrawals are executed with dokan
-
-= 2.18.7 2024-08-20 =
-
-### Bug Fixes
-
-* Added check for missing transaction id meta data
-
-= 2.18.6 2024-08-16 =
-
-### Bug Fixes
-
-* Removed option to set fee allocation
-
-= 2.18.5 2024-08-15 =
-
-### Bug Fixes
-
-* Changed how user id is loaded when checking if a withdraw method is valid
-
-= 2.18.4 2024-08-14 =
-
-### Bug Fixes
-
-* Changed how user id is loaded for withdraw request
-
-= 2.18.3 2024-08-02 =
-
-### Bug Fixes
-
-* Change how user id is loaded when verifing withdrawals
-* Mark orders status as on-hold when a dispute is raised
-
-= 2.18.2 2024-07-24 =
-
-### Bug Fixes
-
-* Added additional infomation to dokan error message
-* Updated label for payment frequency
-
-= 2.18.1 2024-06-12 =
-
-### Bug Fixes
-
-* Added check for required fields for withdrawals in Dokan
-* Allow suborders to be marked as complete
-
-= 2.18.0 2024-06-07 =
+= 2.19.0 2024-12-10 =
 
 ### Features
 
-* Added custom inspection period
+* Log withdraw in Doken when a transaction is made as delivered and a user has an automatic payout ([e973d7](https://github.com/tradesafe/woocommerce/commit/e973d7f16e97fd3a9e96f1179e6a345285df2b51))
