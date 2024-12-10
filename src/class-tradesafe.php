@@ -314,6 +314,39 @@ class TradeSafe {
 						} else {
 							$order->add_order_note( __( 'Hooray! Your customer has accepted the goods or services. TradeSafe will release the funds.', 'tradesafe-payment-gateway' ) );
 						}
+
+						if ( tradesafe_has_dokan() ) {
+							$client      = new \TradeSafe\Helpers\TradeSafeApiClient();
+							$transaction = $client->getTransaction( $order->get_meta( 'tradesafe_transaction_id', true ) );
+
+							foreach ( $transaction['parties'] as $party ) {
+								if ( 'BENEFICIARY_MERCHANT' === $party['role'] && ! in_array( $party['settings']['payout']['interval'], array( 'ACCOUNT', 'WALLET' ), true ) ) {
+
+									$user = get_users(
+										array(
+											'meta_key'   => tradesafe_token_meta_key(),
+											'meta_value' => $party['details']['tokenId'],
+											'number'     => 1,
+										)
+									);
+
+									$vendor = reset( $user );
+
+									$withdraw = new \WeDevs\Dokan\Withdraw\Withdraw();
+
+									$withdraw
+										->set_user_id( $vendor->ID )
+										->set_amount( $party['calculation']['payout'] )
+										->set_date( dokan_current_datetime()->format( 'Y-m-d H:i:s' ) )
+										->set_status( dokan()->withdraw->get_status_code( 'completed' ) )
+										->set_method( 'tradesafe' )
+										->set_ip( dokan_get_client_ip() )
+										->set_note( 'Completed transaction: ' . $transaction['id'] );
+
+									$result = $withdraw->save();
+								}
+							}
+						}
 						exit;
 					}
 

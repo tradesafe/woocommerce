@@ -536,6 +536,36 @@ class TradeSafeApiClient {
 							'state',
 						)
 					),
+				( new Query( 'parties' ) )
+					->setSelectionSet(
+						array(
+							'id',
+							'role',
+							( new Query( 'details' ) )
+								->setSelectionSet(
+									array(
+										'tokenId',
+									)
+								),
+							( new Query( 'calculation' ) )
+								->setSelectionSet(
+									array(
+										'payout',
+									)
+								),
+							( new Query( 'settings' ) )
+								->setSelectionSet(
+									array(
+										( new Query( 'payout' ) )
+											->setSelectionSet(
+												array(
+													'interval',
+												)
+											),
+									)
+								),
+						)
+					),
 			)
 		);
 
