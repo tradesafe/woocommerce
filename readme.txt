@@ -4,7 +4,7 @@ Tags: woocommerce, dokan, payment gateway, escrow, credit card
 Requires at least: 5.6
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 2.19.0
+Stable tag: 2.19.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -82,8 +82,14 @@ Please do not hesitate to email [support@tradesafe.co.za](mailto:support@tradesa
 
 == Changelog ==
 
+= 2.19.0 2024-12-17 =
+
+### Bug Fixes
+
+* Removed unused signature check ([fb5dc8](https://github.com/tradesafe/woocommerce/commit/fb5dc858978fa1a736855842a341f2a38b15c305))
+
 = 2.19.0 2024-12-10 =
 
 ### Features
 
-* Log withdraw in Doken when a transaction is made as delivered and a user has an automatic payout ([e973d7](https://github.com/tradesafe/woocommerce/commit/e973d7f16e97fd3a9e96f1179e6a345285df2b51))
+* Log withdraw in Dokan when a transaction is made as delivered and a user has an automatic payout ([e973d7](https://github.com/tradesafe/woocommerce/commit/e973d7f16e97fd3a9e96f1179e6a345285df2b51))

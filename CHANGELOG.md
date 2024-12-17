@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.19.1](https://github.com/tradesafe/woocommerce/compare/v2.19.0...v2.19.1) (2024-12-17)
+
+### Bug Fixes
+
+* Removed unused signature check ([fb5dc8](https://github.com/tradesafe/woocommerce/commit/fb5dc858978fa1a736855842a341f2a38b15c305))
+
+
+---
+
 ## [2.19.0](https://github.com/tradesafe/woocommerce/compare/v2.18.13...v2.19.0) (2024-12-10)
 
 ### Features
