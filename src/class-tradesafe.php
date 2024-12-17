@@ -209,17 +209,8 @@ class TradeSafe {
 						);
 					}
 
-					$signature = $data['signature'];
-					unset( $data['signature'] );
-
-					$request = '';
-					foreach ( $data as $value ) {
-						$request .= $value;
-					}
-
-					$signature_check = hash_hmac( 'sha256', $request, get_option( 'tradesafe_client_id' ) );
-
 					// TODO: Change how signature check works.
+
 					$query = wc_get_orders(
 						array(
 							'meta_key'     => 'tradesafe_transaction_id',
