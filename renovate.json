@@ -24,7 +24,8 @@
         },
         {
             "matchManagers": [
-                "composer"
+                "composer",
+                "github-actions"
             ],
             "groupName": "{{manager}}"
         }
