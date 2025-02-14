@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.19.2](https://github.com/tradesafe/woocommerce/compare/v2.19.1...v2.19.2) (2025-02-14)
+
+### Bug Fixes
+
+* Show old fee allocation option for sites that don't default to seller ([8ac37f](https://github.com/tradesafe/woocommerce/commit/8ac37f5dc6681142c88d59d85e768dad40fcc972))
+
+
+---
+
 ## [2.19.1](https://github.com/tradesafe/woocommerce/compare/v2.19.0...v2.19.1) (2024-12-17)
 
 ### Bug Fixes

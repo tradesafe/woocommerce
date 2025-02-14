@@ -4,7 +4,7 @@ Tags: woocommerce, dokan, payment gateway, escrow, credit card
 Requires at least: 5.6
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 2.19.1
+Stable tag: 2.19.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -82,7 +82,13 @@ Please do not hesitate to email [support@tradesafe.co.za](mailto:support@tradesa
 
 == Changelog ==
 
-= 2.19.0 2024-12-17 =
+= [2.19.2 2025-02-14 =
+
+### Bug Fixes
+
+* Show old fee allocation option for sites that don't default to seller ([8ac37f](https://github.com/tradesafe/woocommerce/commit/8ac37f5dc6681142c88d59d85e768dad40fcc972))
+
+= 2.19.1 2024-12-17 =
 
 ### Bug Fixes
 
