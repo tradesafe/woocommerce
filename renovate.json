@@ -8,7 +8,7 @@
         "dependencies"
     ],
     "schedule": [
-        "* 0-2 * * *"
+        "* 0-4,16-20 * * *"
     ],
     "packageRules": [
         {
@@ -18,7 +18,6 @@
                 "pin",
                 "digest"
             ],
-            "automerge": true
         },
         {
             "matchManagers": [
