@@ -82,7 +82,7 @@ Please do not hesitate to email [support@tradesafe.co.za](mailto:support@tradesa
 
 == Changelog ==
 
-= [2.19.2 2025-02-14 =
+= 2.19.2 2025-02-14 =
 
 ### Bug Fixes
 
