@@ -458,6 +458,21 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 			 'desc_tip'    => false,
 		 );
 
+		 if ( ! empty( $settings['processing_fee'] ) && $settings['processing_fee'] !== 'SELLER' ) {
+			 $form['processing_fee'] = array(
+				 'title'       => __( 'Fee Allocation (Legacy Setting)', 'tradesafe-payment-gateway' ),
+				 'type'        => 'select',
+				 'description' => __( 'Who absorbs TradeSafe’s fee?', 'tradesafe-payment-gateway' ),
+				 'default'     => 'SELLER',
+				 'options'     => array(
+					 'BUYER'        => 'Buyer',
+					 'SELLER'       => 'Seller',
+					 'BUYER_SELLER' => 'Buyer / Seller',
+				 ),
+				 'desc_tip'    => false,
+			 );
+		 }
+
 		 $this->form_fields = $form;
 	}
 
