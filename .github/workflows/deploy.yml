@@ -12,7 +12,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -38,7 +38,7 @@ jobs:
         run: composer install --prefer-dist --no-dev
 
       - name: Convert CHANGELOG.md to changelog.txt
-        uses: docker://pandoc/core:2.9
+        uses: docker://pandoc/core:3.6
         with:
           args: "-f markdown -t plain CHANGELOG.md -o changelog.txt"
 
