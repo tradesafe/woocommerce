@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.19.3](https://github.com/tradesafe/woocommerce/compare/v2.19.2...v2.19.3) (2025-02-19)
+
+### Bug Fixes
+
+* Updated callback to use order key instead of transaction id ([31447e](https://github.com/tradesafe/woocommerce/commit/31447e97fdae72a22d726e646097a22a69f6e771))
+
+
+---
+
 ## [2.19.2](https://github.com/tradesafe/woocommerce/compare/v2.19.1...v2.19.2) (2025-02-14)
 
 ### Bug Fixes
