@@ -211,25 +211,19 @@ class TradeSafe {
 
 					// TODO: Change how signature check works.
 
-					$query = wc_get_orders(
-						array(
-							'meta_key'     => 'tradesafe_transaction_id',
-							'meta_value'   => $data['id'],
-							'meta_compare' => '=',
-						)
-					);
+					$order_key = substr( $data['reference'], 0, strpos( $data['reference'], '-' ) );
+					$order_id  = wc_get_order_id_by_order_key( $order_key );
+					$order     = wc_get_order( $order_id );
 
-					if ( ! isset( $query[0] ) ) {
+					if ( empty( $order ) ) {
 						wp_die(
-							'Invalid Transaction ID',
+							'Invalid Order Reference',
 							'An Error Occurred While Processing Callback',
 							array(
 								'code' => 400,
 							)
 						);
 					}
-
-					$order = $query[0];
 
 					if ( 'FUNDS_DEPOSITED' === $data['state'] ) {
 						$order->update_status( 'on-hold', __( 'TradeSafe is awaiting for manual EFT payment.', 'tradesafe-payment-gateway' ) );
