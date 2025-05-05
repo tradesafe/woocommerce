@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.19.4](https://github.com/tradesafe/woocommerce/compare/v2.19.3...v2.19.4) (2025-05-05)
+
+### Bug Fixes
+
+* Added type def to number format ([db7a57](https://github.com/tradesafe/woocommerce/commit/db7a57382acdd9463a59fc0cefb2a47eee993562))
+
+
+---
+
 ## [2.19.3](https://github.com/tradesafe/woocommerce/compare/v2.19.2...v2.19.3) (2025-02-19)
 
 ### Bug Fixes
