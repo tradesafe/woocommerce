@@ -32,15 +32,35 @@ class TradeSafeProfile {
 		// add_action( 'woocommerce_edit_account_form', array( 'TradeSafeProfile', 'edit_account_form' ) );
 		// add_action( 'woocommerce_save_account_details', array( 'TradeSafeProfile', 'save_account_details' ) );
 		// add_action( 'woocommerce_save_account_details_errors', array( 'TradeSafeProfile', 'save_account_details_errors' ), 10, 1 );
-		add_action( 'woocommerce_checkout_update_customer', array( 'TradeSafeProfile', 'woocommerce_checkout_update_customer' ), 10, 2 );
+		add_action(
+			'woocommerce_checkout_update_customer',
+			array(
+				'TradeSafeProfile',
+				'woocommerce_checkout_update_customer',
+			),
+			10,
+			2
+		);
 
 		// Withdrawal Page
 		if ( ! tradesafe_has_dokan() ) {
 			// Actions.
-			add_action( 'woocommerce_account_tradesafe-withdrawal_endpoint', array( 'TradeSafeProfile', 'withdrawal_endpoint' ) );
+			add_action(
+				'woocommerce_account_tradesafe-withdrawal_endpoint',
+				array(
+					'TradeSafeProfile',
+					'withdrawal_endpoint',
+				)
+			);
 
 			// Filters.
-			add_filter( 'woocommerce_account_menu_items', array( 'TradeSafeProfile', 'woocommerce_account_menu_items' ) );
+			add_filter(
+				'woocommerce_account_menu_items',
+				array(
+					'TradeSafeProfile',
+					'woocommerce_account_menu_items',
+				)
+			);
 			add_filter( 'the_title', array( 'TradeSafeProfile', 'withdrawal_endpoint_title' ) );
 
 			// Add scripts
@@ -60,6 +80,7 @@ class TradeSafeProfile {
 	 * Add new query var.
 	 *
 	 * @param array $vars
+	 *
 	 * @return array
 	 */
 	public static function query_vars( array $vars ): array {
@@ -79,6 +100,7 @@ class TradeSafeProfile {
 			echo "<table class='form-table' role='presentation'><tbody>";
 			echo "<tr><th scope='row'>Error:</th><td> TradeSafe Payment Gateway not configured</td></tr>";
 			echo '</tbody></table>';
+
 			return;
 		}
 
@@ -106,11 +128,12 @@ class TradeSafeProfile {
 	 * Save the details submitted by the user to their account.
 	 *
 	 * @param int $user_id User Id.
+	 *
 	 * @throws Exception
 	 */
 	public static function save_account_details( int $user_id ) {
 		// Nonce check copied from woocommerce/includes/class-wc-form-handler.php@save_account_details.
-        $nonce_value = wc_get_var($_REQUEST['save-account-details-nonce'], wc_get_var($_REQUEST['_wpnonce'], '')); // @codingStandardsIgnoreLine.
+		$nonce_value = wc_get_var( $_REQUEST['save-account-details-nonce'], wc_get_var( $_REQUEST['_wpnonce'], '' ) ); // @codingStandardsIgnoreLine.
 		$client      = new \TradeSafe\Helpers\TradeSafeApiClient();
 
 		if ( ! wp_verify_nonce( $nonce_value, 'save_account_details' ) ) {
@@ -137,11 +160,11 @@ class TradeSafeProfile {
 		$organization = null;
 
 		if ( isset( $_POST['tradesafe_token_bank_account_number'] )
-			&& ! is_null( $_POST['tradesafe_token_bank_account_number'] )
-			&& isset( $_POST['tradesafe_token_bank_account_type'] )
-			&& ! is_null( $_POST['tradesafe_token_bank_account_type'] )
-			&& isset( $_POST['tradesafe_token_bank'] )
-			&& ! is_null( $_POST['tradesafe_token_bank'] ) ) {
+			 && ! is_null( $_POST['tradesafe_token_bank_account_number'] )
+			 && isset( $_POST['tradesafe_token_bank_account_type'] )
+			 && ! is_null( $_POST['tradesafe_token_bank_account_type'] )
+			 && isset( $_POST['tradesafe_token_bank'] )
+			 && ! is_null( $_POST['tradesafe_token_bank'] ) ) {
 			$bank_account = array(
 				'accountNumber' => sanitize_text_field( wp_unslash( $_POST['tradesafe_token_bank_account_number'] ?? null ) ),
 				'accountType'   => sanitize_text_field( wp_unslash( $_POST['tradesafe_token_bank_account_type'] ?? null ) ),
@@ -150,8 +173,8 @@ class TradeSafeProfile {
 		}
 
 		if ( ! empty( $_POST['tradesafe_token_organization_name'] )
-			&& ! empty( $_POST['tradesafe_token_organization_type'] )
-			&& ! empty( $_POST['tradesafe_token_organization_registration_number'] ) ) {
+			 && ! empty( $_POST['tradesafe_token_organization_type'] )
+			 && ! empty( $_POST['tradesafe_token_organization_registration_number'] ) ) {
 			$organization = array(
 				'name'               => sanitize_text_field( wp_unslash( $_POST['tradesafe_token_organization_name'] ) ),
 				'tradeName'          => sanitize_text_field( wp_unslash( $_POST['tradesafe_token_organization_trading_name'] ?? null ) ),
@@ -185,15 +208,15 @@ class TradeSafeProfile {
 	public static function save_account_details_errors( $args ) {
 		// Are any of the organization fields not empty.
 		if ( ! empty( $_POST['tradesafe_token_organization_name'] )
-			|| ! empty( $_POST['tradesafe_token_organization_trading_name'] )
-			|| ! empty( $_POST['tradesafe_token_organization_type'] )
-			|| ! empty( $_POST['tradesafe_token_organization_registration_number'] )
-			|| ! empty( $_POST['tradesafe_token_organization_tax_number'] ) ) {
+			 || ! empty( $_POST['tradesafe_token_organization_trading_name'] )
+			 || ! empty( $_POST['tradesafe_token_organization_type'] )
+			 || ! empty( $_POST['tradesafe_token_organization_registration_number'] )
+			 || ! empty( $_POST['tradesafe_token_organization_tax_number'] ) ) {
 
 			// Check that optional required fields are set before trying to save.
 			if ( empty( $_POST['tradesafe_token_organization_name'] )
-				|| empty( $_POST['tradesafe_token_organization_type'] )
-				|| empty( $_POST['tradesafe_token_organization_registration_number'] ) ) {
+				 || empty( $_POST['tradesafe_token_organization_type'] )
+				 || empty( $_POST['tradesafe_token_organization_registration_number'] ) ) {
 				$args->add( 'error', __( 'Organization details are incomplete:', 'woocommerce' ), '' );
 			}
 
@@ -303,7 +326,7 @@ class TradeSafeProfile {
 		// TODO: Get pending request?
 
 		if ( ! empty( $_POST ) ) {
-            $nonce_value = wc_get_var($_REQUEST['tradesafe-update-token-nonce'], wc_get_var($_REQUEST['_wpnonce'], '')); // @codingStandardsIgnoreLine.
+			$nonce_value = wc_get_var( $_REQUEST['tradesafe-update-token-nonce'], wc_get_var( $_REQUEST['_wpnonce'], '' ) ); // @codingStandardsIgnoreLine.
 
 			if ( wp_verify_nonce( $nonce_value, 'tradesafe_update_token' ) ) {
 				if ( ! empty( $_POST['withdrawal_submit'] ) && ! empty( $_POST['tradesafe_withdrawal_request'] ) ) {
@@ -372,8 +395,8 @@ class TradeSafeProfile {
 						$bank_account = null;
 
 						if ( ! empty( $_POST['tradesafe_token_bank_account_number'] )
-							&& ! empty( $_POST['tradesafe_token_bank_account_type'] )
-							&& ! empty( $_POST['tradesafe_token_bank'] ) ) {
+							 && ! empty( $_POST['tradesafe_token_bank_account_type'] )
+							 && ! empty( $_POST['tradesafe_token_bank'] ) ) {
 							$bank_account = array(
 								'accountNumber' => sanitize_text_field( $_POST['tradesafe_token_bank_account_number'] ?? null ),
 								'accountType'   => sanitize_text_field( $_POST['tradesafe_token_bank_account_type'] ?? null ),
@@ -516,10 +539,57 @@ class TradeSafeProfile {
 					<th><label>Account Balance</label></th>
 					<td><?php echo 'R ' . number_format( sanitize_text_field( (float) $token_data['balance'] ), 2, '.', ' ' ); ?></td>
 				</tr>
+			<?php
+
+			if ( tradesafe_has_dokan() && 0 == (float) $token_data['balance'] ) {
+				$vendor = dokan_get_vendor( $user->ID );
+				?>
+				<tr id="dokan_balance">
+					<th><label>Dokan Balance</label></th>
+					<td style="vertical-align: middle;">
+					<?php
+					if ( $vendor->get_balance( false ) > (float) $token_data['balance'] ) {
+						if ( $_GET['tradesafe_sync_dokan_balance'] == 'true' ) {
+							$withdraw = new \WeDevs\Dokan\Withdraw\Withdraw();
+
+							$withdraw
+							->set_user_id( $vendor->ID )
+							->set_amount( $vendor->get_balance( false ) )
+							->set_date( dokan_current_datetime()->format( 'Y-m-d H:i:s' ) )
+							->set_status( dokan()->withdraw->get_status_code( 'completed' ) )
+							->set_method( 'tradesafe' )
+							->set_ip( dokan_get_client_ip() )
+							->set_note( 'Sync balance with TradeSafe' );
+
+							$withdraw->save();
+
+							echo 'R ' . number_format( sanitize_text_field( (float) $vendor->get_balance( false ) ), 2, '.', ' ' );
+						} else {
+							$params                                 = $_GET;
+							$params['tradesafe_sync_dokan_balance'] = 'true';
+							$current_page                           = admin_url( sprintf( 'user-edit.php?%s', http_build_query( $params ) ) );
+
+							echo 'R ' . number_format( sanitize_text_field( (float) $vendor->get_balance( false ) ), 2, '.', ' ' );
+							?>
+							(<a id="sync" class="link" href="<?php print $current_page; ?>">Sync Balance</a>)
+							<?php
+						}
+					} else {
+						echo 'R ' . number_format( sanitize_text_field( (float) $vendor->get_balance( false ) ), 2, '.', ' ' );
+					}
+					?>
+					</td>
+				</tr>
+					<?php
+			}
+
+			?>
+
 				</tbody>
 			</table>
-			<?php
-			ob_end_flush();
+				<?php
+
+				ob_end_flush();
 		} else {
 			echo '<p>No information available.</p>';
 		}
