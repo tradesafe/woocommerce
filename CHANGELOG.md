@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.20.0](https://github.com/tradesafe/woocommerce/compare/v2.19.4...v2.20.0) (2025-05-12)
+
+### Features
+
+* Added option to sync dokan balance with tradesafe from the user edit page ([fc519d](https://github.com/tradesafe/woocommerce/commit/fc519dc6a777ee7eccf8e0cbc687e788ab634f84))
+
+
+---
+
 ## [2.19.4](https://github.com/tradesafe/woocommerce/compare/v2.19.3...v2.19.4) (2025-05-05)
 
 ### Bug Fixes

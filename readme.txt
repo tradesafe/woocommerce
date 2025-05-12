@@ -4,7 +4,7 @@ Tags: woocommerce, dokan, payment gateway, escrow, credit card
 Requires at least: 5.6
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 2.19.4
+Stable tag: 2.20.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -82,32 +82,8 @@ Please do not hesitate to email [support@tradesafe.co.za](mailto:support@tradesa
 
 == Changelog ==
 
-= 2.19.4 2025-05-05 =
-
-### Bug Fixes
-
-* Added type def to number format ([db7a57](https://github.com/tradesafe/woocommerce/commit/db7a57382acdd9463a59fc0cefb2a47eee993562))
-
-= 2.19.3 2025-02-19 =
-
-### Bug Fixes
-
-* Updated callback to use order key instead of transaction id ([31447e](https://github.com/tradesafe/woocommerce/commit/31447e97fdae72a22d726e646097a22a69f6e771))
-
-= 2.19.2 2025-02-14 =
-
-### Bug Fixes
-
-* Show old fee allocation option for sites that don't default to seller ([8ac37f](https://github.com/tradesafe/woocommerce/commit/8ac37f5dc6681142c88d59d85e768dad40fcc972))
-
-= 2.19.1 2024-12-17 =
-
-### Bug Fixes
-
-* Removed unused signature check ([fb5dc8](https://github.com/tradesafe/woocommerce/commit/fb5dc858978fa1a736855842a341f2a38b15c305))
-
-= 2.19.0 2024-12-10 =
+= 2.20.0 2025-05-12 =
 
 ### Features
 
-* Log withdraw in Dokan when a transaction is made as delivered and a user has an automatic payout ([e973d7](https://github.com/tradesafe/woocommerce/commit/e973d7f16e97fd3a9e96f1179e6a345285df2b51))
+* Added an option to sync dokan balance with tradesafe from the user edit page ([fc519d](https://github.com/tradesafe/woocommerce/commit/fc519dc6a777ee7eccf8e0cbc687e788ab634f84))
