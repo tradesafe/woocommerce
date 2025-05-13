@@ -549,7 +549,7 @@ class TradeSafeProfile {
 					<td style="vertical-align: middle;">
 					<?php
 					if ( $vendor->get_balance( false ) > (float) $token_data['balance'] ) {
-						if ( $_GET['tradesafe_sync_dokan_balance'] == 'true' ) {
+						if ( ! empty( $_GET['tradesafe_sync_dokan_balance'] ) && $_GET['tradesafe_sync_dokan_balance'] == 'true' ) {
 							$withdraw = new \WeDevs\Dokan\Withdraw\Withdraw();
 
 							$withdraw
@@ -561,9 +561,13 @@ class TradeSafeProfile {
 							->set_ip( dokan_get_client_ip() )
 							->set_note( 'Sync balance with TradeSafe' );
 
-							$withdraw->save();
+							$result = $withdraw->save();
 
 							echo 'R ' . number_format( sanitize_text_field( (float) $vendor->get_balance( false ) ), 2, '.', ' ' );
+
+							if ( $result instanceof WP_Error ) {
+								echo ' (Error: ' . $result->get_error_message() . ')';
+							}
 						} else {
 							$params                                 = $_GET;
 							$params['tradesafe_sync_dokan_balance'] = 'true';
