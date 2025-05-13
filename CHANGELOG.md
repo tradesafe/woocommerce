@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.20.1](https://github.com/tradesafe/woocommerce/compare/v2.20.0...v2.20.1) (2025-05-13)
+
+### Bug Fixes
+
+* Updated error handeling for sync ([2b5d96](https://github.com/tradesafe/woocommerce/commit/2b5d96a4a3b72bce37b723b917999988884da5a7))
+
+
+---
+
 ## [2.20.0](https://github.com/tradesafe/woocommerce/compare/v2.19.4...v2.20.0) (2025-05-12)
 
 ### Features
