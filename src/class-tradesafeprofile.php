@@ -546,20 +546,20 @@ class TradeSafeProfile {
 				?>
 				<tr id="dokan_balance">
 					<th><label>Dokan Balance</label></th>
-					<td style="vertical-align: middle;">
+					<td>
 					<?php
 					if ( $vendor->get_balance( false ) > (float) $token_data['balance'] ) {
-						if ( ! empty( $_GET['tradesafe_sync_dokan_balance'] ) && $_GET['tradesafe_sync_dokan_balance'] == 'true' ) {
+						if ( ! empty( $_GET['tradesafe_sync_dokan_balance'] ) && 'true' == $_GET['tradesafe_sync_dokan_balance'] ) {
 							$withdraw = new \WeDevs\Dokan\Withdraw\Withdraw();
 
 							$withdraw
-							->set_user_id( $vendor->ID )
+							->set_user_id( $vendor->get_id() )
 							->set_amount( $vendor->get_balance( false ) )
 							->set_date( dokan_current_datetime()->format( 'Y-m-d H:i:s' ) )
 							->set_status( dokan()->withdraw->get_status_code( 'completed' ) )
 							->set_method( 'tradesafe' )
 							->set_ip( dokan_get_client_ip() )
-							->set_note( 'Sync balance with TradeSafe' );
+							->set_note( 'Sync Dokan balance with TradeSafe' );
 
 							$result = $withdraw->save();
 
