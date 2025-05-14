@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.20.2](https://github.com/tradesafe/woocommerce/compare/v2.20.1...v2.20.2) (2025-05-14)
+
+### Bug Fixes
+
+* Changed how vendor Id is loaded ([9320c2](https://github.com/tradesafe/woocommerce/commit/9320c2a871895ba303ebcfceb012eb1ff15692d9))
+
+
+---
+
 ## [2.20.1](https://github.com/tradesafe/woocommerce/compare/v2.20.0...v2.20.1) (2025-05-13)
 
 ### Bug Fixes
