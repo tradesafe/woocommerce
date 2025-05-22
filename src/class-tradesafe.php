@@ -323,12 +323,13 @@ class TradeSafe {
 										->set_user_id( $vendor->ID )
 										->set_amount( $party['calculation']['payout'] )
 										->set_date( dokan_current_datetime()->format( 'Y-m-d H:i:s' ) )
-										->set_status( dokan()->withdraw->get_status_code( 'completed' ) )
+										->set_status( dokan()->withdraw->get_status_code( 'approved' ) )
 										->set_method( 'tradesafe' )
 										->set_ip( dokan_get_client_ip() )
 										->set_note( 'Completed transaction: ' . $transaction['id'] );
 
 									$result = $withdraw->save();
+
 								}
 							}
 						}
