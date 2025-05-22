@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.20.4](https://github.com/tradesafe/woocommerce/compare/v2.20.3...v2.20.4) (2025-05-22)
+
+### Bug Fixes
+
+* Load withdrawal as pending before approving ([a074c1](https://github.com/tradesafe/woocommerce/commit/a074c13579c6922c4ef7827cd5cb6ca0603c18a0))
+
+
+---
+
 ## [2.20.3](https://github.com/tradesafe/woocommerce/compare/v2.20.2...v2.20.3) (2025-05-22)
 
 ### Bug Fixes
