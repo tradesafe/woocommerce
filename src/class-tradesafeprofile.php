@@ -556,11 +556,13 @@ class TradeSafeProfile {
 							->set_user_id( $vendor->get_id() )
 							->set_amount( $vendor->get_balance( false ) )
 							->set_date( dokan_current_datetime()->format( 'Y-m-d H:i:s' ) )
-							->set_status( dokan()->withdraw->get_status_code( 'approved' ) )
+							->set_status( dokan()->withdraw->get_status_code( 'pending' ) )
 							->set_method( 'tradesafe' )
 							->set_ip( dokan_get_client_ip() )
 							->set_note( 'Sync Dokan balance with TradeSafe' );
+							$withdraw->save();
 
+							$withdraw->set_status( dokan()->withdraw->get_status_code( 'approved' ) );
 							$result = $withdraw->save();
 
 							echo 'R ' . number_format( sanitize_text_field( (float) $vendor->get_balance( false ) ), 2, '.', ' ' );
