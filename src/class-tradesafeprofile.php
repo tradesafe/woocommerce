@@ -556,20 +556,20 @@ class TradeSafeProfile {
 							->set_user_id( $vendor->get_id() )
 							->set_amount( $vendor->get_balance( false ) )
 							->set_date( dokan_current_datetime()->format( 'Y-m-d H:i:s' ) )
-							->set_status( dokan()->withdraw->get_status_code( 'pending' ) )
+							->set_status( dokan()->withdraw->get_status_code( 'approved' ) )
 							->set_method( 'tradesafe' )
 							->set_ip( dokan_get_client_ip() )
 							->set_note( 'Sync Dokan balance with TradeSafe' );
-							$withdraw->save();
-
-							$withdraw->set_status( dokan()->withdraw->get_status_code( 'approved' ) );
 							$result = $withdraw->save();
 
-							echo 'R ' . number_format( sanitize_text_field( (float) $vendor->get_balance( false ) ), 2, '.', ' ' );
+							( new WeDevs\Dokan\Withdraw\Hooks() )->update_vendor_balance( $withdraw );
 
-							if ( $result instanceof WP_Error ) {
-								echo ' (Error: ' . $result->get_error_message() . ')';
-							}
+							$on_date     = dokan_current_datetime();
+							$cache_group = "withdraws_seller_{$vendor->get_id()}";
+							$cache_key   = "seller_balance_{$vendor->get_id()}_{$on_date->format( 'Y_m_d' )}";
+							\WeDevs\Dokan\Cache::delete( $cache_key, $cache_group );
+
+							echo 'R ' . number_format( sanitize_text_field( (float) $vendor->get_balance( false ) ), 2, '.', ' ' );
 						} else {
 							$params                                 = $_GET;
 							$params['tradesafe_sync_dokan_balance'] = 'true';
