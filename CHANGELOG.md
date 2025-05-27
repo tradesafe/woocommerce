@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.20.5](https://github.com/tradesafe/woocommerce/compare/v2.20.4...v2.20.5) (2025-05-27)
+
+### Bug Fixes
+
+* Add command to update vendor balance after sync ([69ce70](https://github.com/tradesafe/woocommerce/commit/69ce70a7da200b471dc7160e4efd28f1122a0ba9))
+
+
+---
+
 ## [2.20.4](https://github.com/tradesafe/woocommerce/compare/v2.20.3...v2.20.4) (2025-05-22)
 
 ### Bug Fixes
