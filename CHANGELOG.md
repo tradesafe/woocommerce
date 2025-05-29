@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.20.6](https://github.com/tradesafe/woocommerce/compare/v2.20.5...v2.20.6) (2025-05-29)
+
+### Bug Fixes
+
+* Pass correct withdraw data to balance function ([139ae8](https://github.com/tradesafe/woocommerce/commit/139ae8b9f2b55e64a94bae72cf17e99faad82e29))
+
+
+---
+
 ## [2.20.5](https://github.com/tradesafe/woocommerce/compare/v2.20.4...v2.20.5) (2025-05-27)
 
 ### Bug Fixes

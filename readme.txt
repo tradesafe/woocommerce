@@ -4,7 +4,7 @@ Tags: woocommerce, dokan, payment gateway, escrow, credit card
 Requires at least: 5.6
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 2.20.5
+Stable tag: 2.20.6
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -81,6 +81,12 @@ Please do not hesitate to email [support@tradesafe.co.za](mailto:support@tradesa
 2. Mobile Payment Page
 
 == Changelog ==
+
+= 2.20.6 2025-05-29 =
+
+### Bug Fixes
+
+* Pass correct withdraw data to balance function ([139ae8](https://github.com/tradesafe/woocommerce/commit/139ae8b9f2b55e64a94bae72cf17e99faad82e29))
 
 = 2.20.5 2025-05-27 =
 
