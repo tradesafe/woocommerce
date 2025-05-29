@@ -560,7 +560,7 @@ class TradeSafeProfile {
 							->set_method( 'tradesafe' )
 							->set_ip( dokan_get_client_ip() )
 							->set_note( 'Sync Dokan balance with TradeSafe' );
-							$result = $withdraw->save();
+							$withdraw = $withdraw->save();
 
 							( new WeDevs\Dokan\Withdraw\Hooks() )->update_vendor_balance( $withdraw );
 
