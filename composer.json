@@ -14,10 +14,9 @@
         }
     ],
     "require": {
-        "php": "^7.4",
+        "php": "^8.0",
         "gmostafa/php-graphql-client": "^1.13",
         "league/oauth2-client": "^2.6",
-        "symfony/polyfill-php80": "^1.30",
         "symfony/polyfill-php81": "^1.30",
         "symfony/polyfill-php82": "^1.30",
         "symfony/polyfill-php83": "^1.30",
