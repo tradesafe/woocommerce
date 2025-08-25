@@ -9,7 +9,7 @@
  * Text Domain: tradesafe-payment-gateway
  * Requires Plugins: woocommerce
  * Requires at least: 5.5
- * Requires PHP: 7.4
+ * Requires PHP: 8.0
  * Tested up to: 6.8
  * WC tested up to: 8.9
  * WC requires at least: 4.6
