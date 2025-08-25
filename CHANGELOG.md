@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.22.1](https://github.com/tradesafe/woocommerce/compare/v2.21.0...v2.22.1) (2025-08-25)
+
+### Features
+
+* Require php 8.0 ([1e61fb](https://github.com/tradesafe/woocommerce/commit/1e61fb663939ceb3fc7ead143d5023b4f9bfc931))
+
+
+---
+
 ## [2.21.0](https://github.com/tradesafe/woocommerce/compare/v2.20.6...v2.21.0) (2025-08-25)
 
 ### Features
