@@ -84,6 +84,7 @@ class TradeSafe {
 			'query_vars',
 			function ( $query_vars ) {
 				$query_vars[] = 'tradesafe';
+				$query_vars[] = 'action';
 				$query_vars[] = 'status';
 				$query_vars[] = 'method';
 				$query_vars[] = 'transactionId';
@@ -356,7 +357,7 @@ class TradeSafe {
 					$order_id = wc_get_order_id_by_order_key( $matches[1] );
 					$order    = wc_get_order( $order_id );
 
-					if ( in_array( $wp->query_vars['status'], array( 'failure', 'error', 'canceled' ) ) ) {
+					if ( in_array( $wp->query_vars['action'], array( 'failure', 'error', 'canceled' ) ) ) {
 						$pay_url = wc_get_endpoint_url( 'order-pay', $order_id, wc_get_checkout_url() );
 						$pay_url = add_query_arg(
 							array(
