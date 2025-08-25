@@ -4,6 +4,23 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.21.0](https://github.com/tradesafe/woocommerce/compare/v2.20.6...v2.21.0) (2025-08-25)
+
+### Features
+
+* Set minimum php version to 8.0 ([d66cdc](https://github.com/tradesafe/woocommerce/commit/d66cdc4c423ebbd80bcd0452817a016b85d2db58))
+
+### Bug Fixes
+
+* Changed array key from status to action ([e54908](https://github.com/tradesafe/woocommerce/commit/e54908796595e3a87d3b1154d826c48aea9d44ba))
+
+##### Deps
+
+* Update composer (#49) ([1baf26](https://github.com/tradesafe/woocommerce/commit/1baf265354afe959bbf81b2605304d7d932fdad0))
+
+
+---
+
 ## [2.20.6](https://github.com/tradesafe/woocommerce/compare/v2.20.5...v2.20.6) (2025-05-29)
 
 ### Bug Fixes

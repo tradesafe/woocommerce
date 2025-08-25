@@ -1,16 +1,16 @@
 <?php
 /**
  * Plugin Name: TradeSafe Payment Gateway
- * Plugin URI: https://developer.tradesafe.co.za/docs/1.2/plugins/woocommerce
+ * Plugin URI: https://docs.tradesafe.co.za/plugins/woocommerce/
  * Description: Process secure payments with TradeSafe. Customers can make payment either through Card, EFT, Instant EFT, Buy Now Pay Later, or QR code enabled devices. Give your store instant credibility. TradeSafe is backed by Standard Bank.
- * Version: 2.20.6
+ * Version: 2.21.0
  * Author: TradeSafe Escrow
  * Author URI: https://www.tradesafe.co.za
  * Text Domain: tradesafe-payment-gateway
  * Requires Plugins: woocommerce
  * Requires at least: 5.5
  * Requires PHP: 7.4
- * Tested up to: 6.7
+ * Tested up to: 6.8
  * WC tested up to: 8.9
  * WC requires at least: 4.6
  *

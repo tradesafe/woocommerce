@@ -4,7 +4,7 @@ Tags: woocommerce, dokan, payment gateway, escrow, credit card
 Requires at least: 5.6
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 2.20.6
+Stable tag: 2.21.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -82,44 +82,16 @@ Please do not hesitate to email [support@tradesafe.co.za](mailto:support@tradesa
 
 == Changelog ==
 
-= 2.20.6 2025-05-29 =
-
-### Bug Fixes
-
-* Pass correct withdraw data to balance function ([139ae8](https://github.com/tradesafe/woocommerce/commit/139ae8b9f2b55e64a94bae72cf17e99faad82e29))
-
-= 2.20.5 2025-05-27 =
-
-### Bug Fixes
-
-* Add command to update vendor balance after sync ([69ce70](https://github.com/tradesafe/woocommerce/commit/69ce70a7da200b471dc7160e4efd28f1122a0ba9))
-
-= 2.20.4 2025-05-22 =
-
-### Bug Fixes
-
-* Load withdrawal as pending before approving ([a074c1](https://github.com/tradesafe/woocommerce/commit/a074c13579c6922c4ef7827cd5cb6ca0603c18a0))
-
-= 2.20.3 2025-05-22 =
-
-### Bug Fixes
-
-* Changed status used when adding an approved withdraw in dokan ([d1bff5](https://github.com/tradesafe/woocommerce/commit/d1bff5c3ab1d3324fea3e5a0bbe98a5ec149ebc9))
-
-= 2.20.2 2025-05-14 =
-
-### Bug Fixes
-
-* Changed how vendor Id is loaded ([9320c2](https://github.com/tradesafe/woocommerce/commit/9320c2a871895ba303ebcfceb012eb1ff15692d9))
-
-= 2.20.1 2025-05-13 =
-
-### Bug Fixes
-
-* Updated error handeling for sync ([2b5d96](https://github.com/tradesafe/woocommerce/commit/2b5d96a4a3b72bce37b723b917999988884da5a7))
-
-= 2.20.0 2025-05-12 =
+= 2.21.0 2025-08-25 =
 
 ### Features
 
-* Added an option to sync dokan balance with tradesafe from the user edit page ([fc519d](https://github.com/tradesafe/woocommerce/commit/fc519dc6a777ee7eccf8e0cbc687e788ab634f84))
+* Set minimum php version to 8.0 ([d66cdc](https://github.com/tradesafe/woocommerce/commit/d66cdc4c423ebbd80bcd0452817a016b85d2db58))
+
+### Bug Fixes
+
+* Changed array key from status to action ([e54908](https://github.com/tradesafe/woocommerce/commit/e54908796595e3a87d3b1154d826c48aea9d44ba))
+
+##### Deps
+
+* Update composer (#49) ([1baf26](https://github.com/tradesafe/woocommerce/commit/1baf265354afe959bbf81b2605304d7d932fdad0))
