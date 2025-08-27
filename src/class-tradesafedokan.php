@@ -608,7 +608,7 @@ class TradeSafeDokan {
 		$token_id   = tradesafe_get_token_id( $vendor_id );
 		$token_data = $client->getToken( $token_id );
 
-		if ( $token_data['valid'] ) {
+		if ( !empty($token_data['balance']) && $token_data['balance'] > 0 ) {
 			array_push( $active_payment_methods, 'tradesafe' );
 		}
 
