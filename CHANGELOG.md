@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [2.22.2](https://github.com/tradesafe/woocommerce/compare/v2.22.1...v2.22.2) (2025-08-27)
+
+### Bug Fixes
+
+* Changed how user data is checked to allow a withdraw in dokan ([e83205](https://github.com/tradesafe/woocommerce/commit/e832059ac9b7cbb0e820678303913c540496f2de))
+
+
+---
+
 ## [2.22.1](https://github.com/tradesafe/woocommerce/compare/v2.21.0...v2.22.1) (2025-08-25)
 
 ### Features
