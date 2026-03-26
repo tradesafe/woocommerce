@@ -11,40 +11,58 @@ License URI: https://www.gnu.org/licenses/gpl-3.0.html
 The official TradeSafe plugin for WooCommerce
 
 == Description ==
-TradeSafe, backed by Standard Bank, provides an escrow payments-based solution that integrates seamlessly with your existing WordPress store.
+TradeSafe provides an escrow payments-based solution that integrates seamlessly with your existing WordPress store.
 
-With an average documented cart abandonment rate of 70%, it’s reported that many South Africans are becoming fearful when buying online. This is where we come in. TradeSafe bridges the trust gap and eliminates the fear when customers want to make payment upfront in full, online. We give your customers the peace of mind that they will receive what they paid for, leading to a boost in purchase confidence, and ultimately improving conversion rates.
+With an average documented cart abandonment rate of 70%, it’s reported that many South Africans are becoming fearful when buying online. TradeSafe bridges this trust gap by ensuring customers only release funds once they’ve received what they paid for, increasing purchase confidence and improving conversion rates.
 
-The TradeSafe plugin includes payment gateways namely Ozow (Instant EFT), Visa/Mastercard, PayJustNow (Buy Now Pay Later), SnapScan and normal EFT, with many more to come.
+What sets TradeSafe apart is that we sit between payment and delivery — securing funds until the transaction is successfully completed, while still providing a seamless checkout experience.
+
+Merchants have the flexibility to choose between escrow-secured payments or express payments, depending on their operational requirements and risk appetite.
+At checkout, customers will see either the TradeSafe or Relay branding, depending on whether escrow-secured or express payment flow is selected.
+
+The TradeSafe plugin includes payment gateways namely Ozow (Instant EFT), Visa/Mastercard, PayJustNow (Buy Now Pay Later), SnapScan, RCS, Diners Club, and normal EFT, with many more to come.
+
+Now incorporating Relay for direct settlement — improving cash flow, speeding up payments, and simplifying reconciliation across supported payment methods.
 
 The plugin also includes support for paying multiple vendors when using the Dokan plugin.
 
 ### How it Works
 
 - At checkout, the customer chooses to pay using TradeSafe.
-- The customer will be directed to a payment page, where they choose their payment option namely EFT, Instant EFT (Ozow), Card, SnapScan, and Buy Now Pay Later (PayJustNow).
+- Based on your configuration, the transaction follows either an escrow-secured flow (TradeSafe) or an express payment flow (Relay).
+- The customer is directed to a payment page where they select their preferred payment method (EFT, Instant EFT (Ozow), Card, SnapScan, RCS, Diners Club, or Buy Now Pay Later (PayJustNow)).
+
+- For express payments (Relay):
+- Payment is processed and settled directly to you.
+- The order is marked as PROCESSING and fulfilment begins immediately.
+
+- For escrow-secured payments (TradeSafe):
 - Once payment is successful, the order is marked as PROCESSING and delivery is kicked off.
-- When delivery has been completed, a new state called DELIVERED is reached. This triggers an email and sms which TradeSafe will send to the customer, asking them if they received what they ordered.
-- If yes, TradeSafe releases the funds to you, and/or your vendors if trading in a multi-vendor setup.
-- The customer has 24 hours in which to make their decision. If we do not hear from the customer within that time, TradeSafe will deem this as acceptance on the buyer's part and automatically release the funds to you.
-- If the customer is unhappy with the order, then the customer can submit a comment. The transaction will then be placed on hold in WooCommerce. This will give you the opportunity to enact your own return policies until a successful resolution has been achieved.
-- No refund will be processed without your consent. TradeSafe performs all refunds on your behalf. We take away this admin burden.
-- The buyer must have a material complaint and provide evidence. We will release the funds to you in the event the complaint/issue is non-material or frivolous.
+- When delivery has been completed, the order moves to a DELIVERED state.
+- TradeSafe notifies the customer via email and SMS to confirm whether the order was received as expected.
+- If confirmed, funds are released to you, and/or your vendors if trading in a multi-vendor setup.
+- The customer has 24 hours to respond. If no response is received, funds are automatically released.
+- If the customer is unhappy, they can raise a dispute. The transaction is placed on hold, allowing you to resolve the matter in line with your return policies.
+- No refund will be processed without your consent. TradeSafe manages refunds on your behalf.
+- Customers must submit a material complaint with supporting evidence. Non-material or frivolous complaints will result in funds being released to you.
 
 == Frequently Asked Questions ==
 
 = How does TradeSafe benefit me as a merchant? =
 
-- Boosts sales conversions. TradeSafe gives new uninitiated customers the peace of mind to make that upfront purchase.
+- Boosts sales conversions by removing friction and building trust at checkout.
+- More cost-efficient payment processing compared to traditional gateways.
+- Flexibility to choose between escrow-secured or express payment flows.
+- Faster settlement and improved reconciliation through direct settlement infrastructure.
 - We enable split payments for each transaction which allows your digital store to earn a commission for each transaction. No longer do you have to do this manually.
 - Refunds. Just hit that button, and we will refund the customer on your behalf.
 - Wallet functionality. TradeSafe provides two settlement options whereby we either pay to the beneficiary's bank account, or we credit their escrow wallet where they can manually withdraw the funds in WooCommerce.
-- We augment your store's credibility and reputational cred
+- We augment your store's credibility and reputational cred.
 
 = How does TradeSafe benefit my customers? =
 
-- Removes uncertainty and stress. An escrow holding account, together with Standard Bank’s logo, gives buyers the confidence to make that upfront payment.
-- We provide multiple payment options for their convenience.
+- Removes uncertainty and stress. An escrow holding account gives buyers the confidence to make that upfront payment.
+- Multiple payment options for convenience within a single checkout experience.
 - Customers are never redirected to another site, and they never need to register on a separate platform. We ensure a seamless user journey.
 
 = How and when do I get paid? =
@@ -54,9 +72,17 @@ We provide you two options how the funds are to be disbursed to you and/or your 
 1. Automatically. TradeSafe will make payment to your bank account. There is an additional small charge per transaction should you choose this option.
 2. Wallet withdraw. You can choose to withdrawal your funds from your WooCommerce dashboard.
 
-The payment frequencies can be set at your discretion. We will pay the funds to you either on a daily, weekly, bi-monthly, or monthly basis. Some merchants preferred to be paid at the end of the month, and some immediately. Just tell us what would suit you.
+The payment frequencies can be set at your discretion. We will pay the funds to you either on a daily, weekly, bi-monthly, or monthly basis. Some merchants prefer to be paid at the end of the month, and some immediately. Just tell us what would suit you.
 
-= Does the plugin support both production mode and sandbox mode for testing?
+= What is Relay" =
+
+Relay is TradeSafe’s direct settlement infrastructure, enabling payments to be processed and settled directly to you without going through the escrow workflow. It improves cash flow, speeds up payment processing, and simplifies reconciliation, while supporting the same payment methods your customers already know about.
+
+= How do I configure Relay for my customers? =
+
+Relay can be enabled by selecting the express payment option within your TradeSafe merchant or plugin settings. When enabled, transactions are processed via Relay and bypass the escrow workflow, with funds settled directly to you. Customers will see Relay branding at checkout for these transactions.
+
+= Does the plugin support both production mode and sandbox mode for testing? =
 
 Absolutely. You can toggle between production and sandbox easily within your TradeSafe merchant dashboard.
 
