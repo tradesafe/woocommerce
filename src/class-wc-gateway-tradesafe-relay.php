@@ -18,10 +18,9 @@ class WC_Gateway_TradeSafe_Relay extends WC_Gateway_TradeSafe {
 		$this->id                 = 'tradesafe-relay';
 		$this->method_title       = __( 'Relay', 'tradesafe-payment-gateway' );
 		$this->method_description = __( 'Fast, simple and secure payments powered by Relay', 'tradesafe-payment-gateway' );
-		$this->icon               = TRADESAFE_PAYMENT_GATEWAY_BASE_DIR . '/assets/images/logos.svg';
+		$this->icon               = null;
 
-		$settings = get_option( 'woocommerce_tradesafe-relay_settings', array() );
-		$this->client = new \TradeSafe\Helpers\TradeSafeApiClient($settings['client_id'] ?? null, $settings['client_secret'] ?? null, $settings['environment'] ?? null);
+		$this->client = new \TradeSafe\Helpers\TradeSafeApiClient( $this->id );
 
 		$this->version              = WC_GATEWAY_TRADESAFE_VERSION;
 		$this->available_countries  = array( 'ZA' );
@@ -63,14 +62,22 @@ class WC_Gateway_TradeSafe_Relay extends WC_Gateway_TradeSafe {
 	 * @return string
 	 */
 	public function get_title() {
-		// show the title with an icon on the checkout page alone
-		if ( ! is_checkout() ) {
-			return parent::get_title();
-		}
+		$title = strip_tags( $this->title );
+		$title = apply_filters( 'woocommerce_gateway_title', $title, $this->id );
 
+		// show the title with an icon on the checkout page alone
 		$logo_url = plugins_url( '../assets/images/logos.png', __FILE__ );
 		$img      = '<img src="' . $logo_url . '" style="height: 1.4em;margin-left: 0px;margin-right: 0.3em;display: inline;float: none;" class="' . $this->id . '-payment-method-title-icon" alt="Relay logo" />';
-		$title    = '<span style="display: inline-flex;align-items: center;vertical-align: middle;">' . $img . parent::get_title() . '</span>';
+		$title    = '<div style="display: inline-flex;align-items: center;vertical-align: middle;">Pay with Visa, Mastercard, Ozow, PayJustNow, SnapScan, or RCS</div><div>' . $img . '</div>';
 		return apply_filters( 'woocommerce_gateway_title', $title, $this->id );
+	}
+
+	/**
+	 * Get icon function.
+	 *
+	 * @return string
+	 */
+	public function get_icon() {
+		return apply_filters( 'woocommerce_gateway_icon', $this->icon, $this->id );
 	}
 }

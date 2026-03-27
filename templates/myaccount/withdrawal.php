@@ -18,12 +18,12 @@ defined( 'ABSPATH' ) || exit;
 			<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-first">
 				<label for="tradesafe_withdrawal_request"><?php esc_html_e( 'Amount', 'woocommerce-tradesafe-gateway' ); ?></label>
 				<input type="number" class="woocommerce-Input woocommerce-Input--text input-text"
-					   name="tradesafe_withdrawal_request"
-					   id="tradesafe_withdrawal_request"
-					   value="<?php esc_html_e( $token['balance'] ); ?>"
-					   min="<?php echo $token['balance'] > 5 ? '5' : '0'; ?>"
-					   max="<?php esc_html_e( $token['balance'] ); ?>"
-					   step="0.01"/>
+						name="tradesafe_withdrawal_request"
+						id="tradesafe_withdrawal_request"
+						value="<?php esc_html_e( $token['balance'] ); ?>"
+						min="<?php echo $token['balance'] > 5 ? '5' : '0'; ?>"
+						max="<?php esc_html_e( $token['balance'] ); ?>"
+						step="0.01"/>
 			</p>
 			<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-last">
 				<label>&nbsp;</label>
@@ -169,8 +169,8 @@ defined( 'ABSPATH' ) || exit;
 		<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
 			<label class="woocommerce-form__label woocommerce-form__label-for-checkbox checkbox">
 				<input type="checkbox" class="woocommerce-form__input woocommerce-form__input-checkbox input-checkbox"
-					   name="is_organization" <?php checked( ! empty( $is_organization ), true ); // WPCS: input var ok, csrf ok. ?>
-					   id="is_organization"/>
+						name="is_organization" <?php checked( ! empty( $is_organization ), true ); // WPCS: input var ok, csrf ok. ?>
+						id="is_organization"/>
 				<span class="woocommerce-is-organization-text"><?php esc_html_e( 'Is this account for an organisation?', 'woocommerce' ); ?></span>
 			</label>
 		</p>
@@ -183,17 +183,17 @@ defined( 'ABSPATH' ) || exit;
 				<label for="tradesafe_token_given_name"><?php esc_html_e( 'First name', 'woocommerce' ); ?>&nbsp;<span
 							class="required">*</span></label>
 				<input type="text" class="woocommerce-Input woocommerce-Input--text input-text"
-					   name="tradesafe_token_given_name"
-					   id="tradesafe_token_given_name" autocomplete="given-name"
-					   value="<?php esc_attr_e( $token['user']['givenName'] ?? null ); ?>"/>
+						name="tradesafe_token_given_name"
+						id="tradesafe_token_given_name" autocomplete="given-name"
+						value="<?php esc_attr_e( $token['user']['givenName'] ?? null ); ?>"/>
 			</p>
 			<p class="woocommerce-form-row woocommerce-form-row--last form-row form-row-last">
 				<label for="tradesafe_token_family_name"><?php esc_html_e( 'Last name', 'woocommerce' ); ?>&nbsp;<span
 							class="required">*</span></label>
 				<input type="text" class="woocommerce-Input woocommerce-Input--text input-text"
-					   name="tradesafe_token_family_name"
-					   id="tradesafe_token_family_name" autocomplete="family-name"
-					   value="<?php esc_attr_e( $token['user']['familyName'] ?? null ); ?>"/>
+						name="tradesafe_token_family_name"
+						id="tradesafe_token_family_name" autocomplete="family-name"
+						value="<?php esc_attr_e( $token['user']['familyName'] ?? null ); ?>"/>
 			</p>
 			<div class="clear"></div>
 
@@ -201,9 +201,9 @@ defined( 'ABSPATH' ) || exit;
 				<label for="tradesafe_token_email"><?php esc_html_e( 'Email address', 'woocommerce' ); ?>&nbsp;<span
 							class="required">*</span></label>
 				<input type="email" class="woocommerce-Input woocommerce-Input--email input-text"
-					   name="tradesafe_token_email"
-					   id="tradesafe_token_email" autocomplete="email"
-					   value="<?php esc_attr_e( $token['user']['email'] ?? null ); ?>"/>
+						name="tradesafe_token_email"
+						id="tradesafe_token_email" autocomplete="email"
+						value="<?php esc_attr_e( $token['user']['email'] ?? null ); ?>"/>
 			</p>
 			<div class="clear"></div>
 
@@ -211,9 +211,9 @@ defined( 'ABSPATH' ) || exit;
 				<label for="tradesafe_token_mobile"><?php esc_html_e( 'Mobile Number', 'woocommerce' ); ?>&nbsp;<span
 							class="required">*</span></label>
 				<input type="tel" class="woocommerce-Input woocommerce-Input--mobile input-text"
-					   name="tradesafe_token_mobile"
-					   id="tradesafe_token_mobile" autocomplete="mobile"
-					   value="<?php esc_attr_e( $token['user']['mobile'] ?? null ); ?>"/>
+						name="tradesafe_token_mobile"
+						id="tradesafe_token_mobile" autocomplete="mobile"
+						value="<?php esc_attr_e( $token['user']['mobile'] ?? null ); ?>"/>
 			</p>
 			<div class="clear"></div>
 
@@ -221,9 +221,9 @@ defined( 'ABSPATH' ) || exit;
 				<label for="tradesafe_token_id_number"><?php esc_html_e( 'ID Number', 'woocommerce' ); ?>&nbsp;<span
 							class="required">*</span></label>
 				<input type="text" class="woocommerce-Input woocommerce-Input--mobile input-text"
-					   name="tradesafe_token_id_number"
-					   id="tradesafe_token_id_number" autocomplete="id-number"
-					   value="<?php esc_attr_e( $token['user']['idNumber'] ?? null ); ?>"/>
+						name="tradesafe_token_id_number"
+						id="tradesafe_token_id_number" autocomplete="id-number"
+						value="<?php esc_attr_e( $token['user']['idNumber'] ?? null ); ?>"/>
 			</p>
 			<div class="clear"></div>
 		</fieldset>
@@ -234,8 +234,8 @@ defined( 'ABSPATH' ) || exit;
 			<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
 				<label for="tradesafe_token_organization_name"><?php esc_html_e( 'Name', 'woocommerce-tradesafe-gateway' ); ?></label>
 				<input type="text" class="woocommerce-Input woocommerce-Input--text input-text"
-					   name="tradesafe_token_organization_name" id="tradesafe_token_organization_name"
-					   value="<?php esc_attr_e( $token['organization']['name'] ?? null ); ?>"/>
+						name="tradesafe_token_organization_name" id="tradesafe_token_organization_name"
+						value="<?php esc_attr_e( $token['organization']['name'] ?? null ); ?>"/>
 			</p>
 
 			<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-first">
@@ -253,24 +253,24 @@ defined( 'ABSPATH' ) || exit;
 			<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-last">
 				<label for="tradesafe_token_organization_trading_name"><?php esc_html_e( 'Trading Name', 'woocommerce-tradesafe-gateway' ); ?></label>
 				<input type="text" class="woocommerce-Input woocommerce-Input--text input-text"
-					   name="tradesafe_token_organization_trading_name" id="tradesafe_token_organization_trading_name"
-					   value="<?php esc_attr_e( $token['organization']['tradeName'] ?? null ); ?>"/>
+						name="tradesafe_token_organization_trading_name" id="tradesafe_token_organization_trading_name"
+						value="<?php esc_attr_e( $token['organization']['tradeName'] ?? null ); ?>"/>
 			</p>
 			<div class="clear"></div>
 
 			<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-first">
 				<label for="tradesafe_token_organization_registration_number"><?php esc_html_e( 'Registration Number', 'woocommerce-tradesafe-gateway' ); ?></label>
 				<input type="text" class="woocommerce-Input woocommerce-Input--text input-text"
-					   name="tradesafe_token_organization_registration_number"
-					   id="tradesafe_token_organization_registration_number"
-					   value="<?php esc_attr_e( $token['organization']['registration'] ?? null ); ?>"/>
+						name="tradesafe_token_organization_registration_number"
+						id="tradesafe_token_organization_registration_number"
+						value="<?php esc_attr_e( $token['organization']['registration'] ?? null ); ?>"/>
 			</p>
 
 			<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-last">
 				<label for="tradesafe_token_organization_tax_number"><?php esc_html_e( 'VAT Number', 'woocommerce-tradesafe-gateway' ); ?></label>
 				<input type="text" class="woocommerce-Input woocommerce-Input--text input-text"
-					   name="tradesafe_token_organization_tax_number" id="tradesafe_token_organization_tax_number"
-					   value="<?php esc_attr_e( $token['organization']['taxNumber'] ?? null ); ?>"/>
+						name="tradesafe_token_organization_tax_number" id="tradesafe_token_organization_tax_number"
+						value="<?php esc_attr_e( $token['organization']['taxNumber'] ?? null ); ?>"/>
 			</p>
 		</fieldset>
 
@@ -306,8 +306,8 @@ defined( 'ABSPATH' ) || exit;
 				<label for="tradesafe_token_bank_account_number"><?php esc_html_e( 'Account number', 'woocommerce-tradesafe-gateway' ); ?>
 					&nbsp;<span class="required">*</span></label>
 				<input type="text" class="woocommerce-Input woocommerce-Input--mobile input-text"
-					   name="tradesafe_token_bank_account_number" id="tradesafe_token_bank_account_number"
-					   value="<?php esc_attr_e( $token['bankAccount']['accountNumber'] ?? null ); ?>"/>
+						name="tradesafe_token_bank_account_number" id="tradesafe_token_bank_account_number"
+						value="<?php esc_attr_e( $token['bankAccount']['accountNumber'] ?? null ); ?>"/>
 			</p>
 
 			<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-last">

@@ -24,7 +24,7 @@ final class WC_Gateway_TradeSafe_Blocks_Support extends AbstractPaymentMethodTyp
 		$payment_gateways_class = WC()->payment_gateways();
 		$payment_gateways       = $payment_gateways_class->payment_gateways();
 
-		return $payment_gateways[$this->name]->is_available();
+		return $payment_gateways[ $this->name ]->is_available();
 	}
 
 	public function get_payment_method_script_handles() {
@@ -65,7 +65,6 @@ final class WC_Gateway_TradeSafe_Blocks_Support extends AbstractPaymentMethodTyp
 
 	public function get_supported_features() {
 		$payment_gateways = WC()->payment_gateways->payment_gateways();
-		return $payment_gateways[$this->name]->supports;
+		return $payment_gateways[ $this->name ]->supports;
 	}
-
 }
