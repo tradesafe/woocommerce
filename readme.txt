@@ -1,10 +1,10 @@
 === TradeSafe Payment Gateway for WooCommerce ===
 Contributors: richardnbanks, tradesafeops
 Tags: woocommerce, dokan, payment gateway, escrow, credit card
-Requires at least: 5.6
-Tested up to: 6.7
-Requires PHP: 7.4
-Stable tag: 2.22.2
+Requires at least: 6.0
+Tested up to: 6.9
+Requires PHP: 8.0
+Stable tag: 3.0.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -108,30 +108,10 @@ Please do not hesitate to email [support@tradesafe.co.za](mailto:support@tradesa
 
 == Changelog ==
 
-= 2.22.2 2025-08-27 =
+= 3.0.0 2026-03-27 =
 
-### Bug Fixes
-
-* Changed how user data is checked to allow a withdraw in dokan ([e83205](https://github.com/tradesafe/woocommerce/commit/e832059ac9b7cbb0e820678303913c540496f2de))
-
-
-= 2.22.1 2025-08-25 =
+## [3.0.0](https://github.com/tradesafe/woocommerce/compare/v2.22.2...v3.0.0) (2026-03-27)
 
 ### Features
 
-* Require php 8.0 ([1e61fb](https://github.com/tradesafe/woocommerce/commit/1e61fb663939ceb3fc7ead143d5023b4f9bfc931))
-
-
-= 2.21.0 2025-08-25 =
-
-### Features
-
-* Set minimum php version to 8.0 ([d66cdc](https://github.com/tradesafe/woocommerce/commit/d66cdc4c423ebbd80bcd0452817a016b85d2db58))
-
-### Bug Fixes
-
-* Changed array key from status to action ([e54908](https://github.com/tradesafe/woocommerce/commit/e54908796595e3a87d3b1154d826c48aea9d44ba))
-
-##### Deps
-
-* Update composer (#49) ([1baf26](https://github.com/tradesafe/woocommerce/commit/1baf265354afe959bbf81b2605304d7d932fdad0))
+* Added inital work for relay payment method (#54) ([a7a0f4](https://github.com/tradesafe/woocommerce/commit/a7a0f46519dffd5213dc6b20de9a02567097da15))
