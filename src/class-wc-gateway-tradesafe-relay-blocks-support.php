@@ -57,6 +57,7 @@ final class WC_Gateway_TradeSafe_Relay_Blocks_Support extends AbstractPaymentMet
 			'description' => $this->get_setting( 'description' ),
 			'supports'    => $this->get_supported_features(),
 			'logo_urls'   => array(
+				TRADESAFE_PAYMENT_GATEWAY_BASE_DIR . '/assets/images/icon-relay.png',
 				TRADESAFE_PAYMENT_GATEWAY_BASE_DIR . '/assets/images/logos.png',
 			),
 		);

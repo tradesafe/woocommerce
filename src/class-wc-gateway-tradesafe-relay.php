@@ -18,7 +18,7 @@ class WC_Gateway_TradeSafe_Relay extends WC_Gateway_TradeSafe {
 		$this->id                 = 'tradesafe-relay';
 		$this->method_title       = __( 'Relay', 'tradesafe-payment-gateway' );
 		$this->method_description = __( 'Fast, simple and secure payments powered by Relay', 'tradesafe-payment-gateway' );
-		$this->icon               = null;
+		$this->icon               = TRADESAFE_PAYMENT_GATEWAY_BASE_DIR . '/assets/images/icon-relay.png';
 
 		$this->client = new \TradeSafe\Helpers\TradeSafeApiClient( $this->id );
 
@@ -68,16 +68,7 @@ class WC_Gateway_TradeSafe_Relay extends WC_Gateway_TradeSafe {
 		// show the title with an icon on the checkout page alone
 		$logo_url = plugins_url( '../assets/images/logos.png', __FILE__ );
 		$img      = '<img src="' . $logo_url . '" style="height: 1.4em;margin-left: 0px;margin-right: 0.3em;display: inline;float: none;" class="' . $this->id . '-payment-method-title-icon" alt="Relay logo" />';
-		$title    = '<div style="display: inline-flex;align-items: center;vertical-align: middle;">Pay with Visa, Mastercard, Ozow, PayJustNow, SnapScan, or RCS</div><div>' . $img . '</div>';
+		$title    = '<span style="display: inline-flex;flex-direction: column;align-items: start;vertical-align: middle;"><span>Pay with Visa, Mastercard, Ozow, PayJustNow, SnapScan, or RCS</span><span>' . $img . '</span></span>';
 		return apply_filters( 'woocommerce_gateway_title', $title, $this->id );
-	}
-
-	/**
-	 * Get icon function.
-	 *
-	 * @return string
-	 */
-	public function get_icon() {
-		return apply_filters( 'woocommerce_gateway_icon', $this->icon, $this->id );
 	}
 }

@@ -8,11 +8,11 @@
  * Author URI: https://www.tradesafe.co.za
  * Text Domain: tradesafe-payment-gateway
  * Requires Plugins: woocommerce
- * Requires at least: 5.5
+ * Requires at least: 6.0
  * Requires PHP: 8.0
- * Tested up to: 6.8
- * WC tested up to: 8.9
- * WC requires at least: 4.6
+ * Tested up to: 6.9
+ * WC tested up to: 10.6
+ * WC requires at least: 9.0
  *
  * @package TradeSafe Payment Gateway
  */

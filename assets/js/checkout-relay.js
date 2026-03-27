@@ -24,6 +24,7 @@
             (0, r.createElement)("img", {src: settings?.logo_urls[0], alt: settings?.title}, null),
             label
         ),
+        (0, r.createElement)("img", {src: settings?.logo_urls[1], alt: "Payment Types", style: {"padding-right": "1rem"}}),
     );
 
     (0, br.registerPaymentMethod)({

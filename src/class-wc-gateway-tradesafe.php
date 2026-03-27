@@ -45,7 +45,7 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 	public function __construct() {
 		$this->id                 = 'tradesafe';
 		$this->method_title       = __( 'TradeSafe', 'tradesafe-payment-gateway' );
-		$this->method_description = __( 'TradeSafe, backed by Standard Bank, allows for your money to be kept safely until you receive what you ordered. Simply pay using Credit/Debit card, EFT, SnapScan, Ozow, or buy it now and pay later with PayJustNow.', 'tradesafe-payment-gateway' );
+		$this->method_description = __( 'Your payment is securely held until you receive your order.', 'tradesafe-payment-gateway' );
 		$this->icon               = TRADESAFE_PAYMENT_GATEWAY_BASE_DIR . '/assets/images/icon.svg';
 
 		$this->client = new \TradeSafe\Helpers\TradeSafeApiClient( $this->id );
@@ -97,7 +97,7 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 
 		$logo_url = plugins_url( '../assets/images/logos.png', __FILE__ );
 		$img      = '<img src="' . $logo_url . '" style="height: 1.4em;margin-left: 0px;margin-right: 0.3em;display: inline;float: none;" class="' . $this->id . '-payment-method-title-icon" alt="TradeSafe logo" />';
-		$title    = '<span style="display: inline-flex;align-items: center;vertical-align: middle;">' . $img . parent::get_title() . '</span>';
+		$title    = '<span style="display: inline-flex;flex-direction: column;align-items: start;vertical-align: middle;"><span>' . parent::get_title() . '</span><span>' . $img . '</span></span>';
 		return apply_filters( 'woocommerce_gateway_title', $title, $this->id );
 	}
 
@@ -833,7 +833,7 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 				$item_list[] = html_entity_decode( esc_attr( $item->get_name() ) . ': ' . strip_tags( wc_price( $order->get_line_subtotal( $item ), array( 'currency' => $order->get_currency() ) ) ) . ' (excl)' );
 			}
 
-			$payout_interval = 'IMMEDIATE';
+			$payout_interval = 'WALLET';
 			$settings        = get_option( 'woocommerce_' . $payment_method . '_settings', array() );
 
 			if ( empty( $settings['payout_method'] ) ) {
