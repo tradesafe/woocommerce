@@ -445,9 +445,9 @@ class TradeSafe {
 		$totals = WC()->cart->get_totals();
 
 		$base_value = $totals['subtotal']
-					  + $totals['shipping_total']
-					  - $totals['discount_total']
-					  + $totals['fee_total'];
+						+ $totals['shipping_total']
+						- $totals['discount_total']
+						+ $totals['fee_total'];
 
 		foreach ( WC()->cart->get_taxes() as $tax ) {
 			$base_value += $tax;
@@ -549,7 +549,7 @@ class TradeSafe {
 					}
 
 					if ( isset( $settings['delivery_delay_notification'] )
-						 && 'yes' === $settings['delivery_delay_notification'] ) {
+						&& 'yes' === $settings['delivery_delay_notification'] ) {
 						$client->allocationInTransit( $transaction['allocations'][0]['id'] );
 
 						$order->add_order_note( __( 'Good acceptance notification will be sent to the customer in ' . $settings['delivery_days'] . ' business days.', 'tradesafe-payment-gateway' ) );
@@ -628,7 +628,7 @@ class TradeSafe {
 				}
 
 				if ( isset( $settings['delivery_delay_notification'] )
-					 && 'yes' === $settings['delivery_delay_notification'] ) {
+					&& 'yes' === $settings['delivery_delay_notification'] ) {
 					$client->allocationInTransit( $transaction['allocations'][0]['id'] );
 
 					$order->add_order_note( __( 'Good acceptance notification will be sent to the customer in ' . $settings['delivery_days'] . ' business days.', 'tradesafe-payment-gateway' ) );

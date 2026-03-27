@@ -8,11 +8,11 @@
  * Author URI: https://www.tradesafe.co.za
  * Text Domain: tradesafe-payment-gateway
  * Requires Plugins: woocommerce
- * Requires at least: 5.5
+ * Requires at least: 6.0
  * Requires PHP: 8.0
- * Tested up to: 6.8
- * WC tested up to: 8.9
- * WC requires at least: 4.6
+ * Tested up to: 6.9
+ * WC tested up to: 10.6
+ * WC requires at least: 9.0
  *
  * @package TradeSafe Payment Gateway
  */
@@ -65,6 +65,7 @@ function tradesafe_payment_gateway_init() {
 	require_once plugin_basename( 'src/class-tradesafedokan.php' );
 	require_once plugin_basename( 'src/class-tradesafeprofile.php' );
 	require_once plugin_basename( 'src/class-wc-gateway-tradesafe.php' );
+	require_once plugin_basename( 'src/class-wc-gateway-tradesafe-relay.php' );
 	require_once plugin_basename( 'helpers/class-tradesafeapiclient.php' );
 
 	add_action( 'init', array( 'TradeSafe', 'init' ) );
@@ -136,6 +137,8 @@ add_filter( 'plugin_row_meta', 'tradesafe_payment_gateway_plugin_row_meta', 10, 
  */
 function tradesafe_payment_gateway_add( $methods ) {
 	$methods[] = 'WC_Gateway_TradeSafe';
+	$methods[] = 'WC_Gateway_TradeSafe_Relay';
+
 	return $methods;
 }
 
@@ -376,11 +379,19 @@ function tradesafe_payment_gateway_update_db_check() {
 function tradesafe_payment_gateway_woocommerce_blocks_support() {
 	if ( class_exists( 'Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType' ) ) {
 		require_once TRADESAFE_PAYMENT_GATEWAY_PATH . '/src/class-wc-gateway-tradesafe-blocks-support.php';
+		require_once TRADESAFE_PAYMENT_GATEWAY_PATH . '/src/class-wc-gateway-tradesafe-relay-blocks-support.php';
 
 		add_action(
 			'woocommerce_blocks_payment_method_type_registration',
 			function ( Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry $payment_method_registry ) {
 				$payment_method_registry->register( new WC_Gateway_TradeSafe_Blocks_Support() );
+			}
+		);
+
+		add_action(
+			'woocommerce_blocks_payment_method_type_registration',
+			function ( Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry $payment_method_registry ) {
+				$payment_method_registry->register( new WC_Gateway_TradeSafe_Relay_Blocks_Support() );
 			}
 		);
 	}

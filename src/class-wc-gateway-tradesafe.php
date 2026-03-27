@@ -14,7 +14,7 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 	/**
 	 * Api Client
 	 *
-	 * @var string
+	 * @var \TradeSafe\Helpers\TradeSafeApiClient
 	 */
 	public $client;
 
@@ -23,7 +23,21 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 	 *
 	 * @var string
 	 */
-	public $version;
+	public string $version;
+
+	/**
+	 * Available Countries
+	 *
+	 * @var array
+	 */
+	public array $available_countries;
+
+	/**
+	 * Available Currencies
+	 *
+	 * @var array
+	 */
+	public array $available_currencies;
 
 	/**
 	 * Constructor.
@@ -31,10 +45,10 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 	public function __construct() {
 		$this->id                 = 'tradesafe';
 		$this->method_title       = __( 'TradeSafe', 'tradesafe-payment-gateway' );
-		$this->method_description = __( 'TradeSafe, backed by Standard Bank, allows for your money to be kept safely until you receive what you ordered. Simply pay using Credit/Debit card, EFT, SnapScan, Ozow, or buy it now and pay later with PayJustNow.', 'tradesafe-payment-gateway' );
-		$this->icon               = TRADESAFE_PAYMENT_GATEWAY_BASE_DIR . '/assets/images/logos.svg';
+		$this->method_description = __( 'Your payment is securely held until you receive your order.', 'tradesafe-payment-gateway' );
+		$this->icon               = TRADESAFE_PAYMENT_GATEWAY_BASE_DIR . '/assets/images/icon.svg';
 
-		$this->client = new \TradeSafe\Helpers\TradeSafeApiClient();
+		$this->client = new \TradeSafe\Helpers\TradeSafeApiClient( $this->id );
 
 		$this->version              = WC_GATEWAY_TRADESAFE_VERSION;
 		$this->available_countries  = array( 'ZA' );
@@ -81,9 +95,9 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 			return parent::get_title();
 		}
 
-		$logo_url = plugins_url( '../assets/images/icon.svg', __FILE__ );
+		$logo_url = plugins_url( '../assets/images/logos.png', __FILE__ );
 		$img      = '<img src="' . $logo_url . '" style="height: 1.4em;margin-left: 0px;margin-right: 0.3em;display: inline;float: none;" class="' . $this->id . '-payment-method-title-icon" alt="TradeSafe logo" />';
-		$title    = '<span style="display: inline-flex;align-items: center;vertical-align: middle;">' . $img . parent::get_title() . '</span>';
+		$title    = '<span style="display: inline-flex;flex-direction: column;align-items: start;vertical-align: middle;"><span>' . parent::get_title() . '</span><span>' . $img . '</span></span>';
 		return apply_filters( 'woocommerce_gateway_title', $title, $this->id );
 	}
 
@@ -110,7 +124,7 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 			return false;
 		}
 
-		$settings = get_option( 'woocommerce_tradesafe_settings', array() );
+		$settings = get_option( 'woocommerce_' . $this->id . '_settings', array() );
 
 		if ( ! isset( $settings['client_id'] )
 			|| '' === $settings['client_id']
@@ -151,7 +165,7 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 			&& isset( $_GET['section'] )
 			&& $_GET['page'] === 'wc-settings'
 			&& $_GET['tab'] === 'checkout'
-			&& $_GET['section'] === 'tradesafe' ) {
+			&& $_GET['section'] === $this->id ) {
 			return;
 		}
 
@@ -159,13 +173,12 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 			array(
 				'page'    => 'wc-settings',
 				'tab'     => 'checkout',
-				'section' => 'tradesafe',
+				'section' => $this->id,
 			),
 			admin_url( 'admin.php' )
 		);
 
-		 $client  = new \TradeSafe\Helpers\TradeSafeApiClient();
-		 $profile = $client->profile();
+		$profile = $this->client->profile();
 
 		if ( isset( $profile['error'] ) ) {
 			echo '<div class="notice notice-error">
@@ -176,21 +189,21 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 		    </div>';
 		}
 
-		if ( true === $this->is_valid_for_use()
-			&& false === tradesafe_is_prod() ) {
-			echo '<div class="notice notice-warning is-dismissible">
-                <h2>Warning you are running the TradeSafe plugin in sandbox mode!</h2>
-                <p>Any users who crate orders while in this mode will not be charged! To fix this go to the TradeSafe settings page and change the environment to "Live".</p>
-                <p><a href="' . esc_url( $settings_url ) . '" class="button button-primary button-large">Take me to the settings page!</a></p>
-            </div>';
-		}
+		// if ( true === $this->is_valid_for_use()
+		// && false === tradesafe_is_prod() ) {
+		// echo '<div class="notice notice-warning is-dismissible">
+		// <h2>Warning you are running the TradeSafe plugin in sandbox mode!</h2>
+		// <p>Any users who crate orders while in this mode will not be charged! To fix this go to the TradeSafe settings page and change the environment to "Live".</p>
+		// <p><a href="' . esc_url( $settings_url ) . '" class="button button-primary button-large">Take me to the settings page!</a></p>
+		// </div>';
+		// }
 	}
 
 	/**
 	 * Define Gateway settings fields.
 	 */
 	public function init_form_fields() {
-		$settings       = get_option( 'woocommerce_tradesafe_settings', array() );
+		$settings       = get_option( 'woocommerce_' . $this->id . '_settings', array() );
 		$view_order_url = wc_get_endpoint_url( 'view-order', 1234, get_permalink( get_option( 'woocommerce_myaccount_page_id' ) ) );
 
 		if ( ! empty( $settings['success_redirect'] ) ) {
@@ -200,7 +213,7 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 		$form = array(
 			'enabled'     => array(
 				'title'       => __( 'Enable/Disable', 'tradesafe-payment-gateway' ),
-				'label'       => __( 'Enable TradeSafe', 'tradesafe-payment-gateway' ),
+				'label'       => __( 'Enable', 'tradesafe-payment-gateway' ),
 				'type'        => 'checkbox',
 				'description' => __( 'This controls whether or not this gateway is enabled within WooCommerce.', 'tradesafe-payment-gateway' ),
 				'default'     => 'yes',
@@ -348,132 +361,132 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 			'desc_tip'    => false,
 		);
 
-		 $form['marketplace_section_title'] = array(
-			 'title'       => __( 'Marketplace Settings', 'tradesafe-payment-gateway' ),
-			 'type'        => 'title',
-			 'description' => __( 'Additional settings for creating a marketplace', 'tradesafe-payment-gateway' ),
-		 );
+		$form['marketplace_section_title'] = array(
+			'title'       => __( 'Marketplace Settings', 'tradesafe-payment-gateway' ),
+			'type'        => 'title',
+			'description' => __( 'Additional settings for creating a marketplace', 'tradesafe-payment-gateway' ),
+		);
 
-		 $form['is_marketplace'] = array(
-			 'title'       => __( 'Is this website a Marketplace?', 'tradesafe-payment-gateway' ),
-			 'label'       => 'Enable Marketplace Support',
-			 'type'        => 'checkbox',
-			 'description' => __( 'You are a marketplace owner who is paid a commission and has multiple vendors onboarded onto your store', 'tradesafe-payment-gateway' ),
-			 'default'     => false,
-			 'desc_tip'    => false,
-			 'class'       => 'test',
-		 );
+		$form['is_marketplace'] = array(
+			'title'       => __( 'Is this website a Marketplace?', 'tradesafe-payment-gateway' ),
+			'label'       => 'Enable Marketplace Support',
+			'type'        => 'checkbox',
+			'description' => __( 'You are a marketplace owner who is paid a commission and has multiple vendors onboarded onto your store', 'tradesafe-payment-gateway' ),
+			'default'     => false,
+			'desc_tip'    => false,
+			'class'       => 'test',
+		);
 
-		 $form['marketplace_section_open_box'] = array(
-			 'type'  => 'open_box',
-			 'class' => 'is-marketplace',
-		 );
+		$form['marketplace_section_open_box'] = array(
+			'type'  => 'open_box',
+			'class' => 'is-marketplace',
+		);
 
-		 $form['commission'] = array(
-			 'title'             => __( 'Marketplace Commission Fee', 'tradesafe-payment-gateway' ),
-			 'type'              => 'number',
-			 'description'       => __( 'What is the amount that is payable to you the marketplace owner for every transaction', 'tradesafe-payment-gateway' ),
-			 'default'           => 10,
-			 'desc_tip'          => false,
-			 'custom_attributes' => array(
-				 'min'  => 1,
-				 'step' => 0.01,
-			 ),
-		 );
+		$form['commission'] = array(
+			'title'             => __( 'Marketplace Commission Fee', 'tradesafe-payment-gateway' ),
+			'type'              => 'number',
+			'description'       => __( 'What is the amount that is payable to you the marketplace owner for every transaction', 'tradesafe-payment-gateway' ),
+			'default'           => 10,
+			'desc_tip'          => false,
+			'custom_attributes' => array(
+				'min'  => 1,
+				'step' => 0.01,
+			),
+		);
 
-		 $form['commission_type'] = array(
-			 'title'    => __( 'Marketplace Commission Type', 'tradesafe-payment-gateway' ),
-			 'type'     => 'select',
-			 'default'  => 'PERCENT',
-			 'options'  => array(
-				 'PERCENT' => 'Percentage',
-				 'FIXED'   => 'Fixed Value',
-			 ),
-			 'desc_tip' => false,
-		 );
+		$form['commission_type'] = array(
+			'title'    => __( 'Marketplace Commission Type', 'tradesafe-payment-gateway' ),
+			'type'     => 'select',
+			'default'  => 'PERCENT',
+			'options'  => array(
+				'PERCENT' => 'Percentage',
+				'FIXED'   => 'Fixed Value',
+			),
+			'desc_tip' => false,
+		);
 
-		 $form['commission_allocation'] = array(
-			 'title'    => __( 'Marketplace Commission Fee Allocation', 'tradesafe-payment-gateway' ),
-			 'type'     => 'select',
-			 'default'  => 'VENDOR',
-			 'options'  => array(
-				 'BUYER'  => 'Buyer',
-				 'VENDOR' => 'Vendor',
-			 ),
-			 'desc_tip' => false,
-		 );
+		$form['commission_allocation'] = array(
+			'title'    => __( 'Marketplace Commission Fee Allocation', 'tradesafe-payment-gateway' ),
+			'type'     => 'select',
+			'default'  => 'VENDOR',
+			'options'  => array(
+				'BUYER'  => 'Buyer',
+				'VENDOR' => 'Vendor',
+			),
+			'desc_tip' => false,
+		);
 
-		 if ( tradesafe_has_dokan() ) {
-			 $form['commission'] = array(
-				 'title'       => __( 'Marketplace Commission Fee', 'tradesafe-payment-gateway' ),
-				 'description' => __( 'What is the amount that is payable to you the marketplace owner for every transaction.', 'tradesafe-payment-gateway' ),
-				 'type'        => 'row',
-				 'value'       => dokan_get_option( 'admin_percentage', 'dokan_selling', 0 ),
-			 );
+		if ( tradesafe_has_dokan() ) {
+			$form['commission'] = array(
+				'title'       => __( 'Marketplace Commission Fee', 'tradesafe-payment-gateway' ),
+				'description' => __( 'What is the amount that is payable to you the marketplace owner for every transaction.', 'tradesafe-payment-gateway' ),
+				'type'        => 'row',
+				'value'       => dokan_get_option( 'admin_percentage', 'dokan_selling', 0 ),
+			);
 
-			 $form['commission_type'] = array(
-				 'title'       => __( 'Marketplace Commission Type', 'tradesafe-payment-gateway' ),
-				 'description' => __( 'What type of commission been changed.', 'tradesafe-payment-gateway' ),
-				 'type'        => 'row',
-				 'value'       => ucwords( dokan_get_option( 'commission_type', 'dokan_selling', 'percentage' ) ),
-			 );
+			$form['commission_type'] = array(
+				'title'       => __( 'Marketplace Commission Type', 'tradesafe-payment-gateway' ),
+				'description' => __( 'What type of commission been changed.', 'tradesafe-payment-gateway' ),
+				'type'        => 'row',
+				'value'       => ucwords( dokan_get_option( 'commission_type', 'dokan_selling', 'percentage' ) ),
+			);
 
-			 $form['commission_allocation'] = array(
-				 'title'       => __( 'Marketplace Commission Fee Allocation', 'tradesafe-payment-gateway' ),
-				 'description' => __( 'Who will pay the commission.' ),
-				 'type'        => 'row',
-				 'value'       => 'Vendor',
-			 );
-		 }
+			$form['commission_allocation'] = array(
+				'title'       => __( 'Marketplace Commission Fee Allocation', 'tradesafe-payment-gateway' ),
+				'description' => __( 'Who will pay the commission.' ),
+				'type'        => 'row',
+				'value'       => 'Vendor',
+			);
+		}
 
-		 $form['payout_method'] = array(
-			 'title'       => __( 'When should Vendors be Paid Out?', 'tradesafe-payment-gateway' ),
-			 'description' => 'A R5 fee (excl.) is incurred for payouts. If "Once a month" is selected this fee is waived.',
-			 'type'        => 'select',
-			 'default'     => 'IMMEDIATE',
-			 'options'     => array(
-				 'WALLET'    => 'Wallet - Manual Withdrawal',
-				 'IMMEDIATE' => 'Bank Account - Immediate',
-				 'WEEKLY'    => 'Bank Account - Once a Week',
-				 'MONTHLY'   => 'Bank Account - Once a Month',
-			 ),
-		 );
+		$form['payout_method'] = array(
+			'title'       => __( 'When should Vendors be Paid Out?', 'tradesafe-payment-gateway' ),
+			'description' => 'A R5 fee (excl.) is incurred for payouts. If "Once a month" is selected this fee is waived.',
+			'type'        => 'select',
+			'default'     => 'IMMEDIATE',
+			'options'     => array(
+				'WALLET'    => 'Wallet - Manual Withdrawal',
+				'IMMEDIATE' => 'Bank Account - Immediate',
+				'WEEKLY'    => 'Bank Account - Once a Week',
+				'MONTHLY'   => 'Bank Account - Once a Month',
+			),
+		);
 
-		 $form['marketplace_section_close_box'] = array(
-			 'type' => 'close_box',
-		 );
+		$form['marketplace_section_close_box'] = array(
+			'type' => 'close_box',
+		);
 
-		 $form['transaction_section_title'] = array(
-			 'title'       => __( 'Transaction Settings', 'tradesafe-payment-gateway' ),
-			 'type'        => 'title',
-			 'description' => __( 'Default settings for new transactions', 'tradesafe-payment-gateway' ),
-		 );
+		$form['transaction_section_title'] = array(
+			'title'       => __( 'Transaction Settings', 'tradesafe-payment-gateway' ),
+			'type'        => 'title',
+			'description' => __( 'Default settings for new transactions', 'tradesafe-payment-gateway' ),
+		);
 
-		 $form['industry'] = array(
-			 'title'       => __( 'Industry', 'tradesafe-payment-gateway' ),
-			 'type'        => 'select',
-			 'description' => __( 'Which industry will your transactions be classified as?', 'tradesafe-payment-gateway' ),
-			 'default'     => 'GENERAL_GOODS_SERVICES',
-			 'options'     => $this->client->getEnum( 'Industry' ),
-			 'desc_tip'    => false,
-		 );
+		$form['industry'] = array(
+			'title'       => __( 'Industry', 'tradesafe-payment-gateway' ),
+			'type'        => 'select',
+			'description' => __( 'Which industry will your transactions be classified as?', 'tradesafe-payment-gateway' ),
+			'default'     => 'GENERAL_GOODS_SERVICES',
+			'options'     => $this->client->getEnum( 'Industry' ),
+			'desc_tip'    => false,
+		);
 
-		 if ( ! empty( $settings['processing_fee'] ) && $settings['processing_fee'] !== 'SELLER' ) {
-			 $form['processing_fee'] = array(
-				 'title'       => __( 'Fee Allocation (Legacy Setting)', 'tradesafe-payment-gateway' ),
-				 'type'        => 'select',
-				 'description' => __( 'Who absorbs TradeSafe’s fee?', 'tradesafe-payment-gateway' ),
-				 'default'     => 'SELLER',
-				 'options'     => array(
-					 'BUYER'        => 'Buyer',
-					 'SELLER'       => 'Seller',
-					 'BUYER_SELLER' => 'Buyer / Seller',
-				 ),
-				 'desc_tip'    => false,
-			 );
-		 }
+		if ( ! empty( $settings['processing_fee'] ) && $settings['processing_fee'] !== 'SELLER' ) {
+			$form['processing_fee'] = array(
+				'title'       => __( 'Fee Allocation (Legacy Setting)', 'tradesafe-payment-gateway' ),
+				'type'        => 'select',
+				'description' => __( 'Who absorbs TradeSafe’s fee?', 'tradesafe-payment-gateway' ),
+				'default'     => 'SELLER',
+				'options'     => array(
+					'BUYER'        => 'Buyer',
+					'SELLER'       => 'Seller',
+					'BUYER_SELLER' => 'Buyer / Seller',
+				),
+				'desc_tip'    => false,
+			);
+		}
 
-		 $this->form_fields = $form;
+		$this->form_fields = $form;
 	}
 
 	/**
@@ -567,7 +580,7 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 					</table>
 					<p>
 						<a href="https://developer.tradesafe.co.za/"
-						   class="button-secondary button alt button-large button-next" target="_blank">Register
+							class="button-secondary button alt button-large button-next" target="_blank">Register
 							Application</a>
 					</p>
 				</div>
@@ -707,7 +720,7 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 			<td class="forminp">
 				<fieldset>
 					<a href="https://developer.tradesafe.co.za//applications/<?php esc_attr_e( $data['value'] ); ?>/go-live"
-					   class="button-primary" target="_blank">Request Go-Live</a>
+						class="button-primary" target="_blank">Request Go-Live</a>
 					<p class="description"><?php esc_attr_e( $data['description'] ); ?></p>
 				</fieldset>
 			</td>
@@ -785,7 +798,7 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 	public function process_payment( $order_id ): ?array {
 		global $woocommerce;
 
-		$client = new \TradeSafe\Helpers\TradeSafeApiClient();
+		$client = $this->client;
 		$order  = new WC_Order( $order_id );
 
 		if ( is_null( $client ) || is_array( $client ) ) {
@@ -794,6 +807,8 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 
 		$order->set_payment_method_title( parent::get_title() );
 		$order->save();
+
+		$payment_method = $order->get_payment_method();
 
 		if ( ! $order->meta_exists( 'tradesafe_transaction_id' ) ) {
 			$user = wp_get_current_user();
@@ -818,8 +833,8 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 				$item_list[] = html_entity_decode( esc_attr( $item->get_name() ) . ': ' . strip_tags( wc_price( $order->get_line_subtotal( $item ), array( 'currency' => $order->get_currency() ) ) ) . ' (excl)' );
 			}
 
-			$payout_interval = 'IMMEDIATE';
-			$settings        = get_option( 'woocommerce_tradesafe_settings', array() );
+			$payout_interval = 'WALLET';
+			$settings        = get_option( 'woocommerce_' . $payment_method . '_settings', array() );
 
 			if ( empty( $settings['payout_method'] ) ) {
 				$payout_interval = $settings['payout_method'];
@@ -891,7 +906,7 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 				if ( ! $sub_orders ) {
 					$parties[] = array(
 						'role'          => 'BENEFICIARY_MERCHANT',
-						'token'         => tradesafe_get_token_id( dokan_get_seller_id_by_order( $order->ID ) ),
+						'token'         => tradesafe_get_token_id( dokan_get_seller_id_by_order( $order->get_id() ) ),
 						'fee'           => dokan()->commission->get_earning_by_order( $order ),
 						'feeType'       => 'FLAT',
 						'feeAllocation' => 'SELLER',
@@ -974,6 +989,12 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 				);
 			}
 
+			$workflow = 'STANDARD';
+
+			if ( $payment_method === 'tradesafe-relay' ) {
+				$workflow = 'EXPRESS';
+			}
+
 			$transaction = $client->createTransaction(
 				array(
 					'title'         => 'Order ' . $order->get_id(),
@@ -981,6 +1002,7 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 					'industry'      => tradesafe_industry(),
 					'feeAllocation' => tradesafe_fee_allocation(),
 					'reference'     => $order->get_order_key() . '-' . time(),
+					'workflow'      => $workflow,
 				),
 				$allocations,
 				$parties
@@ -1022,15 +1044,17 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 			return;
 		}
 
-		$settings = get_option( 'woocommerce_tradesafe_settings', array() );
+		$payment_method = $order->get_payment_method();
+
+		$settings = get_option( 'woocommerce_' . $payment_method . '_settings', array() );
 
 		if ( ! isset( $settings['delivery_delay_notification'] )
-			 || 'yes' !== $settings['delivery_delay_notification'] ) {
+			|| 'yes' !== $settings['delivery_delay_notification'] ) {
 			return;
 		}
 
 		try {
-			$client      = new \TradeSafe\Helpers\TradeSafeApiClient();
+			$client      = $this->client;
 			$transaction = $client->getTransaction( $order->get_meta( 'tradesafe_transaction_id', true ) );
 
 			if ( 'IN_TRANSIT' === $transaction['allocations'][0]['state'] ) {
@@ -1070,7 +1094,7 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 	 * @return void
 	 */
 	public function tradesafe_payment_gateway_admin_post_action_deliver( $post_id ) {
-		$client = new \TradeSafe\Helpers\TradeSafeApiClient();
+		$client = $this->client;
 		$order  = new WC_Order( $post_id );
 
 		if ( ! $order->meta_exists( 'tradesafe_transaction_id' ) ) {

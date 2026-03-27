@@ -9,19 +9,20 @@ use GraphQL\RawObject;
 use GraphQL\Variable;
 
 class TradeSafeApiClient {
-
-
-
-	private string $clientId;
-	private string $clientSecret;
+	private $clientId;
+	private $clientSecret;
 	private string $clientRedirectUri;
+
+	protected string $gateway;
 
 	private string $apiDomain;
 	private string $authDomain;
 
 	private string $user_agent;
 
-	public function __construct() {
+	private string $error;
+
+	public function __construct( $gateway = 'tradesafe' ) {
 		// Domains are in a separate file to help with internal development and testing.
 		require __DIR__ . '/../config.php';
 
@@ -29,10 +30,18 @@ class TradeSafeApiClient {
 			require __DIR__ . '/../config.local.php';
 		}
 
-		$settings = get_option( 'woocommerce_tradesafe_settings', array() );
+		$this->gateway = $gateway;
 
-		$this->clientId          = $settings['client_id'];
-		$this->clientSecret      = $settings['client_secret'];
+		if ( 'tradesafe-relay' === $gateway ) {
+			$baseSettings = get_option( 'woocommerce_tradesafe_settings', array() );
+			$settings     = get_option( 'woocommerce_tradesafe-relay_settings', $baseSettings );
+		} else {
+			$baseSettings = get_option( 'woocommerce_tradesafe-relay_settings', array() );
+			$settings     = get_option( 'woocommerce_tradesafe_settings', $baseSettings );
+		}
+
+		$this->clientId          = $settings['client_id'] ?? null;
+		$this->clientSecret      = $settings['client_secret'] ?? null;
 		$this->clientRedirectUri = site_url( '/tradesafe/oauth/callback/' );
 
 		$this->authDomain = $auth_domain;

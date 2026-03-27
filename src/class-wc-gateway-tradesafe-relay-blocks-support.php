@@ -7,14 +7,14 @@
 
 use Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType;
 
-final class WC_Gateway_TradeSafe_Blocks_Support extends AbstractPaymentMethodType {
+final class WC_Gateway_TradeSafe_Relay_Blocks_Support extends AbstractPaymentMethodType {
 
 	/**
 	 * Payment method name/id/slug.
 	 *
 	 * @var string
 	 */
-	protected $name = 'tradesafe';
+	protected $name = 'tradesafe-relay';
 
 	public function initialize() {
 		$this->settings = get_option( 'woocommerce_' . $this->name . '_settings', array() );
@@ -30,7 +30,7 @@ final class WC_Gateway_TradeSafe_Blocks_Support extends AbstractPaymentMethodTyp
 	public function get_payment_method_script_handles() {
 		wp_register_script(
 			$this->name . '-payment-gateway-blocks-integration',
-			plugin_dir_url( __FILE__ ) . '../assets/js/checkout.js',
+			plugin_dir_url( __FILE__ ) . '../assets/js/checkout-relay.js',
 			array(
 				'wc-blocks-registry',
 				'wc-settings',
@@ -45,7 +45,7 @@ final class WC_Gateway_TradeSafe_Blocks_Support extends AbstractPaymentMethodTyp
 		);
 
 		if ( function_exists( 'wp_set_script_translations' ) ) {
-			wp_set_script_translations( $this->name . '-payment-gateway-blocks-integration', 'tradesafe-relay_payment_gateway' );
+			wp_set_script_translations( $this->name . '-payment-gateway-blocks-integration', 'tradesafe_payment_gateway' );
 		}
 
 		return array( $this->name . '-payment-gateway-blocks-integration' );
@@ -57,7 +57,7 @@ final class WC_Gateway_TradeSafe_Blocks_Support extends AbstractPaymentMethodTyp
 			'description' => $this->get_setting( 'description' ),
 			'supports'    => $this->get_supported_features(),
 			'logo_urls'   => array(
-				TRADESAFE_PAYMENT_GATEWAY_BASE_DIR . '/assets/images/icon.svg',
+				TRADESAFE_PAYMENT_GATEWAY_BASE_DIR . '/assets/images/icon-relay.png',
 				TRADESAFE_PAYMENT_GATEWAY_BASE_DIR . '/assets/images/logos.png',
 			),
 		);

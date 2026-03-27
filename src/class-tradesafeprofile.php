@@ -160,11 +160,11 @@ class TradeSafeProfile {
 		$organization = null;
 
 		if ( isset( $_POST['tradesafe_token_bank_account_number'] )
-			 && ! is_null( $_POST['tradesafe_token_bank_account_number'] )
-			 && isset( $_POST['tradesafe_token_bank_account_type'] )
-			 && ! is_null( $_POST['tradesafe_token_bank_account_type'] )
-			 && isset( $_POST['tradesafe_token_bank'] )
-			 && ! is_null( $_POST['tradesafe_token_bank'] ) ) {
+			&& ! is_null( $_POST['tradesafe_token_bank_account_number'] )
+			&& isset( $_POST['tradesafe_token_bank_account_type'] )
+			&& ! is_null( $_POST['tradesafe_token_bank_account_type'] )
+			&& isset( $_POST['tradesafe_token_bank'] )
+			&& ! is_null( $_POST['tradesafe_token_bank'] ) ) {
 			$bank_account = array(
 				'accountNumber' => sanitize_text_field( wp_unslash( $_POST['tradesafe_token_bank_account_number'] ?? null ) ),
 				'accountType'   => sanitize_text_field( wp_unslash( $_POST['tradesafe_token_bank_account_type'] ?? null ) ),
@@ -173,8 +173,8 @@ class TradeSafeProfile {
 		}
 
 		if ( ! empty( $_POST['tradesafe_token_organization_name'] )
-			 && ! empty( $_POST['tradesafe_token_organization_type'] )
-			 && ! empty( $_POST['tradesafe_token_organization_registration_number'] ) ) {
+			&& ! empty( $_POST['tradesafe_token_organization_type'] )
+			&& ! empty( $_POST['tradesafe_token_organization_registration_number'] ) ) {
 			$organization = array(
 				'name'               => sanitize_text_field( wp_unslash( $_POST['tradesafe_token_organization_name'] ) ),
 				'tradeName'          => sanitize_text_field( wp_unslash( $_POST['tradesafe_token_organization_trading_name'] ?? null ) ),
@@ -208,15 +208,15 @@ class TradeSafeProfile {
 	public static function save_account_details_errors( $args ) {
 		// Are any of the organization fields not empty.
 		if ( ! empty( $_POST['tradesafe_token_organization_name'] )
-			 || ! empty( $_POST['tradesafe_token_organization_trading_name'] )
-			 || ! empty( $_POST['tradesafe_token_organization_type'] )
-			 || ! empty( $_POST['tradesafe_token_organization_registration_number'] )
-			 || ! empty( $_POST['tradesafe_token_organization_tax_number'] ) ) {
+			|| ! empty( $_POST['tradesafe_token_organization_trading_name'] )
+			|| ! empty( $_POST['tradesafe_token_organization_type'] )
+			|| ! empty( $_POST['tradesafe_token_organization_registration_number'] )
+			|| ! empty( $_POST['tradesafe_token_organization_tax_number'] ) ) {
 
 			// Check that optional required fields are set before trying to save.
 			if ( empty( $_POST['tradesafe_token_organization_name'] )
-				 || empty( $_POST['tradesafe_token_organization_type'] )
-				 || empty( $_POST['tradesafe_token_organization_registration_number'] ) ) {
+				|| empty( $_POST['tradesafe_token_organization_type'] )
+				|| empty( $_POST['tradesafe_token_organization_registration_number'] ) ) {
 				$args->add( 'error', __( 'Organization details are incomplete:', 'woocommerce' ), '' );
 			}
 
@@ -395,8 +395,8 @@ class TradeSafeProfile {
 						$bank_account = null;
 
 						if ( ! empty( $_POST['tradesafe_token_bank_account_number'] )
-							 && ! empty( $_POST['tradesafe_token_bank_account_type'] )
-							 && ! empty( $_POST['tradesafe_token_bank'] ) ) {
+							&& ! empty( $_POST['tradesafe_token_bank_account_type'] )
+							&& ! empty( $_POST['tradesafe_token_bank'] ) ) {
 							$bank_account = array(
 								'accountNumber' => sanitize_text_field( $_POST['tradesafe_token_bank_account_number'] ?? null ),
 								'accountType'   => sanitize_text_field( $_POST['tradesafe_token_bank_account_type'] ?? null ),
@@ -470,10 +470,8 @@ class TradeSafeProfile {
 			if ( empty( $fields['tradesafe_token_organization_registration_number'] ) ) {
 				$error->add( 'tradesafe_token_organization_registration_number', 'Organization registration number is required.' );
 			}
-		} else {
-			if ( empty( $fields['tradesafe_token_id_number'] ) ) {
+		} elseif ( empty( $fields['tradesafe_token_id_number'] ) ) {
 				$error->add( 'tradesafe_token_id_number', 'ID number is required.' );
-			}
 		}
 
 		if ( empty( $fields['tradesafe_token_bank'] ) ) {

@@ -131,8 +131,8 @@ class TradeSafeDokan {
 				<div class="checkbox">
 					<input name="settings[tradesafe][is_organization]" value="no" type="hidden">
 					<input id="is_organization" name="settings[tradesafe][is_organization]" value="yes"
-						   type="checkbox"
-						   class="switch-input" <?php echo $organization_name !== '' ? 'checked' : ''; ?>>
+							type="checkbox"
+							class="switch-input" <?php echo $organization_name !== '' ? 'checked' : ''; ?>>
 					<label for="is_organization">
 						Is this account for a business?
 					</label>
@@ -145,40 +145,40 @@ class TradeSafeDokan {
 			<div class="dokan-form-group">
 				<div class="dokan-w12">
 					<input name="settings[tradesafe][given_name]" value="<?php echo esc_attr( $given_name ); ?>"
-						   class="dokan-form-control"
-						   placeholder="<?php esc_attr_e( 'First Name', 'tradesafe-payment-gateway' ); ?>" type="text">
+							class="dokan-form-control"
+							placeholder="<?php esc_attr_e( 'First Name', 'tradesafe-payment-gateway' ); ?>" type="text">
 				</div>
 			</div>
 
 			<div class="dokan-form-group">
 				<div class="dokan-w12">
 					<input name="settings[tradesafe][family_name]" value="<?php echo esc_attr( $family_name ); ?>"
-						   class="dokan-form-control"
-						   placeholder="<?php esc_attr_e( 'Last Name', 'tradesafe-payment-gateway' ); ?>" type="text">
+							class="dokan-form-control"
+							placeholder="<?php esc_attr_e( 'Last Name', 'tradesafe-payment-gateway' ); ?>" type="text">
 				</div>
 			</div>
 
 			<div class="dokan-form-group">
 				<div class="dokan-w12">
 					<input name="settings[tradesafe][email]" value="<?php echo esc_attr( $email ); ?>"
-						   class="dokan-form-control"
-						   placeholder="<?php esc_attr_e( 'Email', 'tradesafe-payment-gateway' ); ?>" type="email">
+							class="dokan-form-control"
+							placeholder="<?php esc_attr_e( 'Email', 'tradesafe-payment-gateway' ); ?>" type="email">
 				</div>
 			</div>
 
 			<div class="dokan-form-group">
 				<div class="dokan-w12">
 					<input name="settings[tradesafe][mobile]" value="<?php echo esc_attr( $mobile ); ?>"
-						   class="dokan-form-control"
-						   placeholder="<?php esc_attr_e( 'Mobile', 'tradesafe-payment-gateway' ); ?>" type="tel">
+							class="dokan-form-control"
+							placeholder="<?php esc_attr_e( 'Mobile', 'tradesafe-payment-gateway' ); ?>" type="tel">
 				</div>
 			</div>
 
 			<div class="dokan-form-group toggle-id-number">
 				<div class="dokan-w12">
 					<input name="settings[tradesafe][id_number]" value="<?php echo esc_attr( $id_number ); ?>"
-						   class="dokan-form-control"
-						   placeholder="<?php esc_attr_e( 'ID Number', 'tradesafe-payment-gateway' ); ?>" type="text">
+							class="dokan-form-control"
+							placeholder="<?php esc_attr_e( 'ID Number', 'tradesafe-payment-gateway' ); ?>" type="text">
 				</div>
 			</div>
 		</div>
@@ -188,8 +188,8 @@ class TradeSafeDokan {
 			<div class="dokan-form-group">
 				<div class="dokan-w12">
 					<input name="settings[tradesafe][organization_name]"
-						   value="<?php echo esc_attr( $organization_name ); ?>" class="dokan-form-control"
-						   placeholder="<?php esc_attr_e( 'Name', 'tradesafe-payment-gateway' ); ?>" type="text">
+							value="<?php echo esc_attr( $organization_name ); ?>" class="dokan-form-control"
+							placeholder="<?php esc_attr_e( 'Name', 'tradesafe-payment-gateway' ); ?>" type="text">
 				</div>
 			</div>
 
@@ -213,17 +213,17 @@ class TradeSafeDokan {
 			<div class="dokan-form-group">
 				<div class="dokan-w12">
 					<input name="settings[tradesafe][organization_trade_name]"
-						   value="<?php echo esc_attr( $organization_trade_name ); ?>" class="dokan-form-control"
-						   placeholder="<?php esc_attr_e( 'Trade Name', 'tradesafe-payment-gateway' ); ?>" type="text">
+							value="<?php echo esc_attr( $organization_trade_name ); ?>" class="dokan-form-control"
+							placeholder="<?php esc_attr_e( 'Trade Name', 'tradesafe-payment-gateway' ); ?>" type="text">
 				</div>
 			</div>
 
 			<div class="dokan-form-group">
 				<div class="dokan-w12">
 					<input name="settings[tradesafe][organization_registration]"
-						   value="<?php echo esc_attr( $organization_registration ); ?>" class="dokan-form-control"
-						   placeholder="<?php esc_attr_e( 'Registration Number', 'tradesafe-payment-gateway' ); ?>"
-						   type="text">
+							value="<?php echo esc_attr( $organization_registration ); ?>" class="dokan-form-control"
+							placeholder="<?php esc_attr_e( 'Registration Number', 'tradesafe-payment-gateway' ); ?>"
+							type="text">
 					<p class="description">If registering as a sole prop you must enter your ID number in place of a
 						business registration number.</p>
 				</div>
@@ -232,8 +232,8 @@ class TradeSafeDokan {
 			<div class="dokan-form-group">
 				<div class="dokan-w12">
 					<input name="settings[tradesafe][organization_tax_number]"
-						   value="<?php echo esc_attr( $organization_tax_number ); ?>" class="dokan-form-control"
-						   placeholder="<?php esc_attr_e( 'Vat Number', 'tradesafe-payment-gateway' ); ?>" type="text">
+							value="<?php echo esc_attr( $organization_tax_number ); ?>" class="dokan-form-control"
+							placeholder="<?php esc_attr_e( 'Vat Number', 'tradesafe-payment-gateway' ); ?>" type="text">
 				</div>
 			</div>
 		</div>
@@ -244,7 +244,7 @@ class TradeSafeDokan {
 					<div class="checkbox">
 						<input name="settings[tradesafe][update_banking_details]" value="no" type="hidden">
 						<input id="change_details" name="settings[tradesafe][update_banking_details]" value="yes"
-							   type="checkbox">
+								type="checkbox">
 						<label for="change_details">
 							I would like to change my banking details
 						</label>
@@ -279,8 +279,8 @@ class TradeSafeDokan {
 			<div class="dokan-form-group">
 				<div class="dokan-w12">
 					<input name="settings[tradesafe][account_number]" value="" class="dokan-form-control"
-						   placeholder="<?php esc_attr_e( 'Your bank account number', 'tradesafe-payment-gateway' ); ?>"
-						   type="text">
+							placeholder="<?php esc_attr_e( 'Your bank account number', 'tradesafe-payment-gateway' ); ?>"
+							type="text">
 				</div>
 			</div>
 
@@ -388,17 +388,17 @@ class TradeSafeDokan {
 
 					// Banking Details
 					if ( ! empty( $post_data['settings']['tradesafe']['account_number'] )
-						 && ! is_numeric( $post_data['settings']['tradesafe']['account_number'] ) ) {
+						&& ! is_numeric( $post_data['settings']['tradesafe']['account_number'] ) ) {
 						wp_send_json_error( 'Invalid Account Number' );
 					}
 
 					if ( ! empty( $post_data['settings']['tradesafe']['account_number'] )
-						 && empty( $post_data['settings']['tradesafe']['bank_name'] ) ) {
+						&& empty( $post_data['settings']['tradesafe']['bank_name'] ) ) {
 						wp_send_json_error( 'Invalid Bank' );
 					}
 
 					if ( ! empty( $post_data['settings']['tradesafe']['account_number'] )
-						 && empty( $post_data['settings']['tradesafe']['account_type'] ) ) {
+						&& empty( $post_data['settings']['tradesafe']['account_type'] ) ) {
 						wp_send_json_error( 'Invalid Account Type' );
 					}
 
@@ -512,17 +512,17 @@ class TradeSafeDokan {
 
 				// Banking Details
 				if ( ! empty( $post_data['settings']['tradesafe']['account_number'] )
-					 && ! is_numeric( $post_data['settings']['tradesafe']['account_number'] ) ) {
+					&& ! is_numeric( $post_data['settings']['tradesafe']['account_number'] ) ) {
 					throw new Exception( 'Invalid Account Number' );
 				}
 
 				if ( ! empty( $post_data['settings']['tradesafe']['account_number'] )
-					 && empty( $post_data['settings']['tradesafe']['bank_name'] ) ) {
+					&& empty( $post_data['settings']['tradesafe']['bank_name'] ) ) {
 					throw new Exception( 'Invalid Bank' );
 				}
 
 				if ( ! empty( $post_data['settings']['tradesafe']['account_number'] )
-					 && empty( $post_data['settings']['tradesafe']['account_type'] ) ) {
+					&& empty( $post_data['settings']['tradesafe']['account_type'] ) ) {
 					throw new Exception( 'Invalid Account Type' );
 				}
 
@@ -608,7 +608,7 @@ class TradeSafeDokan {
 		$token_id   = tradesafe_get_token_id( $vendor_id );
 		$token_data = $client->getToken( $token_id );
 
-		if ( !empty($token_data['balance']) && $token_data['balance'] > 0 ) {
+		if ( ! empty( $token_data['balance'] ) && $token_data['balance'] > 0 ) {
 			array_push( $active_payment_methods, 'tradesafe' );
 		}
 
