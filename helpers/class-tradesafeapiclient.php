@@ -29,7 +29,13 @@ class TradeSafeApiClient {
 			require __DIR__ . '/../config.local.php';
 		}
 
-		$settings = get_option( 'woocommerce_tradesafe_settings', array() );
+		if (class_exists( 'WC_Gateway_TradeSafe' )) {
+			$settings = get_option( 'woocommerce_tradesafe_settings', array() );
+		}
+
+		if (class_exists( 'WC_Gateway_TradeSafe_Relay' )) {
+			$settings = get_option( 'woocommerce_tradesafe-relay_settings', array() );
+		}
 
 		$this->clientId          = $settings['client_id'];
 		$this->clientSecret      = $settings['client_secret'];

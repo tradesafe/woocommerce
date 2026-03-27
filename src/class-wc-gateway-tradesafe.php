@@ -110,7 +110,7 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 			return false;
 		}
 
-		$settings = get_option( 'woocommerce_tradesafe_settings', array() );
+        $settings = get_option( 'woocommerce_' . $this->id . '_settings', array() );
 
 		if ( ! isset( $settings['client_id'] )
 			|| '' === $settings['client_id']
@@ -151,7 +151,7 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 			&& isset( $_GET['section'] )
 			&& $_GET['page'] === 'wc-settings'
 			&& $_GET['tab'] === 'checkout'
-			&& $_GET['section'] === 'tradesafe' ) {
+			&& $_GET['section'] === $this->id ) {
 			return;
 		}
 
@@ -159,7 +159,7 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 			array(
 				'page'    => 'wc-settings',
 				'tab'     => 'checkout',
-				'section' => 'tradesafe',
+				'section' => $this->id,
 			),
 			admin_url( 'admin.php' )
 		);
@@ -190,7 +190,7 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 	 * Define Gateway settings fields.
 	 */
 	public function init_form_fields() {
-		$settings       = get_option( 'woocommerce_tradesafe_settings', array() );
+		$settings       = get_option( 'woocommerce_' . $this->id . '_settings', array() );
 		$view_order_url = wc_get_endpoint_url( 'view-order', 1234, get_permalink( get_option( 'woocommerce_myaccount_page_id' ) ) );
 
 		if ( ! empty( $settings['success_redirect'] ) ) {
@@ -795,6 +795,8 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 		$order->set_payment_method_title( parent::get_title() );
 		$order->save();
 
+        $payment_method = $order->get_payment_method();
+
 		if ( ! $order->meta_exists( 'tradesafe_transaction_id' ) ) {
 			$user = wp_get_current_user();
 
@@ -819,7 +821,7 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 			}
 
 			$payout_interval = 'IMMEDIATE';
-			$settings        = get_option( 'woocommerce_tradesafe_settings', array() );
+            $settings        = get_option( 'woocommerce_' . $payment_method . '_settings', array() );
 
 			if ( empty( $settings['payout_method'] ) ) {
 				$payout_interval = $settings['payout_method'];
@@ -891,7 +893,7 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 				if ( ! $sub_orders ) {
 					$parties[] = array(
 						'role'          => 'BENEFICIARY_MERCHANT',
-						'token'         => tradesafe_get_token_id( dokan_get_seller_id_by_order( $order->ID ) ),
+						'token'         => tradesafe_get_token_id( dokan_get_seller_id_by_order( $order->get_id() ) ),
 						'fee'           => dokan()->commission->get_earning_by_order( $order ),
 						'feeType'       => 'FLAT',
 						'feeAllocation' => 'SELLER',
@@ -974,6 +976,12 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 				);
 			}
 
+            $workflow = 'STANDARD';
+
+            if ( $payment_method === 'tradesafe-relay' ) {
+                $workflow = 'EXPRESS';
+            }
+
 			$transaction = $client->createTransaction(
 				array(
 					'title'         => 'Order ' . $order->get_id(),
@@ -981,6 +989,7 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 					'industry'      => tradesafe_industry(),
 					'feeAllocation' => tradesafe_fee_allocation(),
 					'reference'     => $order->get_order_key() . '-' . time(),
+                    'workflow'      => $workflow,
 				),
 				$allocations,
 				$parties
@@ -1022,7 +1031,9 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 			return;
 		}
 
-		$settings = get_option( 'woocommerce_tradesafe_settings', array() );
+        $payment_method = $order->get_payment_method();
+
+        $settings = get_option( 'woocommerce_' . $payment_method . '_settings', array() );
 
 		if ( ! isset( $settings['delivery_delay_notification'] )
 			 || 'yes' !== $settings['delivery_delay_notification'] ) {
