@@ -4,7 +4,7 @@ Tags: woocommerce, dokan, payment gateway, escrow, credit card
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 8.0
-Stable tag: 3.0.0
+Stable tag: 3.0.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -108,9 +108,15 @@ Please do not hesitate to email [support@tradesafe.co.za](mailto:support@tradesa
 
 == Changelog ==
 
-= 3.0.0 2026-03-27 =
+= 3.0.1 2026-04-24 =
 
-## [3.0.0](https://github.com/tradesafe/woocommerce/compare/v2.22.2...v3.0.0) (2026-03-27)
+## [3.0.1](https://github.com/tradesafe/woocommerce/compare/v3.0.0...v3.0.1) (2026-04-24)
+
+### Bug Fixes
+
+* Removed deplricated calls to user and order data ([251e4b](https://github.com/tradesafe/woocommerce/commit/251e4b78b2d0c5e2c5499582aa944c9f9765c6a5))
+
+= 3.0.0 2026-03-27 =
 
 ### Features
 

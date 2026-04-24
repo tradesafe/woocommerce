@@ -4,6 +4,15 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## [3.0.1](https://github.com/tradesafe/woocommerce/compare/v3.0.0...v3.0.1) (2026-04-24)
+
+### Bug Fixes
+
+* Removed deplricated calls to user and order data ([251e4b](https://github.com/tradesafe/woocommerce/commit/251e4b78b2d0c5e2c5499582aa944c9f9765c6a5))
+
+
+---
+
 ## [3.0.0](https://github.com/tradesafe/woocommerce/compare/v2.22.2...v3.0.0) (2026-03-27)
 
 ### Features
