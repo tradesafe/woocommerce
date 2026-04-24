@@ -252,10 +252,10 @@ class TradeSafeProfile {
 
 		if ( '' === $customer->get_meta( tradesafe_token_meta_key(), true ) ) {
 			$user_info = array(
-				'givenName'  => $customer->first_name,
-				'familyName' => $customer->last_name,
-				'email'      => $customer->billing['email'],
-				'mobile'     => $customer->billing['phone'],
+				'givenName'  => $customer->get_billing_first_name(),
+				'familyName' => $customer->get_billing_last_name(),
+				'email'      => $customer->get_billing_email(),
+				'mobile'     => $customer->get_billing_phone(),
 			);
 
 			$payout_interval = 'IMMEDIATE';

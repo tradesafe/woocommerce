@@ -45,7 +45,7 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 	public function __construct() {
 		$this->id                 = 'tradesafe';
 		$this->method_title       = __( 'TradeSafe', 'tradesafe-payment-gateway' );
-		$this->method_description = __( 'Your payment is securely held until you receive your order.', 'tradesafe-payment-gateway' );
+		$this->method_description = __( 'Your payment is securely held by TradeSafe until you receive your order.', 'tradesafe-payment-gateway' );
 		$this->icon               = TRADESAFE_PAYMENT_GATEWAY_BASE_DIR . '/assets/images/icon.svg';
 
 		$this->client = new \TradeSafe\Helpers\TradeSafeApiClient( $this->id );
@@ -858,10 +858,10 @@ class WC_Gateway_TradeSafe extends WC_Payment_Gateway {
 
 			if ( $user->ID === 0 ) {
 				$userDetails = array(
-					'givenName'  => $order->data['billing']['first_name'],
-					'familyName' => $order->data['billing']['last_name'],
-					'email'      => $order->data['billing']['email'],
-					'mobile'     => $order->data['billing']['phone'],
+					'givenName'  => $order->get_billing_first_name(),
+					'familyName' => $order->get_billing_last_name(),
+					'email'      => $order->get_billing_email(),
+					'mobile'     => $order->get_billing_phone(),
 				);
 
 				$token_data = $client->createToken(
