@@ -43,6 +43,7 @@
         "dependencies"
       ],
       "automerge": false,
+      "commitMessageAction": "update",
       "description": "Require manual review for minor updates to mitigate supply chain risk",
       "groupName": "{{manager}} (minor)",
       "matchManagers": [
@@ -56,6 +57,7 @@
       "addLabels": [
         "dependencies"
       ],
+      "commitMessageAction": "update",
       "description": "Group patches together with standard update title",
       "groupName": "{{manager}} (patch)",
       "matchManagers": [
@@ -85,6 +87,7 @@
       "security"
     ],
     "assigneesFromCodeOwners": true,
+    "commitMessageAction": "fix vulnerability in",
     "commitMessagePrefix": "security(deps):",
     "commitMessageSuffix": ""
   }
