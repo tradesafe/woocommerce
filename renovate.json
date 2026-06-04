@@ -1,30 +1,91 @@
 {
-    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-    "extends": [
-        "config:recommended",
-        ":disableDependencyDashboard"
-    ],
-    "labels": [
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "assigneesFromCodeOwners": true,
+  "branchNameStrict": true,
+  "commitMessageExtra": "",
+  "extends": [
+    "config:best-practices",
+    ":semanticCommits",
+    ":semanticCommitTypeAll(chore)",
+    ":pinDependencies",
+    ":ignoreModulesAndTests"
+  ],
+  "internalChecksFilter": "strict",
+  "minimumReleaseAge": "3 days",
+  "osvVulnerabilityAlerts": true,
+  "packageRules": [
+    {
+      "automerge": true,
+      "description": "Safe to automerge for non-breaking, minimum-risk patches",
+      "matchUpdateTypes": [
+        "patch",
+        "pin",
+        "digest"
+      ]
+    },
+    {
+      "addLabels": [
         "dependencies"
+      ],
+      "automerge": false,
+      "commitMessageAction": "Upgrade",
+      "description": "Require manual review for major upgrades",
+      "groupName": "{{manager}}",
+      "matchManagers": [
+        "composer"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ]
+    },
+    {
+      "addLabels": [
+        "dependencies"
+      ],
+      "automerge": false,
+      "description": "Require manual review for minor updates to mitigate supply chain risk",
+      "groupName": "{{manager}} (minor)",
+      "matchManagers": [
+        "composer"
+      ],
+      "matchUpdateTypes": [
+        "minor"
+      ]
+    },
+    {
+      "addLabels": [
+        "dependencies"
+      ],
+      "description": "Group patches together with standard update title",
+      "groupName": "{{manager}} (patch)",
+      "matchManagers": [
+        "composer"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "pin",
+        "digest"
+      ]
+    },
+    {
+      "description": "Prevent silent manipulation of pinned action digests inside the same version",
+      "enabled": false,
+      "matchFileNames": [
+        ".github/workflows/**"
+      ],
+      "matchUpdateTypes": [
+        "pinDigest"
+      ]
+    }
+  ],
+  "prCreation": "not-pending",
+  "rebaseWhen": "behind-base-branch",
+  "vulnerabilityAlerts": {
+    "addLabels": [
+      "security"
     ],
-    "schedule": [
-        "* 0-4,16-20 * * *"
-    ],
-    "packageRules": [
-        {
-            "matchUpdateTypes": [
-                "minor",
-                "patch",
-                "pin",
-                "digest"
-            ],
-        },
-        {
-            "matchManagers": [
-                "composer",
-                "github-actions"
-            ],
-            "groupName": "{{manager}}"
-        }
-    ]
+    "assigneesFromCodeOwners": true,
+    "commitMessagePrefix": "security(deps):",
+    "commitMessageSuffix": ""
+  }
 }
