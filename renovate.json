@@ -28,7 +28,7 @@
         "dependencies"
       ],
       "automerge": false,
-      "commitMessageAction": "Upgrade",
+      "commitMessageAction": "upgrade",
       "description": "Require manual review for major upgrades",
       "groupName": "{{manager}}",
       "matchManagers": [
