@@ -43,7 +43,7 @@ jobs:
         run: composer install --prefer-dist --no-dev
 
       - name: Convert CHANGELOG.md to changelog.txt
-        uses: docker://pandoc/core:3.10@sha256:8d7467e8ee40b0365a344c3d41067d6d2349da52e9961e4229f331094806fb14
+        uses: docker://pandoc/core:3.14@sha256:f6c6e92d8b150cc1e106e0fbdf2697dea179c737c99c8dbf36caa907b7ba7e73
         with:
           args: "-f markdown -t plain CHANGELOG.md -o changelog.txt"
 
